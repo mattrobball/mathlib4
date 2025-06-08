@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Mario Carneiro
 -/
 import Mathlib.Algebra.Group.Torsion
-import Mathlib.Algebra.Notation.Pi.Defs
+import Mathlib.Algebra.Notation.Pi.Basic
 import Mathlib.Data.FunLike.Basic
 import Mathlib.Logic.Function.Iterate
 import Mathlib.Logic.Equiv.Defs
