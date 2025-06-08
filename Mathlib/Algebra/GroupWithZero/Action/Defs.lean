@@ -6,6 +6,7 @@ Authors: Chris Hughes, Yury Kudryashov
 import Mathlib.Algebra.Group.Action.Opposite
 import Mathlib.Algebra.GroupWithZero.Hom
 import Mathlib.Algebra.GroupWithZero.Opposite
+import Mathlib.Algebra.Notation.Pi.Basic
 
 /-!
 # Definitions of group actions
