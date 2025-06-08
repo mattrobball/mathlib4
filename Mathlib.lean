@@ -739,7 +739,8 @@ import Mathlib.Algebra.Notation.Defs
 import Mathlib.Algebra.Notation.FiniteSupport
 import Mathlib.Algebra.Notation.Indicator
 import Mathlib.Algebra.Notation.Lemmas
-import Mathlib.Algebra.Notation.Pi
+import Mathlib.Algebra.Notation.Pi.Defs.Basic
+import Mathlib.Algebra.Notation.Pi.Defs
 import Mathlib.Algebra.Notation.Prod
 import Mathlib.Algebra.Notation.Support
 import Mathlib.Algebra.Opposites

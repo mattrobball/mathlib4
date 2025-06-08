@@ -8,7 +8,7 @@ import Mathlib.Algebra.Group.Hom.Basic
 import Mathlib.Algebra.Group.Opposite
 import Mathlib.Algebra.Group.Torsion
 import Mathlib.Algebra.Group.Units.Hom
-import Mathlib.Algebra.Notation.Pi
+import Mathlib.Algebra.Notation.Pi.Defs
 import Mathlib.Algebra.Notation.Prod
 import Mathlib.Logic.Equiv.Prod
 import Mathlib.Tactic.TermCongr
