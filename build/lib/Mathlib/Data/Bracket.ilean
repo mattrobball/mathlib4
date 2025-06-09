@@ -1,0 +1,1 @@
+{"version":1,"references":{"c:Bracket.mk":{"usages":[],"definition":[36,6,36,13]},"c:Bracket.bracket":{"usages":[[42,44,42,59]],"definition":[39,2,39,9]},"c:Bracket":{"usages":[[40,19,40,26]],"definition":[36,6,36,13]}},"module":"Mathlib.Data.Bracket"}

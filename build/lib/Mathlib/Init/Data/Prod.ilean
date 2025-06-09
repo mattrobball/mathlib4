@@ -1,0 +1,1 @@
+{"version":1,"references":{"c:rfl":{"usages":[[14,14,14,17]],"definition":null},"c:Prod.snd":{"usages":[[13,45,13,46]],"definition":null},"c:Prod.mk.eta":{"usages":[],"definition":[13,8,13,19]},"c:Prod.fst":{"usages":[[13,40,13,41]],"definition":null},"c:Prod":{"usages":[[10,19,10,23]],"definition":null}},"module":"Mathlib.Init.Data.Prod"}

@@ -1,0 +1,1 @@
+{"version":1,"references":{"c:Lean.Parser.Category.term":{"usages":[[27,20,27,24]],"definition":null},"c:Lean.Parser.Category.tactic":{"usages":[[27,29,27,35]],"definition":null}},"module":"Mathlib.Tactic.Existsi"}

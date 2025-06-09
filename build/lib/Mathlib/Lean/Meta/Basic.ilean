@@ -1,0 +1,1 @@
+{"version":1,"references":{"c:Lean.setMCtx":{"usages":[[18,16,18,23]],"definition":null},"c:Lean.MonadMCtx.getMCtx":{"usages":[[17,13,17,20]],"definition":null},"c:Lean.Meta.preservingMCtx":{"usages":[],"definition":[16,4,16,28]},"c:Lean.Meta.MetaM":{"usages":[[16,34,16,39],[16,45,16,50]],"definition":null}},"module":"Mathlib.Lean.Meta.Basic"}

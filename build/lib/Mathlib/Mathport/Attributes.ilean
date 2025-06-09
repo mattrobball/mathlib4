@@ -1,0 +1,1 @@
+{"version":1,"references":{"c:Lean.registerTagAttribute":{"usages":[[9,38,9,58],[12,2,12,22]],"definition":null},"c:Lean.TagAttribute":{"usages":[[9,23,9,35],[11,28,11,40]],"definition":null},"c:Lean.Attr.substAttr":{"usages":[],"definition":[9,11,9,20]},"c:Lean.Attr.hintTacticAttr":{"usages":[],"definition":[11,11,11,25]}},"module":"Mathlib.Mathport.Attributes"}
