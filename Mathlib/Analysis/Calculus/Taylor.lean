@@ -387,6 +387,7 @@ theorem taylorWithinEval_eq {f : Real → Real} {x₀ : Real} {d : Nat}
     taylorWithinEval f d s x₀ = taylorWithinEval f d Set.univ x₀ := by
   ext x
   rw [taylorWithinEval, taylorWithinEval, taylorWithin_eq hx hs hf]
+#check iteratedDerivWithin_comp_const_smul
 
 /-- **Taylor's theorem** with the Lagrange form of the remainder for `x < x₀`.
 
@@ -396,25 +397,32 @@ that $$f(x) - (P_n f)(x₀, x) = \frac{f^{(n+1)}(x') (x - x₀)^{n+1}}{(n+1)!},$
 where $P_n f$ denotes the Taylor polynomial of degree $n$ and $f^{(n+1)}$ is the $n+1$-th iterated
 derivative. -/
 theorem taylor_mean_remainder_lagrange' {f : ℝ → ℝ} {x x₀ : ℝ} {n : ℕ} (hx : x < x₀)
-    (hf : ContDiff ℝ (n + 1) f) :
+    (hf : ContDiffOn ℝ n f (Icc x x₀))
+    (hf' : DifferentiableOn ℝ (iteratedDerivWithin n f (Icc x x₀)) (Ioo x x₀)) :
     ∃ x' ∈ Ioo x x₀, f x - taylorWithinEval f n (Icc x x₀) x₀ x =
       iteratedDerivWithin (n + 1) f (Icc x x₀) x' * (x - x₀) ^ (n + 1) / (n + 1)! := by
-  have H1 : ContDiff ℝ (n + 1) fun p => f (-p) :=
-    (show (f ∘ (fun x => -x)) = (fun p => f (-p)) by rfl) ▸ ContDiff.comp hf contDiff_neg
+  have H1 : ContDiffOn ℝ n (fun p => f (-p)) (Icc (-x₀) (-x)) :=
+    (show (f ∘ (fun x => -x)) = (fun p => f (-p)) by rfl)
+      ▸ ContDiffOn.comp hf (by sorry) (by intros y hy
+                                          rw [Set.mem_Icc] at hy ⊢
+                                          constructor
+                                          <;> simp [neg_le, le_neg, hy])
   have H2 : DifferentiableOn ℝ (iteratedDerivWithin n (fun x => f (-x)) (Icc (-x₀) (-x)))
                                 (Ioo (-x₀) (-x)) := by
+
     apply DifferentiableOn.mono _ Set.Ioo_subset_Icc_self
+    rw [show (fun p => f (-p)) = (fun p => f (-1 * p)) by simp]
+    rw [differentiableOn_congr (by intros z hz; rw[iteratedDerivWithin_comp_const_smul hz sorry sorry _ sorry])]
+    apply ContDiffOn.continuousOn_iteratedDerivWithin (n := n) H1 (by sorry) (by sorry)
     apply ContDiffOn.differentiableOn_iteratedDerivWithin (n := n + 1) _ (by norm_cast; simp)
                                                           (uniqueDiffOn_Icc (neg_lt_neg hx))
     apply ContDiff.contDiffOn H1
   have ⟨x' , hx', H⟩:= taylor_mean_remainder_lagrange
-                        (f := fun x => f (-x)) (n := n) (neg_lt_neg hx)
-                        (ContDiff.contDiffOn (ContDiff.of_le H1 (by norm_cast; simp))) H2
+                        (f := fun x => f (-x)) (n := n) (neg_lt_neg hx) H1 H2
   have hx'' : -x' ∈ Ioo x x₀ := by
     simp at *; apply And.intro <;> apply neg_lt_neg_iff.mp <;> simp [hx']
   use -x'; use hx''
-  rw [neg_neg, taylorWithinEval_eq _ (by simp [le_of_lt hx])
-                (uniqueDiffOn_Icc (by simp [hx])) H1] at H
+  rw [neg_neg, taylorWithinEval_eq _ (by simp [le_of_lt hx]) (by sorry)] at H
   rw [taylorWithinEval_neg, ←taylorWithinEval_eq (Icc x x₀)
                                 (by simp [le_of_lt hx]) (uniqueDiffOn_Icc hx) (by simp [hf])] at H
   simp only [neg_neg, sub_neg_eq_add] at H
