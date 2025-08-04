@@ -22,7 +22,8 @@ open Filter Function Metric Bornology ENNReal NNReal Uniformity Pointwise Topolo
 
 section SeminormedGroup
 
-variable [SeminormedGroup E] [SeminormedGroup F] [SeminormedGroup G] {s : Set E} {a : E}
+variable [Group E] [SeminormedGroup E] [Group F] [SeminormedGroup F] [Group G] [SeminormedGroup G]
+variable {s : Set E} {a : E}
 
 @[to_additive]
 theorem tendsto_iff_norm_div_tendsto_zero {f : α → E} {a : Filter α} {b : E} :
@@ -92,23 +93,24 @@ end SeminormedGroup
 section Instances
 
 @[to_additive]
-instance SeminormedGroup.toContinuousENorm [SeminormedGroup E] : ContinuousENorm E where
+instance SeminormedGroup.toContinuousENorm [Group E] [SeminormedGroup E] : ContinuousENorm E where
   continuous_enorm := ENNReal.isOpenEmbedding_coe.continuous.comp continuous_nnnorm'
 
 @[to_additive]
-instance NormedGroup.toENormedMonoid {F : Type*} [NormedGroup F] : ENormedMonoid F where
+instance NormedGroup.toENormedMonoid {F : Type*} [Group F] [NormedGroup F] : ENormedMonoid F where
   enorm_eq_zero := by simp [enorm_eq_nnnorm]
   enorm_mul_le := by simp [enorm_eq_nnnorm, ← coe_add, nnnorm_mul_le']
 
 @[to_additive]
-instance NormedCommGroup.toENormedCommMonoid [NormedCommGroup E] : ENormedCommMonoid E where
-  mul_comm := by simp [mul_comm]
+instance NormedCommGroup.toENormedCommMonoid [CommGroup E] [NormedCommGroup E] :
+    ENormedCommMonoid E where
 
 end Instances
 
 section SeminormedGroup
 
-variable [SeminormedGroup E] [SeminormedGroup F] [SeminormedGroup G] {s : Set E} {a : E}
+variable [Group E] [SeminormedGroup E] [Group F] [SeminormedGroup F] [Group G] [SeminormedGroup G]
+variable {s : Set E} {a : E}
 
 set_option linter.docPrime false in
 @[to_additive Inseparable.norm_eq_norm]
@@ -175,7 +177,8 @@ end ContinuousENorm
 
 section SeminormedGroup
 
-variable [SeminormedGroup E] [SeminormedGroup F] [SeminormedGroup G] {s : Set E} {a : E}
+variable [Group E] [SeminormedGroup E] [Group F] [SeminormedGroup F] [Group G] [SeminormedGroup G]
+variable {s : Set E} {a : E}
 
 section
 
@@ -256,7 +259,8 @@ end SeminormedGroup
 
 section SeminormedCommGroup
 
-variable [SeminormedCommGroup E] [SeminormedCommGroup F] {a b : E} {r : ℝ}
+variable [CommGroup E] [SeminormedCommGroup E] [CommGroup F] [SeminormedCommGroup F]
+variable {a b : E} {r : ℝ}
 
 open Finset
 
@@ -292,7 +296,7 @@ theorem controlled_prod_of_mem_closure {s : Subgroup E} (hg : a ∈ closure (s :
     apply hφ
 
 @[to_additive]
-theorem controlled_prod_of_mem_closure_range {j : E →* F} {b : F}
+theorem controlled_prod_of_mem_closure_range {E : Type*} [CommGroup E] {j : E →* F} {b : F}
     (hb : b ∈ closure (j.range : Set F)) {f : ℕ → ℝ} (b_pos : ∀ n, 0 < f n) :
     ∃ a : ℕ → E,
       Tendsto (fun n => ∏ i ∈ range (n + 1), j (a i)) atTop (𝓝 b) ∧
@@ -307,7 +311,7 @@ end SeminormedCommGroup
 
 section NormedGroup
 
-variable [NormedGroup E] {a b : E}
+variable [Group E] [NormedGroup E] {a b : E}
 
 /-- See `tendsto_norm_one` for a version with full neighborhoods. -/
 @[to_additive "See `tendsto_norm_zero` for a version with full neighborhoods."]

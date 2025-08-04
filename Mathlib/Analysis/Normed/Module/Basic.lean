@@ -37,14 +37,15 @@ equality `‖c • x‖ = ‖c‖ ‖x‖`. We require only `‖c • x‖ ≤ �
 Note that since this requires `SeminormedAddCommGroup` and not `NormedAddCommGroup`, this
 typeclass can be used for "semi normed spaces" too, just as `Module` can be used for
 "semi modules". -/
-class NormedSpace (𝕜 : Type*) (E : Type*) [NormedField 𝕜] [SeminormedAddCommGroup E]
-    extends Module 𝕜 E where
+class NormedSpace (𝕜 : Type*) (E : Type*) [NormedField 𝕜] [AddCommGroup E]
+    [SeminormedAddCommGroup E] [Module 𝕜 E] where
   protected norm_smul_le : ∀ (a : 𝕜) (b : E), ‖a • b‖ ≤ ‖a‖ * ‖b‖
 
 attribute [inherit_doc NormedSpace] NormedSpace.norm_smul_le
 
-variable [NormedField 𝕜] [SeminormedAddCommGroup E] [SeminormedAddCommGroup F]
-variable [NormedSpace 𝕜 E] [NormedSpace 𝕜 F]
+variable [NormedField 𝕜] [AddCommGroup E] [SeminormedAddCommGroup E] [AddCommGroup F]
+    [SeminormedAddCommGroup F]
+variable [Module 𝕜 E] [NormedSpace 𝕜 E] [Module 𝕜 F] [NormedSpace 𝕜 F]
 
 -- see Note [lower instance priority]
 instance (priority := 100) NormedSpace.toNormSMulClass [NormedSpace 𝕜 E] : NormSMulClass 𝕜 E :=
@@ -63,11 +64,11 @@ variable (𝕜) in
 theorem norm_zsmul (n : ℤ) (x : E) : ‖n • x‖ = ‖(n : 𝕜)‖ * ‖x‖ := by
   rw [← norm_smul, ← Int.smul_one_eq_cast, smul_assoc, one_smul]
 
-theorem norm_intCast_eq_abs_mul_norm_one (α) [SeminormedRing α] [NormSMulClass ℤ α] (n : ℤ) :
-    ‖(n : α)‖ = |n| * ‖(1 : α)‖ := by
+theorem norm_intCast_eq_abs_mul_norm_one (α) [Ring α] [SeminormedRing α] [NormSMulClass ℤ α]
+    (n : ℤ) : ‖(n : α)‖ = |n| * ‖(1 : α)‖ := by
   rw [← zsmul_one, norm_smul, Int.norm_eq_abs, Int.cast_abs]
 
-theorem norm_natCast_eq_mul_norm_one (α) [SeminormedRing α] [NormSMulClass ℤ α] (n : ℕ) :
+theorem norm_natCast_eq_mul_norm_one (α) [Ring α] [SeminormedRing α] [NormSMulClass ℤ α] (n : ℕ) :
     ‖(n : α)‖ = n * ‖(1 : α)‖ := by
   simpa using norm_intCast_eq_abs_mul_norm_one α n
 
@@ -89,7 +90,7 @@ theorem Filter.IsBoundedUnder.smul_tendsto_zero {f : α → 𝕜} {g : α → E}
     (norm_smul_le y x).trans_eq (mul_comm _ _)
 
 instance NormedSpace.discreteTopology_zmultiples
-    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℚ E] (e : E) :
+    {E : Type*} [AddCommGroup E] [NormedAddCommGroup E] [Module ℚ E] [NormedSpace ℚ E] (e : E) :
     DiscreteTopology <| AddSubgroup.zmultiples e := by
   rcases eq_or_ne e 0 with (rfl | he)
   · rw [AddSubgroup.zmultiples_zero_eq_bot]
@@ -107,19 +108,19 @@ open NormedField
 
 instance ULift.normedSpace : NormedSpace 𝕜 (ULift E) :=
   { __ := ULift.seminormedAddCommGroup (E := E),
-    __ := ULift.module'
-    norm_smul_le := fun s x => (norm_smul_le s x.down :) }
+    norm_smul_le := fun s x => norm_smul_le s x.down }
 
 /-- The product of two normed spaces is a normed space, with the sup norm. -/
 instance Prod.normedSpace : NormedSpace 𝕜 (E × F) :=
-  { Prod.seminormedAddCommGroup (E := E) (F := F), Prod.instModule with
+  { Prod.seminormedAddCommGroup (E := E) (F := F) with
     norm_smul_le := fun s x => by
       simp only [norm_smul, Prod.norm_def,
         mul_max_of_nonneg, norm_nonneg, le_rfl] }
 
 /-- The product of finitely many normed spaces is a normed space, with the sup norm. -/
-instance Pi.normedSpace {ι : Type*} {E : ι → Type*} [Fintype ι] [∀ i, SeminormedAddCommGroup (E i)]
-    [∀ i, NormedSpace 𝕜 (E i)] : NormedSpace 𝕜 (∀ i, E i) where
+instance Pi.normedSpace {ι : Type*} {E : ι → Type*} [Fintype ι] [∀ i, AddCommGroup (E i)]
+    [∀ i, SeminormedAddCommGroup (E i)] [∀ i, Module 𝕜 (E i)] [∀ i, NormedSpace 𝕜 (E i)] :
+    NormedSpace 𝕜 (∀ i, E i) where
   norm_smul_le a f := by
     simp_rw [← coe_nnnorm, ← NNReal.coe_mul, NNReal.coe_le_coe, Pi.nnnorm_def,
       NNReal.mul_finset_sup]
@@ -133,12 +134,13 @@ instance MulOpposite.instNormedSpace : NormedSpace 𝕜 Eᵐᵒᵖ where
 
 /-- A subspace of a normed space is also a normed space, with the restriction of the norm. -/
 instance Submodule.normedSpace {𝕜 R : Type*} [SMul 𝕜 R] [NormedField 𝕜] [Ring R] {E : Type*}
-    [SeminormedAddCommGroup E] [NormedSpace 𝕜 E] [Module R E] [IsScalarTower 𝕜 R E]
-    (s : Submodule R E) : NormedSpace 𝕜 s where
+    [AddCommGroup E] [SeminormedAddCommGroup E] [Module 𝕜 E] [NormedSpace 𝕜 E] [Module R E]
+    [IsScalarTower 𝕜 R E] (s : Submodule R E) : NormedSpace 𝕜 s where
   norm_smul_le c x := norm_smul_le c (x : E)
 
-variable {S 𝕜 R E : Type*} [SMul 𝕜 R] [NormedField 𝕜] [Ring R] [SeminormedAddCommGroup E]
-variable [NormedSpace 𝕜 E] [Module R E] [IsScalarTower 𝕜 R E] [SetLike S E] [AddSubgroupClass S E]
+variable {S 𝕜 R E : Type*} [SMul 𝕜 R] [NormedField 𝕜] [Ring R] [AddCommGroup E]
+  [SeminormedAddCommGroup E] [Module 𝕜 E] [NormedSpace 𝕜 E] [Module R E] [IsScalarTower 𝕜 R E]
+  [SetLike S E] [AddSubgroupClass S E]
 variable [SMulMemClass S R E] (s : S)
 
 instance (priority := 75) SubmoduleClass.toNormedSpace : NormedSpace 𝕜 s where
@@ -151,15 +153,17 @@ domain, using the `SeminormedAddCommGroup.induced` norm.
 
 See note [reducible non-instances] -/
 abbrev NormedSpace.induced {F : Type*} (𝕜 E G : Type*) [NormedField 𝕜] [AddCommGroup E] [Module 𝕜 E]
-    [SeminormedAddCommGroup G] [NormedSpace 𝕜 G] [FunLike F E G] [LinearMapClass F 𝕜 E G] (f : F) :
-    @NormedSpace 𝕜 E _ (SeminormedAddCommGroup.induced E G f) :=
+    [AddCommGroup G] [SeminormedAddCommGroup G] [Module 𝕜 G] [NormedSpace 𝕜 G] [FunLike F E G]
+    [LinearMapClass F 𝕜 E G] (f : F) :
+    @NormedSpace 𝕜 E _ _ (SeminormedAddCommGroup.induced E G f) _ :=
   let _ := SeminormedAddCommGroup.induced E G f
   ⟨fun a b ↦ by simpa only [← map_smul f a b] using norm_smul_le a (f b)⟩
 
 section NontriviallyNormedSpace
 
 variable (𝕜 E)
-variable [NontriviallyNormedField 𝕜] [NormedAddCommGroup E] [NormedSpace 𝕜 E] [Nontrivial E]
+variable [NontriviallyNormedField 𝕜] [AddCommGroup E] [NormedAddCommGroup E] [Module 𝕜 E]
+  [NormedSpace 𝕜 E] [Nontrivial E]
 include 𝕜
 
 /-- If `E` is a nontrivial normed space over a nontrivially normed field `𝕜`, then `E` is unbounded:
@@ -183,7 +187,7 @@ protected lemma NormedSpace.cobounded_neBot : NeBot (cobounded E) := by
 instance (priority := 100) NontriviallyNormedField.cobounded_neBot : NeBot (cobounded 𝕜) :=
   NormedSpace.cobounded_neBot 𝕜 𝕜
 
-instance (priority := 80) RealNormedSpace.cobounded_neBot [NormedSpace ℝ E] :
+instance (priority := 80) RealNormedSpace.cobounded_neBot [Module ℝ E] [NormedSpace ℝ E] :
     NeBot (cobounded E) := NormedSpace.cobounded_neBot ℝ E
 
 instance (priority := 80) NontriviallyNormedField.infinite : Infinite 𝕜 :=
@@ -194,7 +198,8 @@ end NontriviallyNormedSpace
 section NormedSpace
 
 variable (𝕜 E)
-variable [NormedField 𝕜] [Infinite 𝕜] [NormedAddCommGroup E] [Nontrivial E] [NormedSpace 𝕜 E]
+variable [NormedField 𝕜] [Infinite 𝕜] [AddCommGroup E] [NormedAddCommGroup E] [Module 𝕜 E]
+  [NormedSpace 𝕜 E] [Nontrivial E]
 include 𝕜
 
 /-- A normed vector space over an infinite normed field is a noncompact space.
@@ -216,8 +221,8 @@ protected theorem NormedSpace.noncompactSpace : NoncompactSpace E := by
 instance (priority := 100) NormedField.noncompactSpace : NoncompactSpace 𝕜 :=
   NormedSpace.noncompactSpace 𝕜 𝕜
 
-instance (priority := 100) RealNormedSpace.noncompactSpace [NormedSpace ℝ E] : NoncompactSpace E :=
-  NormedSpace.noncompactSpace ℝ E
+instance (priority := 100) RealNormedSpace.noncompactSpace [Module ℝ E] [NormedSpace ℝ E] :
+    NoncompactSpace E := NormedSpace.noncompactSpace ℝ E
 
 end NormedSpace
 
@@ -232,18 +237,17 @@ variable [NormedField 𝕜] [NonUnitalSeminormedRing 𝕜']
 variable [NormedSpace 𝕜 𝕜'] [SMulCommClass 𝕜 𝕜' 𝕜'] [IsScalarTower 𝕜 𝕜' 𝕜']
 ```
 -/
-class NormedAlgebra (𝕜 : Type*) (𝕜' : Type*) [NormedField 𝕜] [SeminormedRing 𝕜'] extends
+class NormedAlgebra (𝕜 : Type*) (𝕜' : Type*) [NormedField 𝕜] [Ring 𝕜'] [SeminormedRing 𝕜'] extends
   Algebra 𝕜 𝕜' where
   norm_smul_le : ∀ (r : 𝕜) (x : 𝕜'), ‖r • x‖ ≤ ‖r‖ * ‖x‖
 
 attribute [inherit_doc NormedAlgebra] NormedAlgebra.norm_smul_le
 
 variable (𝕜')
-variable [NormedField 𝕜] [SeminormedRing 𝕜'] [NormedAlgebra 𝕜 𝕜']
+variable [NormedField 𝕜] [Ring 𝕜'] [SeminormedRing 𝕜'] [NormedAlgebra 𝕜 𝕜']
 
-instance (priority := 100) NormedAlgebra.toNormedSpace : NormedSpace 𝕜 𝕜' :=
-  { NormedAlgebra.toAlgebra.toModule with
-  norm_smul_le := NormedAlgebra.norm_smul_le }
+instance (priority := 100) NormedAlgebra.toNormedSpace : NormedSpace 𝕜 𝕜' where
+  norm_smul_le := NormedAlgebra.norm_smul_le
 
 theorem norm_algebraMap (x : 𝕜) : ‖algebraMap 𝕜 𝕜' x‖ = ‖x‖ * ‖(1 : 𝕜')‖ := by
   rw [Algebra.algebraMap_eq_smul_one]
@@ -315,8 +319,8 @@ normed algebra over the rationals.
 
 Phrased another way, if `𝕜` is a normed algebra over the reals, then `AlgebraRat` respects that
 norm. -/
-instance normedAlgebraRat {𝕜} [NormedDivisionRing 𝕜] [CharZero 𝕜] [NormedAlgebra ℝ 𝕜] :
-    NormedAlgebra ℚ 𝕜 where
+instance normedAlgebraRat {𝕜} [DivisionRing 𝕜] [NormedDivisionRing 𝕜] [CharZero 𝕜]
+    [NormedAlgebra ℝ 𝕜] : NormedAlgebra ℚ 𝕜 where
   norm_smul_le q x := by
     rw [← smul_one_smul ℝ q x, Rat.smul_one_eq_cast, norm_smul, Rat.norm_cast_real]
 
@@ -327,22 +331,22 @@ instance : NormedAlgebra 𝕜 (ULift 𝕜') :=
   { ULift.normedSpace, ULift.algebra with }
 
 /-- The product of two normed algebras is a normed algebra, with the sup norm. -/
-instance Prod.normedAlgebra {E F : Type*} [SeminormedRing E] [SeminormedRing F] [NormedAlgebra 𝕜 E]
-    [NormedAlgebra 𝕜 F] : NormedAlgebra 𝕜 (E × F) :=
+instance Prod.normedAlgebra {E F : Type*} [Ring E] [SeminormedRing E] [Ring F] [SeminormedRing F]
+    [NormedAlgebra 𝕜 E] [NormedAlgebra 𝕜 F] : NormedAlgebra 𝕜 (E × F) :=
   { Prod.normedSpace, Prod.algebra 𝕜 E F with }
 
 /-- The product of finitely many normed algebras is a normed algebra, with the sup norm. -/
-instance Pi.normedAlgebra {ι : Type*} {E : ι → Type*} [Fintype ι] [∀ i, SeminormedRing (E i)]
-    [∀ i, NormedAlgebra 𝕜 (E i)] : NormedAlgebra 𝕜 (∀ i, E i) :=
+instance Pi.normedAlgebra {ι : Type*} {E : ι → Type*} [Fintype ι] [∀ i, Ring (E i)]
+    [∀ i, SeminormedRing (E i)] [∀ i, NormedAlgebra 𝕜 (E i)] : NormedAlgebra 𝕜 (∀ i, E i) :=
   { Pi.normedSpace, Pi.algebra _ E with }
 
-variable [SeminormedRing E] [NormedAlgebra 𝕜 E]
+variable [Ring E] [SeminormedRing E] [NormedAlgebra 𝕜 E]
 
 instance SeparationQuotient.instNormedAlgebra : NormedAlgebra 𝕜 (SeparationQuotient E) where
   __ : NormedSpace 𝕜 (SeparationQuotient E) := inferInstance
   __ : Algebra 𝕜 (SeparationQuotient E) := inferInstance
 
-instance MulOpposite.instNormedAlgebra {E : Type*} [SeminormedRing E] [NormedAlgebra 𝕜 E] :
+instance MulOpposite.instNormedAlgebra {E : Type*} [Ring E] [SeminormedRing E] [NormedAlgebra 𝕜 E] :
     NormedAlgebra 𝕜 Eᵐᵒᵖ where
   __ := instAlgebra
   __ := instNormedSpace
@@ -354,19 +358,19 @@ end NormedAlgebra
 
 See note [reducible non-instances] -/
 abbrev NormedAlgebra.induced {F : Type*} (𝕜 R S : Type*) [NormedField 𝕜] [Ring R] [Algebra 𝕜 R]
-    [SeminormedRing S] [NormedAlgebra 𝕜 S] [FunLike F R S] [NonUnitalAlgHomClass F 𝕜 R S]
+    [Ring S] [SeminormedRing S] [NormedAlgebra 𝕜 S] [FunLike F R S] [NonUnitalAlgHomClass F 𝕜 R S]
     (f : F) :
-    @NormedAlgebra 𝕜 R _ (SeminormedRing.induced R S f) :=
+    @NormedAlgebra 𝕜 R _ _ (SeminormedRing.induced R S f) :=
   letI := SeminormedRing.induced R S f
   ⟨fun a b ↦ show ‖f (a • b)‖ ≤ ‖a‖ * ‖f b‖ from (map_smul f a b).symm ▸ norm_smul_le a (f b)⟩
 
-instance Subalgebra.toNormedAlgebra {𝕜 A : Type*} [SeminormedRing A] [NormedField 𝕜]
+instance Subalgebra.toNormedAlgebra {𝕜 A : Type*} [Ring A] [SeminormedRing A] [NormedField 𝕜]
     [NormedAlgebra 𝕜 A] (S : Subalgebra 𝕜 A) : NormedAlgebra 𝕜 S :=
   NormedAlgebra.induced 𝕜 S A S.val
 
 section SubalgebraClass
 
-variable {S 𝕜 E : Type*} [NormedField 𝕜] [SeminormedRing E] [NormedAlgebra 𝕜 E]
+variable {S 𝕜 E : Type*} [NormedField 𝕜] [Ring E] [SeminormedRing E] [NormedAlgebra 𝕜 E]
 variable [SetLike S E] [SubringClass S E] [SMulMemClass S 𝕜 E] (s : S)
 
 instance (priority := 75) SubalgebraClass.toNormedAlgebra : NormedAlgebra 𝕜 s where
@@ -378,43 +382,43 @@ section RestrictScalars
 
 section NormInstances
 
-instance [I : SeminormedAddCommGroup E] :
+instance [AddCommGroup E] [I : SeminormedAddCommGroup E] :
     SeminormedAddCommGroup (RestrictScalars 𝕜 𝕜' E) :=
   I
 
-instance [I : NormedAddCommGroup E] :
+instance [AddCommGroup E] [I : NormedAddCommGroup E] :
     NormedAddCommGroup (RestrictScalars 𝕜 𝕜' E) :=
   I
 
-instance [I : NonUnitalSeminormedRing E] :
+instance [NonUnitalRing E] [I : NonUnitalSeminormedRing E] :
     NonUnitalSeminormedRing (RestrictScalars 𝕜 𝕜' E) :=
   I
 
-instance [I : NonUnitalNormedRing E] :
+instance [NonUnitalRing E] [I : NonUnitalNormedRing E] :
     NonUnitalNormedRing (RestrictScalars 𝕜 𝕜' E) :=
   I
 
-instance [I : SeminormedRing E] :
+instance [Ring E] [I : SeminormedRing E] :
     SeminormedRing (RestrictScalars 𝕜 𝕜' E) :=
   I
 
-instance [I : NormedRing E] :
+instance [Ring E] [I : NormedRing E] :
     NormedRing (RestrictScalars 𝕜 𝕜' E) :=
   I
 
-instance [I : NonUnitalSeminormedCommRing E] :
+instance [NonUnitalCommRing E] [I : NonUnitalSeminormedCommRing E] :
     NonUnitalSeminormedCommRing (RestrictScalars 𝕜 𝕜' E) :=
   I
 
-instance [I : NonUnitalNormedCommRing E] :
+instance [NonUnitalCommRing E] [I : NonUnitalNormedCommRing E] :
     NonUnitalNormedCommRing (RestrictScalars 𝕜 𝕜' E) :=
   I
 
-instance [I : SeminormedCommRing E] :
+instance [CommRing E] [I : SeminormedCommRing E] :
     SeminormedCommRing (RestrictScalars 𝕜 𝕜' E) :=
   I
 
-instance [I : NormedCommRing E] :
+instance [CommRing E] [I : NormedCommRing E] :
     NormedCommRing (RestrictScalars 𝕜 𝕜' E) :=
   I
 
@@ -424,7 +428,7 @@ section NormedSpace
 
 variable (𝕜 𝕜' E)
 variable [NormedField 𝕜] [NormedField 𝕜'] [NormedAlgebra 𝕜 𝕜']
-  [SeminormedAddCommGroup E] [NormedSpace 𝕜' E]
+  [AddCommGroup E] [SeminormedAddCommGroup E] [NormedSpace 𝕜' E]
 
 /-- If `E` is a normed space over `𝕜'` and `𝕜` is a normed algebra over `𝕜'`, then
 `RestrictScalars.module` is additionally a `NormedSpace`. -/
@@ -721,7 +725,7 @@ abbrev NormedSpace.ofCore {𝕜 : Type*} {E : Type*} [NormedField 𝕜] [Seminor
 
 end Core
 
-variable {G H : Type*} [SeminormedAddCommGroup G] [SeminormedAddCommGroup H] [NormedSpace ℝ H]
+variable {G H : Type*} [AddCommGroup G] [SeminormedAddCommGroup G] [SeminormedAddCommGroup H] [NormedSpace ℝ H]
   {s : Set G}
 
 /-- A group homomorphism from a normed group to a real normed space,

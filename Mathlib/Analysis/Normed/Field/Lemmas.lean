@@ -29,7 +29,7 @@ open scoped Topology NNReal Pointwise
 
 section NormedDivisionRing
 
-variable [NormedDivisionRing α]
+variable [DivisionRing α] [NormedDivisionRing α]
 
 /-- Multiplication by a nonzero element `a` on the left
 as a `DilationEquiv` of a normed division ring. -/

@@ -26,7 +26,7 @@ subspace as a submodule of `E`.
 
 -/
 
-variable {M : Type*} [SeminormedCommGroup M]
+variable {M : Type*} [CommGroup M] [SeminormedCommGroup M]
 
 variable (M) in
 /-- The null subgroup with respect to the norm. -/
@@ -48,7 +48,8 @@ lemma isClosed_nullSubgroup : IsClosed (nullSubgroup M : Set M) := by
 lemma mem_nullSubgroup_iff {x : M} : x ∈ nullSubgroup M ↔ ‖x‖ = 0 := Iff.rfl
 
 variable {𝕜 E : Type*}
-variable [SeminormedAddCommGroup E] [SeminormedRing 𝕜] [Module 𝕜 E] [IsBoundedSMul 𝕜 E]
+variable [AddCommGroup E] [SeminormedAddCommGroup E] [Ring 𝕜] [SeminormedRing 𝕜]
+    [Module 𝕜 E] [IsBoundedSMul 𝕜 E]
 
 variable (𝕜 E) in
 /-- The null space with respect to the norm. -/

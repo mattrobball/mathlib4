@@ -23,7 +23,7 @@ variable {α β : Type*}
 
 section SeminormedAddGroup
 
-variable [SeminormedAddGroup α] [SeminormedAddGroup β] [SMulZeroClass α β]
+variable [AddGroup α] [SeminormedAddGroup α] [AddGroup β] [SeminormedAddGroup β] [SMulZeroClass α β]
 variable [IsBoundedSMul α β] {r : α} {x : β}
 
 @[bound]
@@ -53,14 +53,14 @@ theorem edist_smul_le (s : α) (x y : β) : edist (s • x) (s • y) ≤ ‖s�
 end SeminormedAddGroup
 
 /-- Left multiplication is bounded. -/
-instance NonUnitalSeminormedRing.isBoundedSMul [NonUnitalSeminormedRing α] :
+instance NonUnitalSeminormedRing.isBoundedSMul [NonUnitalRing α] [NonUnitalSeminormedRing α] :
     IsBoundedSMul α α where
   dist_smul_pair' x y₁ y₂ := by simpa [mul_sub, dist_eq_norm] using norm_mul_le x (y₁ - y₂)
   dist_pair_smul' x₁ x₂ y := by simpa [sub_mul, dist_eq_norm] using norm_mul_le (x₁ - x₂) y
 
 /-- Right multiplication is bounded. -/
-instance NonUnitalSeminormedRing.isBoundedSMulOpposite [NonUnitalSeminormedRing α] :
-    IsBoundedSMul αᵐᵒᵖ α where
+instance NonUnitalSeminormedRing.isBoundedSMulOpposite
+    [NonUnitalRing α] [NonUnitalSeminormedRing α] : IsBoundedSMul αᵐᵒᵖ α where
   dist_smul_pair' x y₁ y₂ := by
     simpa [sub_mul, dist_eq_norm, mul_comm] using norm_mul_le (y₁ - y₂) x.unop
   dist_pair_smul' x₁ x₂ y := by
@@ -68,7 +68,7 @@ instance NonUnitalSeminormedRing.isBoundedSMulOpposite [NonUnitalSeminormedRing 
 
 section SeminormedRing
 
-variable [SeminormedRing α] [SeminormedAddCommGroup β] [Module α β]
+variable [Ring α] [SeminormedRing α] [AddCommGroup β] [SeminormedAddCommGroup β] [Module α β]
 
 theorem IsBoundedSMul.of_norm_smul_le (h : ∀ (r : α) (x : β), ‖r • x‖ ≤ ‖r‖ * ‖x‖) :
     IsBoundedSMul α β :=
@@ -105,11 +105,11 @@ instance (priority := 100) NormMulClass.toNormSMulClass [Norm α] [Mul α] [Norm
     NormSMulClass α α where
   norm_smul := norm_mul
 
-instance (priority := 100) NormMulClass.toNormSMulClass_op [SeminormedRing α] [NormMulClass α] :
-    NormSMulClass αᵐᵒᵖ α where
+instance (priority := 100) NormMulClass.toNormSMulClass_op
+    [Ring α] [SeminormedRing α] [NormMulClass α] : NormSMulClass αᵐᵒᵖ α where
   norm_smul a b := mul_comm ‖b‖ ‖a‖ ▸ norm_mul b a.unop
 
-variable [SeminormedRing α] [SeminormedAddGroup β] [SMul α β]
+variable [Ring α] [SeminormedRing α] [AddGroup β] [SeminormedAddGroup β] [SMul α β]
 
 theorem NormSMulClass.of_nnnorm_smul (h : ∀ (r : α) (x : β), ‖r • x‖₊ = ‖r‖₊ * ‖x‖₊) :
     NormSMulClass α β where
@@ -123,12 +123,13 @@ theorem nnnorm_smul (r : α) (x : β) : ‖r • x‖₊ = ‖r‖₊ * ‖x‖�
 lemma enorm_smul (r : α) (x : β) : ‖r • x‖ₑ = ‖r‖ₑ * ‖x‖ₑ := by simp [enorm, nnnorm_smul]
 
 instance Pi.instNormSMulClass {ι : Type*} {β : ι → Type*} [Fintype ι]
-    [SeminormedRing α] [∀ i, SeminormedAddGroup (β i)] [∀ i, SMul α (β i)]
-    [∀ i, NormSMulClass α (β i)] : NormSMulClass α (Π i, β i) where
+    [Ring α] [SeminormedRing α] [∀ i, AddGroup (β i)] [∀ i, SeminormedAddGroup (β i)]
+    [∀ i, SMul α (β i)] [∀ i, NormSMulClass α (β i)] : NormSMulClass α (Π i, β i) where
   norm_smul r x := by
     simp [nnnorm_def, ← coe_nnnorm, nnnorm_smul, ← NNReal.coe_mul, NNReal.mul_finset_sup]
 
-instance Prod.instNormSMulClass {γ : Type*} [SeminormedAddGroup γ] [SMul α γ] [NormSMulClass α γ] :
+instance Prod.instNormSMulClass
+    {γ : Type*} [AddGroup γ] [SeminormedAddGroup γ] [SMul α γ] [NormSMulClass α γ] :
     NormSMulClass α (β × γ) where
   norm_smul := fun r ⟨v₁, v₂⟩ ↦ by simp only [smul_def, ← coe_nnnorm, nnnorm_def,
     nnnorm_smul r, ← NNReal.coe_mul, NNReal.mul_sup]
@@ -140,7 +141,8 @@ end NormSMulClass
 
 section NormSMulClassModule
 
-variable [SeminormedRing α] [SeminormedAddCommGroup β] [Module α β] [NormSMulClass α β]
+variable [Ring α] [SeminormedRing α] [AddCommGroup β] [SeminormedAddCommGroup β] [Module α β]
+    [NormSMulClass α β]
 
 theorem dist_smul₀ (s : α) (x y : β) : dist (s • x) (s • y) = ‖s‖ * dist x y := by
   simp_rw [dist_eq_norm, (norm_smul s (x - y)).symm, smul_sub]
@@ -158,7 +160,7 @@ end NormSMulClassModule
 
 section NormedDivisionRing
 
-variable [NormedDivisionRing α] [SeminormedAddGroup β]
+variable [DivisionRing α] [NormedDivisionRing α] [AddGroup β] [SeminormedAddGroup β]
 variable [MulActionWithZero α β] [IsBoundedSMul α β]
 
 /-- For a normed division ring, a sub-multiplicative norm is actually strictly multiplicative.
@@ -167,7 +169,7 @@ This is not an instance as it forms a loop with `NormSMulClass.toIsBoundedSMul`.
 lemma NormedDivisionRing.toNormSMulClass : NormSMulClass α β where
   norm_smul r x := by
     by_cases h : r = 0
-    · simp [h, zero_smul α x]
+    · simp only [h, zero_smul, norm_zero, zero_mul]
     · refine le_antisymm (norm_smul_le r x) ?_
       calc
       ‖r‖ * ‖x‖ = ‖r‖ * ‖r⁻¹ • r • x‖ := by rw [inv_smul_smul₀ h]

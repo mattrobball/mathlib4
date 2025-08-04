@@ -33,7 +33,7 @@ open scoped Topology NNReal ENNReal
 
 /-- A normed division ring is a division ring endowed with a seminorm which satisfies the equality
 `‖x y‖ = ‖x‖ ‖y‖`. -/
-class NormedDivisionRing (α : Type*) extends Norm α, DivisionRing α, MetricSpace α where
+class NormedDivisionRing (α : Type*) [DivisionRing α] extends Norm α, MetricSpace α where
   /-- The distance is induced by the norm. -/
   dist_eq : ∀ x y, dist x y = norm (x - y)
   /-- The norm is multiplicative. -/
@@ -41,19 +41,21 @@ class NormedDivisionRing (α : Type*) extends Norm α, DivisionRing α, MetricSp
 
 -- see Note [lower instance priority]
 /-- A normed division ring is a normed ring. -/
-instance (priority := 100) NormedDivisionRing.toNormedRing [β : NormedDivisionRing α] :
+instance (priority := 100) NormedDivisionRing.toNormedRing [DivisionRing α]
+    [β : NormedDivisionRing α] :
     NormedRing α :=
   { β with norm_mul_le a b := (NormedDivisionRing.norm_mul a b).le }
 
 -- see Note [lower instance priority]
 /-- The norm on a normed division ring is strictly multiplicative. -/
-instance (priority := 100) NormedDivisionRing.toNormMulClass [NormedDivisionRing α] :
+instance (priority := 100) NormedDivisionRing.toNormMulClass [DivisionRing α]
+    [NormedDivisionRing α] :
     NormMulClass α where
   norm_mul := NormedDivisionRing.norm_mul
 
 section NormedDivisionRing
 
-variable [NormedDivisionRing α] {a b : α}
+variable [DivisionRing α] [NormedDivisionRing α] {a b : α}
 
 instance (priority := 900) NormedDivisionRing.to_normOneClass : NormOneClass α :=
   ⟨mul_left_cancel₀ (mt norm_eq_zero.1 (one_ne_zero' α)) <| by rw [← norm_mul, mul_one, mul_one]⟩
@@ -106,7 +108,7 @@ namespace NormedDivisionRing
 
 section Discrete
 
-variable {𝕜 : Type*} [NormedDivisionRing 𝕜] [DiscreteTopology 𝕜]
+variable {𝕜 : Type*} [DivisionRing 𝕜] [NormedDivisionRing 𝕜] [DiscreteTopology 𝕜]
 
 lemma norm_eq_one_iff_ne_zero_of_discrete {x : 𝕜} : ‖x‖ = 1 ↔ x ≠ 0 := by
   constructor <;> intro hx
@@ -325,7 +327,7 @@ variable {F : Type*} (R S : Type*) [FunLike F R S]
 `NormedDivisionRing` structure on the domain.
 
 See note [reducible non-instances] -/
-abbrev NormedDivisionRing.induced [DivisionRing R] [NormedDivisionRing S]
+abbrev NormedDivisionRing.induced [DivisionRing R] [DivisionRing S] [NormedDivisionRing S]
     [NonUnitalRingHomClass F R S] (f : F) (hf : Function.Injective f) : NormedDivisionRing R :=
   { NormedAddCommGroup.induced R S f hf, ‹DivisionRing R› with
     norm_mul x y := show ‖f _‖ = _ from (map_mul f x y).symm ▸ norm_mul (f x) (f y) }

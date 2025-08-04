@@ -32,7 +32,7 @@ corresponds to `HasSolidNorm`.
 
 open Filter Topology
 
-variable {ι α G : Type*} [Preorder ι] [TopologicalSpace α]
+variable {ι α G : Type*} [Preorder ι] [TopologicalSpace α] [AddCommGroup G]
   [NormedAddCommGroup G] [Lattice G] [HasSolidNorm G] [IsOrderedAddMonoid G]
 
 section Unbundled

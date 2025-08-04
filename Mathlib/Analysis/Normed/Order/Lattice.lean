@@ -40,10 +40,10 @@ section SolidNorm
 /-- Let `α` be an `AddCommGroup` with a `Lattice` structure. A norm on `α` is *solid* if, for `a`
 and `b` in `α`, with absolute values `|a|` and `|b|` respectively, `|a| ≤ |b|` implies `‖a‖ ≤ ‖b‖`.
 -/
-class HasSolidNorm (α : Type*) [NormedAddCommGroup α] [Lattice α] : Prop where
+class HasSolidNorm (α : Type*) [AddCommGroup α] [NormedAddCommGroup α] [Lattice α] : Prop where
   solid : ∀ ⦃x y : α⦄, |x| ≤ |y| → ‖x‖ ≤ ‖y‖
 
-variable {α : Type*} [NormedAddCommGroup α] [Lattice α] [HasSolidNorm α]
+variable {α : Type*} [AddCommGroup α] [NormedAddCommGroup α] [Lattice α] [HasSolidNorm α]
 
 theorem norm_le_norm_of_abs_le_abs {a b : α} (h : |a| ≤ |b|) : ‖a‖ ≤ ‖b‖ :=
   HasSolidNorm.solid h
@@ -69,7 +69,7 @@ said to be a normed lattice ordered group.
   "Use `[NormedAddCommGroup α] [Lattice α] [HasSolidNorm α] [IsOrderedAddMonoid α]` instead."
   (since := "2025-04-10")]
 structure NormedLatticeAddCommGroup (α : Type*) extends
-    NormedAddCommGroup α, Lattice α, HasSolidNorm α where
+    AddCommGroup α, NormedAddCommGroup α, Lattice α, HasSolidNorm α where
   add_le_add_left : ∀ a b : α, a ≤ b → ∀ c : α, c + a ≤ c + b
 
 instance Int.hasSolidNorm : HasSolidNorm ℤ where
@@ -78,7 +78,8 @@ instance Int.hasSolidNorm : HasSolidNorm ℤ where
 instance Rat.hasSolidNorm : HasSolidNorm ℚ where
   solid x y h := by simpa [← Rat.norm_cast_real, ← Rat.cast_abs] using h
 
-variable {α : Type*} [NormedAddCommGroup α] [Lattice α] [HasSolidNorm α] [IsOrderedAddMonoid α]
+variable {α : Type*} [AddCommGroup α] [NormedAddCommGroup α] [Lattice α] [HasSolidNorm α]
+variable [IsOrderedAddMonoid α]
 
 open HasSolidNorm
 
@@ -149,7 +150,7 @@ instance (priority := 100) HasSolidNorm.continuousInf : ContinuousInf α := by
   simp
 
 -- see Note [lower instance priority]
-instance (priority := 100) HasSolidNorm.continuousSup {α : Type*}
+instance (priority := 100) HasSolidNorm.continuousSup {α : Type*} [AddCommGroup α]
     [NormedAddCommGroup α] [Lattice α] [HasSolidNorm α] [IsOrderedAddMonoid α] : ContinuousSup α :=
   OrderDual.continuousSup αᵒᵈ
 
@@ -200,7 +201,7 @@ theorem isClosed_le_of_isClosed_nonneg {G}
   exact IsClosed.preimage (continuous_snd.sub continuous_fst) h
 
 -- See note [lower instance priority]
-instance (priority := 100) HasSolidNorm.orderClosedTopology {E}
+instance (priority := 100) HasSolidNorm.orderClosedTopology {E} [AddCommGroup E]
     [NormedAddCommGroup E] [Lattice E] [HasSolidNorm E] [IsOrderedAddMonoid E] :
     OrderClosedTopology E :=
   ⟨isClosed_le_of_isClosed_nonneg isClosed_nonneg⟩

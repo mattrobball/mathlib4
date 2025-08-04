@@ -155,7 +155,7 @@ section SeminormedAddCommGroup
 ### Bounded operations in seminormed additive commutative groups
 -/
 
-variable {R : Type*} [SeminormedAddCommGroup R]
+variable {R : Type*} [AddCommGroup R] [SeminormedAddCommGroup R]
 
 lemma SeminormedAddCommGroup.lipschitzWith_sub :
     LipschitzWith 2 (fun (p : R × R) ↦ p.1 - p.2) := by
@@ -171,7 +171,7 @@ section NonUnitalSeminormedRing
 ### Bounded operations in non-unital seminormed rings
 -/
 
-variable {R : Type*} [NonUnitalSeminormedRing R]
+variable {R : Type*} [NonUnitalRing R] [NonUnitalSeminormedRing R]
 
 instance : BoundedMul R where
   isBounded_mul {s t} hs ht := by

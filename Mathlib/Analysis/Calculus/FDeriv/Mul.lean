@@ -20,7 +20,6 @@ This file contains the usual formulas (and existence assertions) for the derivat
 * taking the pointwise multiplicative inverse (i.e. `Inv.inv` or `Ring.inverse`) of a function
 -/
 
-
 open Asymptotics ContinuousLinearMap Topology
 
 section
@@ -67,7 +66,7 @@ theorem HasFDerivWithinAt.clm_comp (hc : HasFDerivWithinAt c c' s x)
 theorem HasFDerivAt.clm_comp (hc : HasFDerivAt c c' x) (hd : HasFDerivAt d d' x) :
     HasFDerivAt (fun y => (c y).comp (d y))
       ((compL 𝕜 F G H (c x)).comp d' + ((compL 𝕜 F G H).flip (d x)).comp c') x := by
-  exact (isBoundedBilinearMap_comp.hasFDerivAt (c x, d x) :).comp x <| hc.prodMk hd
+  exact isBoundedBilinearMap_comp.hasFDerivAt (c x, d x)|>.comp x <| hc.prodMk hd
 
 @[fun_prop]
 theorem DifferentiableWithinAt.clm_comp (hc : DifferentiableWithinAt 𝕜 c s x)
