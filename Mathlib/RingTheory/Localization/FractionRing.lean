@@ -572,26 +572,54 @@ commutative ring `R` is an integral domain only when this is needed for proving.
 
 In this generality, this construction is also known as the *total fraction ring* of `R`.
 -/
-abbrev FractionRing :=
+def FractionRing :=
   Localization (nonZeroDivisors R)
 
 namespace FractionRing
 
+instance instCommRing : CommRing (FractionRing R) :=
+  inferInstanceAs (CommRing (Localization (nonZeroDivisors R)))
+
+instance instInhabited : Inhabited (FractionRing R) :=
+  inferInstanceAs (Inhabited (Localization (nonZeroDivisors R)))
+
+instance instAlgebra : Algebra R (FractionRing R) :=
+  inferInstanceAs (Algebra R (Localization (nonZeroDivisors R)))
+
+instance instIsLocalization : IsLocalization (nonZeroDivisors R) (FractionRing R) :=
+  inferInstanceAs (IsLocalization (nonZeroDivisors R) (Localization (nonZeroDivisors R)))
+
+variable {R} in
+/-- Construct an element of `FractionRing R` from a numerator and denominator. -/
+def mk (r : R) (s : R⁰) : FractionRing R :=
+  Localization.mk r s
+
+theorem mk_eq_mk {r} {s : R⁰} : mk r s = Localization.mk r s :=
+  rfl
+
+theorem mk_eq_mk' {r} {s : R⁰} :
+    mk r s = IsLocalization.mk' (FractionRing R) r s := by
+  unfold FractionRing
+  rw [← Localization.mk_eq_mk', FractionRing.mk_eq_mk]
+
 instance : IsFractionRing (FractionRing R) (FractionRing R) := IsFractionRing.idem R _
 
-instance unique [Subsingleton R] : Unique (FractionRing R) := inferInstance
+instance instUnique [Subsingleton R] : Unique (FractionRing R) :=
+  inferInstanceAs (Unique (Localization (nonZeroDivisors R)))
 
-instance [Nontrivial R] : Nontrivial (FractionRing R) := inferInstance
+instance [Nontrivial R] : Nontrivial (FractionRing R) :=
+  inferInstanceAs (Nontrivial (Localization (nonZeroDivisors R)))
 
 variable [IsDomain A]
 
-noncomputable instance field : Field (FractionRing A) := inferInstance
+noncomputable instance field : Field (FractionRing A) :=
+  inferInstanceAs (Field (Localization (nonZeroDivisors A)))
 
 @[simp]
 theorem mk_eq_div {r s} :
-    (Localization.mk r s : FractionRing A) =
-      (algebraMap _ _ r / algebraMap A _ s : FractionRing A) := by
-  rw [Localization.mk_eq_mk', IsFractionRing.mk'_eq_div]
+    mk r s = algebraMap _ _ r / algebraMap A (FractionRing A) s := by
+  rw [mk, Localization.mk_eq_mk', IsFractionRing.mk'_eq_div]
+  rfl
 
 section liftAlgebra
 
@@ -615,6 +643,18 @@ lemma algebraMap_liftAlgebra :
     have := (FaithfulSMul.algebraMap_injective R K).isDomain
     algebraMap (FractionRing R) K = IsFractionRing.lift (FaithfulSMul.algebraMap_injective R _) :=
   rfl
+
+instance {R₀} [SMul R₀ R] [IsScalarTower R₀ R R] : SMul R₀ (FractionRing R) :=
+  inferInstanceAs (SMul _ (Localization _))
+
+instance {R₀} [Semiring R₀] [Module R₀ R] [IsScalarTower R₀ R R] : Module R₀ (FractionRing R) :=
+  inferInstanceAs (Module _ (Localization _))
+
+instance {R₀} [SMul R₀ R] [IsScalarTower R₀ R R] : IsScalarTower R₀ R (FractionRing R) :=
+  inferInstanceAs (IsScalarTower _ _ (Localization _))
+
+instance {R₀} [CommSemiring R₀] [Algebra R₀ R] : Algebra R₀ (FractionRing R) :=
+  inferInstanceAs (Algebra _ (Localization _))
 
 instance {R₀} [SMul R₀ R] [IsScalarTower R₀ R R] [SMul R₀ K] [IsScalarTower R₀ R K] :
     IsScalarTower R₀ (FractionRing R) K := IsScalarTower.to₁₃₄ _ R _ _
@@ -642,8 +682,13 @@ instance (k K : Type*) [Field k] [Field K] [Algebra A k] [Algebra A K] [Algebra 
     IsScalarTower (FractionRing A) k K where
   smul_assoc a b c := a.ind fun ⟨a₁, a₂⟩ ↦ by
     rw [← smul_right_inj (nonZeroDivisors.coe_ne_zero a₂)]
-    simp_rw [← smul_assoc, Localization.smul_mk, smul_eq_mul, Localization.mk_eq_mk',
-      IsLocalization.mk'_mul_cancel_left, algebraMap_smul, smul_assoc]
+    simp_rw [← smul_assoc]
+    conv_lhs => rw [Localization.smul_mk]
+    rw [smul_eq_mul, Localization.mk_eq_mk',
+      IsLocalization.mk'_mul_cancel_left]
+    sorry
+    -- conv_lhs => rw [algebraMap_smul (FractionRing _ a₁ b]
+    -- simp_rw [smul_assoc]
 
 end IsScalarTower
 

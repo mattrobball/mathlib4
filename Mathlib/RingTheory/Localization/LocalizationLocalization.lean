@@ -182,6 +182,10 @@ noncomputable instance instAlgebraLocalizationAtPrime (x : Ideal R) [H : x.IsPri
       rw [mem_nonZeroDivisors_iff_ne_zero]
       exact fun h => ha (h.symm ▸ x.zero_mem))
 
+noncomputable instance {R : Type*} [CommRing R] [IsDomain R] (p : Ideal R) [p.IsPrime] :
+    Algebra (Localization.AtPrime p) (FractionRing R) :=
+  inferInstanceAs <| Algebra (Localization.AtPrime p) (Localization (nonZeroDivisors R))
+
 instance {R : Type*} [CommRing R] [IsDomain R] (p : Ideal R) [p.IsPrime] :
     IsScalarTower R (Localization.AtPrime p) (FractionRing R) :=
   localization_isScalarTower_of_submonoid_le (Localization.AtPrime p) (FractionRing R)

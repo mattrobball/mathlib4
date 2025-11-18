@@ -142,7 +142,7 @@ theorem mk_zero (p : K[X]) : RatFunc.mk p 0 = ofFractionRing (0 : FractionRing K
 
 theorem mk_coe_def (p : K[X]) (q : K[X]⁰) :
     RatFunc.mk p q = ofFractionRing (IsLocalization.mk' _ p q) := by
-  simp only [mk_eq_div', ← Localization.mk_eq_mk', FractionRing.mk_eq_div]
+  simp only [mk_eq_div', ← FractionRing.mk_eq_mk', FractionRing.mk_eq_div]
 
 theorem mk_def_of_mem (p : K[X]) {q} (hq : q ∈ K[X]⁰) :
     RatFunc.mk p q = ofFractionRing (IsLocalization.mk' (FractionRing K[X]) p ⟨q, hq⟩) := by
@@ -158,6 +158,7 @@ theorem mk_eq_localization_mk (p : K[X]) {q : K[X]} (hq : q ≠ 0) :
     RatFunc.mk p q =
       ofFractionRing (Localization.mk p ⟨q, mem_nonZeroDivisors_iff_ne_zero.mpr hq⟩) := by
   rw [mk_def_of_ne _ hq, Localization.mk_eq_mk']
+  rfl
 
 theorem mk_one' (p : K[X]) :
     RatFunc.mk p 1 = ofFractionRing (algebraMap _ _ p) := by
