@@ -118,7 +118,7 @@ theorem fg_of_noetherian [IsNoetherian R A] (S : Subalgebra R A) : S.FG :=
 
 theorem fg_of_submodule_fg (h : (⊤ : Submodule R A).FG) : (⊤ : Subalgebra R A).FG :=
   let ⟨s, hs⟩ := h
-  ⟨s, toSubmodule.injective <| by
+  ⟨s, toSubmodule_injective <| by
     rw [Algebra.top_toSubmodule, eq_top_iff, ← hs, span_le]
     exact Algebra.subset_adjoin⟩
 

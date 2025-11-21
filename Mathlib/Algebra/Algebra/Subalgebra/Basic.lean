@@ -269,14 +269,18 @@ instance toCommRing {R A} [CommRing R] [CommRing A] [Algebra R A] (S : Subalgebr
 
 end
 
+@[reducible]
+def toSubmodule (S : Subalgebra R A) : Submodule R A where
+  carrier := S
+  zero_mem' := S.zero_mem
+  add_mem' := S.add_mem
+  smul_mem' := fun c {x} hx ↦
+    (Algebra.smul_def c x).symm ▸ mul_mem (S.algebraMap_mem' c) hx
+
 /-- The forgetful map from `Subalgebra` to `Submodule` as an `OrderEmbedding` -/
-def toSubmodule : Subalgebra R A ↪o Submodule R A where
+def toSubmoduleOrderEmbedding : Subalgebra R A ↪o Submodule R A where
   toEmbedding :=
-    { toFun := fun S =>
-        { S with
-          carrier := S
-          smul_mem' := fun c {x} hx ↦
-            (Algebra.smul_def c x).symm ▸ mul_mem (S.range_le ⟨c, rfl⟩) hx }
+    { toFun := fun S => toSubmodule S
       inj' := fun _ _ h ↦ ext fun x ↦ SetLike.ext_iff.mp h x }
   map_rel_iff' := SetLike.coe_subset_coe.symm.trans SetLike.coe_subset_coe
 
@@ -294,7 +298,6 @@ theorem toSubmodule_injective : Function.Injective (toSubmodule : Subalgebra R A
 section
 
 /-! `Subalgebra`s inherit structure from their `Submodule` coercions. -/
-
 
 instance (priority := low) module' [Semiring R'] [SMul R' R] [Module R' A] [IsScalarTower R' R A] :
     Module R' S :=
