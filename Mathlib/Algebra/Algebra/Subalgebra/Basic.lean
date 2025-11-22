@@ -269,14 +269,17 @@ instance toCommRing {R A} [CommRing R] [CommRing A] [Algebra R A] (S : Subalgebr
 
 end
 
+/-- The forgetful map from `Subalgebra` to `Submodule`. -/
+def toSubmodule (S : Subalgebra R A) : Submodule R A :=
+  { S with
+    carrier := S
+    smul_mem' := fun c {x} hx ↦
+      (Algebra.smul_def c x).symm ▸ mul_mem (S.range_le ⟨c, rfl⟩) hx }
+
 /-- The forgetful map from `Subalgebra` to `Submodule` as an `OrderEmbedding` -/
-def toSubmodule : Subalgebra R A ↪o Submodule R A where
+def toSubmoduleOrderEmbedding : Subalgebra R A ↪o Submodule R A where
   toEmbedding :=
-    { toFun := fun S =>
-        { S with
-          carrier := S
-          smul_mem' := fun c {x} hx ↦
-            (Algebra.smul_def c x).symm ▸ mul_mem (S.range_le ⟨c, rfl⟩) hx }
+    { toFun := toSubmodule
       inj' := fun _ _ h ↦ ext fun x ↦ SetLike.ext_iff.mp h x }
   map_rel_iff' := SetLike.coe_subset_coe.symm.trans SetLike.coe_subset_coe
 

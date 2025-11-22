@@ -39,7 +39,7 @@ theorem Normal.exists_isSplittingField [h : Normal F K] [FiniteDimensional F K] 
   let s := Module.Basis.ofVectorSpace F K
   refine
     ⟨∏ x, minpoly F (s x), splits_prod _ fun x _ => h.splits (s x),
-      Subalgebra.toSubmodule.injective ?_⟩
+      Subalgebra.toSubmodule_injective ?_⟩
   rw [Algebra.top_toSubmodule, eq_top_iff, ← s.span_eq, Submodule.span_le, Set.range_subset_iff]
   refine fun x =>
     Algebra.subset_adjoin

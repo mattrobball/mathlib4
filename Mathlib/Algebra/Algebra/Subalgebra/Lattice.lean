@@ -80,7 +80,7 @@ theorem top_toSubring {R A : Type*} [CommRing R] [Ring A] [Algebra R A] :
 
 @[simp]
 theorem toSubmodule_eq_top {S : Subalgebra R A} : Subalgebra.toSubmodule S = ⊤ ↔ S = ⊤ :=
-  Subalgebra.toSubmodule.injective.eq_iff' top_toSubmodule
+  Subalgebra.toSubmodule_injective.eq_iff' top_toSubmodule
 
 @[simp]
 theorem toSubsemiring_eq_top {S : Subalgebra R A} : S.toSubsemiring = ⊤ ↔ S = ⊤ :=
