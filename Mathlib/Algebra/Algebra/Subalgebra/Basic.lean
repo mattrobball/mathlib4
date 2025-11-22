@@ -270,6 +270,7 @@ instance toCommRing {R A} [CommRing R] [CommRing A] [Algebra R A] (S : Subalgebr
 end
 
 /-- The forgetful map from `Subalgebra` to `Submodule`. -/
+@[reducible]
 def toSubmodule (S : Subalgebra R A) : Submodule R A :=
   { S with
     carrier := S
