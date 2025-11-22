@@ -187,7 +187,6 @@ protected theorem prod_mem {R : Type u} {A : Type v} [CommSemiring R] [CommSemir
   prod_mem h
 
 /-- Turn a `Subalgebra` into a `NonUnitalSubalgebra` by forgetting that it contains `1`. -/
-@[reducible]
 def toNonUnitalSubalgebra (S : Subalgebra R A) : NonUnitalSubalgebra R A where
   __ := S
   smul_mem' r _x hx := S.smul_mem hx r
@@ -216,13 +215,13 @@ protected theorem intCast_mem {R : Type u} {A : Type v} [CommRing R] [Ring A] [A
   intCast_mem S n
 
 /-- The projection from a subalgebra of `A` to an additive submonoid of `A`. -/
-@[reducible, simps coe]
+@[simps coe]
 def toAddSubmonoid {R : Type u} {A : Type v} [CommSemiring R] [Semiring A] [Algebra R A]
     (S : Subalgebra R A) : AddSubmonoid A :=
   S.toSubsemiring.toAddSubmonoid
 
 /-- A subalgebra over a ring is also a `Subring`. -/
-@[reducible, simps toSubsemiring]
+@[simps toSubsemiring]
 def toSubring {R : Type u} {A : Type v} [CommRing R] [Ring A] [Algebra R A] (S : Subalgebra R A) :
     Subring A :=
   { S.toSubsemiring with neg_mem' := S.neg_mem }
@@ -271,7 +270,6 @@ instance toCommRing {R A} [CommRing R] [CommRing A] [Algebra R A] (S : Subalgebr
 end
 
 /-- The forgetful map from `Subalgebra` to `Submodule`. -/
-@[reducible]
 def toSubmodule (S : Subalgebra R A) : Submodule R A :=
   { S with
     carrier := S
@@ -374,7 +372,6 @@ protected theorem coe_eq_one {x : S} : (x : A) = 1 ↔ x = 1 :=
 -- todo: standardize on the names these morphisms
 -- compare with submodule.subtype
 /-- Embedding of a subalgebra into the algebra. -/
-@[reducible]
 def val : S →ₐ[R] A :=
   { toFun := ((↑) : S → A)
     map_zero' := rfl
@@ -477,7 +474,6 @@ instance (priority := 75) toAlgebra : Algebra R s where
 lemma coe_algebraMap (r : R) : (algebraMap R s r : A) = algebraMap R A r := rfl
 
 /-- Embedding of a subalgebra into the algebra, as an algebra homomorphism. -/
-@[reducible]
 def val (s : S) : s →ₐ[R] A :=
   { SubsemiringClass.subtype s, SMulMemClass.subtype s with
     toFun := (↑)
