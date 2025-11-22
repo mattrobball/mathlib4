@@ -48,6 +48,9 @@ variable {I} {x y : R}
 instance one (I : Ideal R) : One (R ⧸ I) :=
   ⟨Submodule.Quotient.mk 1⟩
 
+instance instAddCommGroup (J : Ideal R) : AddCommGroup (R ⧸ J) :=
+  inferInstanceAs <| AddCommGroup (R ⧸ J.toAddSubgroup)
+
 /-- On `Ideal`s, `Submodule.quotientRel` is a ring congruence. -/
 protected def ringCon (I : Ideal R) [I.IsTwoSided] : RingCon R where
   __ := QuotientAddGroup.con I.toAddSubgroup
@@ -66,6 +69,14 @@ instance {R} [CommRing R] (I : Ideal R) : Ring (R ⧸ I) := fast_instance% infer
 instance commSemiring {R} [CommRing R] (I : Ideal R) : CommSemiring (R ⧸ I) := fast_instance%
   inferInstance
 instance semiring {R} [CommRing R] (I : Ideal R) : Semiring (R ⧸ I) := fast_instance% inferInstance
+
+section SMul
+
+variable {S : Type*} [SMul S R] [IsScalarTower S R R] (I : Ideal R)
+
+instance instSMul : SMul S (R ⧸ I) := Submodule.Quotient.instSMul' I
+
+end SMul
 
 variable [I.IsTwoSided]
 

@@ -49,7 +49,7 @@ protected theorem nontrivial (hI : I ≠ ⊤) : Nontrivial (R ⧸ I) :=
 
 theorem subsingleton_iff : Subsingleton (R ⧸ I) ↔ I = ⊤ := by
   rw [Submodule.Quotient.subsingleton_iff, eq_top_iff, SetLike.le_def]
-  simp_rw [Submodule.mem_top, true_implies]
+  simp_rw [Ideal.mem_top, true_implies]
 
 instance : Unique (R ⧸ (⊤ : Ideal R)) :=
   ⟨⟨0⟩, by rintro ⟨x⟩; exact Quotient.eq_zero_iff_mem.mpr Submodule.mem_top⟩

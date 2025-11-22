@@ -42,6 +42,10 @@ variable [Semiring α] (I : Ideal α)
 def span (s : Set α) : Ideal α :=
   Submodule.span α s
 
+/-- Copying over API from `Submodule` -/
+theorem mem_sup {x : α} {I J : Ideal α} :
+    x ∈ I ⊔ J ↔ ∃ a ∈ I, ∃ b ∈ J, a + b = x := Submodule.mem_sup
+
 @[simp]
 theorem submodule_span_eq {s : Set α} : Submodule.span α s = Ideal.span s :=
   rfl

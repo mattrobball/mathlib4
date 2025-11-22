@@ -33,8 +33,11 @@ open Pointwise
 
 /-- A (left) ideal in a semiring `R` is an additive submonoid `s` such that
 `a * b ∈ s` whenever `b ∈ s`. If `R` is a ring, then `s` is an additive subgroup. -/
-abbrev Ideal (R : Type u) [Semiring R] :=
+def Ideal (R : Type u) [Semiring R] :=
   Submodule R R
+
+instance (R : Type*) [Semiring R] : Coe (Ideal R) (Submodule R R) where
+  coe I := I
 
 section Semiring
 
@@ -42,9 +45,30 @@ namespace Ideal
 
 variable [Semiring α] (I : Ideal α) {a b : α}
 
+instance : SetLike (Ideal α) α :=
+  inferInstanceAs (SetLike (Submodule α α) α)
+
+instance : AddSubmonoidClass (Ideal α) α :=
+  inferInstanceAs (AddSubmonoidClass (Submodule α α) α)
+
+instance {α} [Ring α] : AddSubgroupClass (Ideal α) α :=
+  inferInstanceAs (AddSubgroupClass (Submodule α α) α)
+
+instance module' {S} [Semiring S] [Module S α] [IsScalarTower S α α] : Module S I :=
+  Submodule.module' ..
+
+instance : Module α I := I.module'
+
 /-- A left ideal `I : Ideal R` is two-sided if it is also a right ideal. -/
 @[mk_iff] class IsTwoSided : Prop where
   mul_mem_of_left {a : α} (b : α) : a ∈ I → a * b ∈ I
+
+/-- We make the priority `high` to avoid use of `Submodule.mem_toAddSubgroup`
+which exposes `Submodule` -/
+@[simp high]
+theorem mem_toAddSubgroup {α} [Ring α] (I : Ideal α) {a : α} :
+    a ∈ I.toAddSubgroup ↔ a ∈ I := by
+  simp only [*, Submodule.mem_toAddSubgroup]
 
 protected theorem zero_mem : (0 : α) ∈ I :=
   Submodule.zero_mem I

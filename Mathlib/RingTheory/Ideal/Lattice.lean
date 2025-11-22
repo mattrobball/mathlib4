@@ -32,6 +32,14 @@ namespace Ideal
 
 variable [Semiring α] (I : Ideal α) {a b : α}
 
+instance [Nontrivial α] : Nontrivial (Ideal α) :=
+  inferInstanceAs <| Nontrivial (Submodule α α)
+
+instance [Subsingleton α] : Unique (Ideal α) :=
+  inferInstanceAs <| Unique (Submodule α α)
+
+instance : CompleteLattice (Ideal α) := inferInstanceAs <| CompleteLattice (Submodule α α)
+
 instance (priority := low) : IsTwoSided (⊥ : Ideal α) :=
   ⟨fun _ h ↦ by rw [h, zero_mul]; exact zero_mem _⟩
 
@@ -39,6 +47,10 @@ instance (priority := low) : IsTwoSided (⊤ : Ideal α) := ⟨fun _ _ ↦ trivi
 
 instance (priority := low) {ι} (I : ι → Ideal α) [∀ i, (I i).IsTwoSided] : (⨅ i, I i).IsTwoSided :=
   ⟨fun _ h ↦ (Submodule.mem_iInf _).mpr (mul_mem_right _ _ <| (Submodule.mem_iInf _).mp h ·)⟩
+
+@[simp]
+theorem top_coe : ((⊤ : Ideal α) : Set α) = Set.univ :=
+  rfl
 
 theorem eq_top_of_unit_mem (x y : α) (hx : x ∈ I) (h : y * x = 1) : I = ⊤ :=
   eq_top_iff.2 fun z _ =>
@@ -56,6 +68,10 @@ theorem eq_top_iff_one : I = ⊤ ↔ (1 : α) ∈ I :=
 
 theorem ne_top_iff_one : I ≠ ⊤ ↔ (1 : α) ∉ I :=
   not_congr I.eq_top_iff_one
+
+@[simp]
+theorem mem_top {x : α} : x ∈ (⊤ : Ideal α) :=
+  trivial
 
 section Lattice
 
@@ -83,6 +99,7 @@ theorem mem_inf {I J : Ideal R} {x : R} : x ∈ I ⊓ J ↔ x ∈ I ∧ x ∈ J 
 theorem mem_iInf {ι : Sort*} {I : ι → Ideal R} {x : R} : x ∈ iInf I ↔ ∀ i, x ∈ I i :=
   Submodule.mem_iInf _
 
+@[simp]
 theorem mem_bot {x : R} : x ∈ (⊥ : Ideal R) ↔ x = 0 :=
   Submodule.mem_bot _
 

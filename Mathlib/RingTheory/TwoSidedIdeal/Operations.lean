@@ -5,9 +5,8 @@ Authors: Jujian Zhang, Jireh Loreaux, Yunzhou Xie
 -/
 import Mathlib.Algebra.Group.Subgroup.Map
 import Mathlib.Algebra.Module.Opposite
-import Mathlib.Algebra.Module.Submodule.Lattice
 import Mathlib.RingTheory.Congruence.Opposite
-import Mathlib.RingTheory.Ideal.Defs
+import Mathlib.RingTheory.Ideal.Lattice
 import Mathlib.RingTheory.TwoSidedIdeal.Lattice
 import Mathlib.Algebra.Group.Pointwise.Set.Basic
 
@@ -327,7 +326,7 @@ def asIdeal : TwoSidedIdeal R →o Ideal R where
 
 @[simp]
 lemma mem_asIdeal {I : TwoSidedIdeal R} {x : R} :
-    x ∈ asIdeal I ↔ x ∈ I := by simp [asIdeal]
+    x ∈ asIdeal I ↔ x ∈ I := by simp [Ideal, asIdeal]
 
 lemma gc : GaloisConnection fromIdeal (asIdeal (R := R)) :=
   fun I J => ⟨fun h x hx ↦ h <| mem_span_iff.2 fun _ H ↦ H hx, fun h x hx ↦ by
@@ -348,7 +347,6 @@ instance (I : TwoSidedIdeal R) : I.asIdeal.IsTwoSided :=
 def asIdealOpposite : TwoSidedIdeal R →o Ideal Rᵐᵒᵖ where
   toFun I := asIdeal ⟨I.ringCon.op⟩
   monotone' I J h x h' := by
-    simp only [mem_asIdeal, mem_iff, RingCon.op_iff, MulOpposite.unop_zero] at h' ⊢
     exact J.rel_iff _ _ |>.2 <| h <| I.rel_iff 0 x.unop |>.1 h'
 
 lemma mem_asIdealOpposite {I : TwoSidedIdeal R} {x : Rᵐᵒᵖ} :

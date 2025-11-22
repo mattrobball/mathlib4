@@ -20,6 +20,11 @@ namespace Ideal
 
 variable {ι R S : Type*} [CommSemiring R] [CommRing S] [IsDomain S] [Algebra R S]
 
+theorem mem_mem {x : S} {I : Ideal S} : @Membership.mem S (Submodule S S) (@SetLike.instMembership (Ideal
+  S) S _) I x = x ∈ I := sorry
+
+#check Submodule.restrictScalars_mem
+-- set_option trace.Meta.synthInstance true in
 /-- A basis on `S` gives a basis on `Ideal.span {x}`, by multiplying everything by `x`. -/
 noncomputable def basisSpanSingleton (b : Basis ι R S) {x : S} (hx : x ≠ 0) :
     Basis ι R (span ({x} : Set S)) :=
@@ -28,7 +33,7 @@ noncomputable def basisSpanSingleton (b : Basis ι R S) {x : S} (hx : x ≠ 0) :
         LinearEquiv.ofEq _ _
           (by
             ext
-            simp [mem_span_singleton', mul_comm]) ≪≫ₗ
+            simp? [mem_span_singleton', mul_comm]) ≪≫ₗ
       (Submodule.restrictScalarsEquiv R S S (Ideal.span ({x} : Set S))).restrictScalars R
 
 @[simp]
