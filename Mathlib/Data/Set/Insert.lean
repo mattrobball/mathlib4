@@ -73,7 +73,6 @@ alias eq_of_not_mem_of_mem_insert := eq_of_mem_insert_of_notMem
 theorem mem_insert_iff {x a : α} {s : Set α} : x ∈ insert a s ↔ x = a ∨ x ∈ s :=
   Iff.rfl
 
-@[simp]
 theorem insert_eq_of_mem {a : α} {s : Set α} (h : a ∈ s) : insert a s = s := by grind
 
 theorem ne_insert_of_notMem {s : Set α} (t : Set α) {a : α} : a ∉ s → s ≠ insert a t := by grind
