@@ -55,7 +55,19 @@ variable (P : Extension.{w} R S)
 The cotangent space on `P = R[X]`.
 This is isomorphic to `Sⁿ` with `n` being the number of variables of `P`.
 -/
-abbrev CotangentSpace : Type _ := S ⊗[P.Ring] Ω[P.Ring⁄R]
+def CotangentSpace : Type _ := S ⊗[P.Ring] Ω[P.Ring⁄R]
+
+noncomputable instance : AddCommGroup P.CotangentSpace :=
+  inferInstanceAs <| AddCommGroup (S ⊗[P.Ring] Ω[P.Ring⁄R])
+
+noncomputable instance : Module S P.CotangentSpace :=
+  inferInstanceAs <| Module S (S ⊗[P.Ring] Ω[P.Ring⁄R])
+
+noncomputable instance : Module P.Ring P.CotangentSpace :=
+  inferInstanceAs <| Module P.Ring (S ⊗[P.Ring] Ω[P.Ring⁄R])
+
+noncomputable instance : IsScalarTower P.Ring S P.CotangentSpace :=
+  inferInstanceAs <| IsScalarTower P.Ring S (S ⊗[P.Ring] Ω[P.Ring⁄R])
 
 /-- The cotangent complex given by a presentation `R[X] → S` (i.e. a closed embedding `S ↪ Aⁿ`). -/
 noncomputable
@@ -90,31 +102,46 @@ variable [IsScalarTower R R' R''] [IsScalarTower S S' S'']
 
 namespace CotangentSpace
 
+noncomputable instance : Module S P'.CotangentSpace :=
+  inferInstanceAs <| Module S (S' ⊗[P'.Ring] Ω[P'.Ring⁄R'])
+
 /--
 This is the map on the cotangent space associated to a map of presentation.
 The matrix associated to this map is the Jacobian matrix. See `CotangentSpace.repr_map`.
 -/
 protected noncomputable
-def map (f : Hom P P') : P.CotangentSpace →ₗ[S] P'.CotangentSpace := by
+def map (f : Hom P P') : P.CotangentSpace →ₗ[S] P'.CotangentSpace :=
   letI := ((algebraMap S S').comp (algebraMap P.Ring S)).toAlgebra
   haveI : IsScalarTower P.Ring S S' := IsScalarTower.of_algebraMap_eq' rfl
   letI := f.toAlgHom.toAlgebra
   haveI : IsScalarTower P.Ring P'.Ring S' :=
     IsScalarTower.of_algebraMap_eq (fun x ↦ (f.algebraMap_toRingHom x).symm)
-  apply LinearMap.liftBaseChange
-  refine (TensorProduct.mk _ _ _ 1).restrictScalars _ ∘ₗ KaehlerDifferential.map R R' P.Ring P'.Ring
+  haveI : IsScalarTower P.Ring S P'.CotangentSpace :=
+    inferInstanceAs <| IsScalarTower P.Ring S (S' ⊗[P'.Ring] Ω[P'.Ring⁄R'])
+  LinearMap.liftBaseChange _ ((TensorProduct.mk _ _ _ 1).restrictScalars _ ∘ₗ
+  KaehlerDifferential.map R R' P.Ring P'.Ring)
 
 @[simp]
 lemma map_tmul (f : Hom P P') (x y) :
     CotangentSpace.map f (x ⊗ₜ .D _ _ y) = (algebraMap _ _ x) ⊗ₜ .D _ _ (f.toAlgHom y) := by
-  simp only [CotangentSpace.map, AlgHom.toRingHom_eq_coe, LinearMap.liftBaseChange_tmul,
-    LinearMap.coe_comp, LinearMap.coe_restrictScalars, Function.comp_apply, map_D, mk_apply]
+  simp only [CotangentSpace.map, AlgHom.toRingHom_eq_coe, Extension.CotangentSpace,
+    LinearMap.liftBaseChange_tmul, LinearMap.coe_comp, LinearMap.coe_restrictScalars,
+    Function.comp_apply, map_D, mk_apply]
   rw [smul_tmul', ← Algebra.algebraMap_eq_smul_one]
   rfl
 
+-- set_option allowUnsafeReducibility true in
+-- attribute [reducible] Extension.CotangentSpace in
 @[simp]
 lemma map_id :
-    CotangentSpace.map (.id P) = LinearMap.id := by ext; simp
+    CotangentSpace.map (.id P) = LinearMap.id := by
+  ext; simp
+  sorry
+  -- exact map_tmul
+
+instance : LinearMap.CompatibleSMul P'.CotangentSpace P''.CotangentSpace S S' :=
+  inferInstanceAs <|
+    LinearMap.CompatibleSMul (S' ⊗[P'.Ring] Ω[P'.Ring⁄R']) (S'' ⊗[P''.Ring] Ω[P''.Ring⁄R'']) S S'
 
 lemma map_comp (f : Hom P P') (g : Hom P' P'') :
     CotangentSpace.map (g.comp f) =
@@ -144,6 +171,10 @@ lemma map_cotangentComplex (f : Hom P P') (x) :
     CotangentSpace.map f (P.cotangentComplex x) = P'.cotangentComplex (.map f x) := by
   obtain ⟨x, rfl⟩ := Cotangent.mk_surjective x
   rw [cotangentComplex_mk, map_tmul, map_one, Cotangent.map_mk, cotangentComplex_mk]
+
+instance : LinearMap.CompatibleSMul P'.Cotangent P'.CotangentSpace S S' :=
+  inferInstanceAs <|
+    LinearMap.CompatibleSMul P'.Cotangent (S' ⊗[P'.Ring] Ω[P'.Ring⁄R']) S S'
 
 lemma map_comp_cotangentComplex (f : Hom P P') :
     CotangentSpace.map f ∘ₗ P.cotangentComplex =
@@ -194,7 +225,7 @@ their difference induces a map `P.CotangentSpace →ₗ[S] P'.Cotangent` that ma
 between the cotangent complexes homotopic.
 -/
 noncomputable
-def Hom.sub (f g : Hom P P') : P.CotangentSpace →ₗ[S] P'.Cotangent := by
+def Hom.sub (f g : Hom P P') : P.CotangentSpace →ₗ[S] P'.Cotangent :=
   letI := ((algebraMap S S').comp (algebraMap P.Ring S)).toAlgebra
   haveI : IsScalarTower P.Ring S S' := IsScalarTower.of_algebraMap_eq' rfl
   letI := f.toAlgHom.toAlgebra
@@ -204,24 +235,25 @@ def Hom.sub (f g : Hom P P') : P.CotangentSpace →ₗ[S] P'.Cotangent := by
     IsScalarTower.of_algebraMap_eq fun x ↦
       show algebraMap R S' x = algebraMap S S' (algebraMap P.Ring S (algebraMap R P.Ring x)) by
         rw [← IsScalarTower.algebraMap_apply R P.Ring S, ← IsScalarTower.algebraMap_apply]
-  refine (Derivation.liftKaehlerDifferential ?_).liftBaseChange S
-  refine
-  { __ := Cotangent.mk.restrictScalars R ∘ₗ f.subToKer g
-    map_one_eq_zero' := ?_
-    leibniz' := ?_ }
-  · ext
-    simp [Ideal.toCotangent_eq_zero]
-  · intro x y
-    ext
-    simp only [LinearMap.coe_comp, LinearMap.coe_restrictScalars, Function.comp_apply,
-      Cotangent.val_mk, Cotangent.val_add, Cotangent.val_smul''', ← map_smul, ← map_add,
-      Ideal.toCotangent_eq]
-    exact Hom.sub_aux f g x y
+  let D : Derivation R P.Ring P'.Cotangent :=
+    { __ := Cotangent.mk.restrictScalars R ∘ₗ f.subToKer g
+      map_one_eq_zero' := by
+        ext
+        simp [Ideal.toCotangent_eq_zero]
+      leibniz' := by
+        intro x y
+        ext
+        simp only [LinearMap.coe_comp, LinearMap.coe_restrictScalars, Function.comp_apply,
+          Cotangent.val_mk, Cotangent.val_add, Cotangent.val_smul''', ← map_smul, ← map_add,
+          Ideal.toCotangent_eq]
+        exact Hom.sub_aux f g x y }
+  (Derivation.liftKaehlerDifferential D).liftBaseChange S
 
 variable [IsScalarTower R S S']
 
 lemma Hom.sub_one_tmul (f g : Hom P P') (x) :
     f.sub g (1 ⊗ₜ .D _ _ x) = Cotangent.mk (f.subToKer g x) := by
+  unfold Extension.CotangentSpace
   simp only [sub, LinearMap.liftBaseChange_tmul, Derivation.liftKaehlerDifferential_comp_D,
     Derivation.mk_coe, LinearMap.coe_comp, LinearMap.coe_restrictScalars, Function.comp_apply,
     one_smul]
@@ -229,6 +261,7 @@ lemma Hom.sub_one_tmul (f g : Hom P P') (x) :
 @[simp]
 lemma Hom.sub_tmul (f g : Hom P P') (r x) :
     f.sub g (r ⊗ₜ .D _ _ x) = r • Cotangent.mk (f.subToKer g x) := by
+  unfold Extension.CotangentSpace
   simp only [sub, LinearMap.liftBaseChange_tmul, Derivation.liftKaehlerDifferential_comp_D,
     Derivation.mk_coe, LinearMap.coe_comp, LinearMap.coe_restrictScalars, Function.comp_apply]
 
@@ -248,10 +281,12 @@ lemma CotangentSpace.map_sub_map (f g : Hom P P') :
     | add => simp only [map_add, tmul_add, LinearMap.coe_comp, LinearMap.coe_restrictScalars,
       Function.comp_apply, *]
     | tmul =>
-      simp only [Derivation.tensorProductTo_tmul, tmul_smul, smul_tmul', LinearMap.sub_apply,
-        map_tmul, Hom.toAlgHom_apply, LinearMap.coe_comp, LinearMap.coe_restrictScalars,
-        Function.comp_apply, Hom.sub_tmul, LinearMap.map_smul_of_tower, cotangentComplex_mk,
-        Hom.subToKer_apply_coe, map_sub, ← algebraMap_eq_smul_one, tmul_sub, smul_sub]
+      unfold Extension.CotangentSpace
+      sorry
+      -- simp only [Derivation.tensorProductTo_tmul, tmul_smul, smul_tmul', LinearMap.sub_apply,
+      --   map_tmul, Hom.toAlgHom_apply, LinearMap.coe_comp, LinearMap.coe_restrictScalars,
+      --   Function.comp_apply, Hom.sub_tmul, LinearMap.map_smul_of_tower, cotangentComplex_mk,
+      --   Hom.subToKer_apply_coe, map_sub, ← algebraMap_eq_smul_one, tmul_sub, smul_sub]
 
 lemma Cotangent.map_sub_map (f g : Hom P P') :
     map f - map g = (f.sub g) ∘ₗ P.cotangentComplex := by
@@ -383,6 +418,7 @@ def cotangentSpaceBasis : Basis ι S P.toExtension.CotangentSpace :=
 lemma cotangentSpaceBasis_repr_tmul (r x i) :
     P.cotangentSpaceBasis.repr (r ⊗ₜ[P.Ring] KaehlerDifferential.D R P.Ring x : _) i =
       r * aeval P.val (pderiv i x) := by
+  unfold Extension.CotangentSpace
   classical
   simp only [cotangentSpaceBasis, Basis.baseChange_repr_tmul, mvPolynomialBasis_repr_apply,
     Algebra.smul_def, mul_comm r, algebraMap_apply, toExtension]
@@ -393,6 +429,7 @@ lemma cotangentSpaceBasis_repr_one_tmul (x i) :
 
 lemma cotangentSpaceBasis_apply (i) :
     P.cotangentSpaceBasis i = ((1 : S) ⊗ₜ[P.Ring] D R P.Ring (.X i) :) := by
+  unfold Extension.CotangentSpace
   simp [cotangentSpaceBasis, toExtension]
 
 instance (P : Generators R S ι) : Module.Free S P.toExtension.CotangentSpace :=
@@ -465,6 +502,9 @@ attribute [local instance] Module.finitePresentation_of_projective in
 instance [Algebra.FinitePresentation R S] : Module.FinitePresentation S Ω[S⁄R] := by
   let P := Algebra.Presentation.ofFinitePresentation R S
   have : Algebra.FiniteType R P.toExtension.Ring := by simp [P]; infer_instance
+  have : Module.FinitePresentation S P.toExtension.CotangentSpace := sorry
+    -- inferInstanceAs <| Module.FinitePresentation S (S ⊗[P.toExtension.Ring] Ω[P.toExtension.Ring⁄R])
+
   refine Module.finitePresentation_of_surjective _ P.toExtension.toKaehler_surjective ?_
   rw [LinearMap.exact_iff.mp P.toExtension.exact_cotangentComplex_toKaehler, ← Submodule.map_top]
   exact (Extension.Cotangent.finite P.fg_ker).1.map P.toExtension.cotangentComplex
@@ -537,6 +577,10 @@ instance [FinitePresentation R S] [Module.Projective S Ω[S⁄R]] :
     .of_surjective P.equivH1Cotangent.toLinearMap P.equivH1Cotangent.surjective
   rw [Module.finite_def, Submodule.fg_top, ← LinearMap.ker_rangeRestrict]
   have := Extension.Cotangent.finite P.fg_ker
+  have : Module.FinitePresentation S P.toExtension.CotangentSpace :=
+    sorry
+    -- inferInstanceAs <| Module.FinitePresentation S (S ⊗[P.toExtension.Ring] Ω[P.toExtension.Ring⁄R])
+
   have : Module.FinitePresentation S (LinearMap.range P.toExtension.cotangentComplex) := by
     rw [← LinearMap.exact_iff.mp P.toExtension.exact_cotangentComplex_toKaehler]
     exact Module.finitePresentation_of_projective_of_exact

@@ -129,9 +129,17 @@ def CotangentSpace.compEquiv :
 section instanceProblem
 
 -- Note: these instances are needed to prevent instance search timeouts.
-attribute [local instance 999999] Zero.toOfNat0 SemilinearMapClass.distribMulActionSemiHomClass
-  SemilinearEquivClass.instSemilinearMapClass TensorProduct.addZeroClass AddZero.toZero
+-- attribute [local instance 999999] Zero.toOfNat0 SemilinearMapClass.distribMulActionSemiHomClass
+--   SemilinearEquivClass.instSemilinearMapClass TensorProduct.addZeroClass AddZero.toZero
 
+set_option trace.profiler true in
+set_option trace.Meta.synthInstance true in
+example : ZeroHomClass (Q.toExtension.CotangentSpace ≃ₗ[T] ι →₀ T)
+Q.toExtension.CotangentSpace (ι →₀ T) := inferInstance
+
+#exit
+
+set_option trace.profiler true in
 lemma CotangentSpace.compEquiv_symm_inr :
     (compEquiv Q P).symm.toLinearMap ∘ₗ
       LinearMap.inr T Q.toExtension.CotangentSpace (T ⊗[S] P.toExtension.CotangentSpace) =
@@ -147,7 +155,7 @@ lemma CotangentSpace.compEquiv_symm_inr :
     Basis.repr_linearCombination, LinearMap.liftBaseChange_tmul, one_smul, repr_CotangentSpaceMap]
   obtain (j | j) := j <;>
     simp only [Basis.prod_repr_inr, Basis.baseChange_repr_tmul,
-      Basis.repr_self, Basis.prod_repr_inl, map_zero, Finsupp.coe_zero,
+      Basis.repr_self, Basis.prod_repr_inl, LinearEquiv.map_zero, Finsupp.coe_zero,
       Pi.zero_apply, ne_eq, not_false_eq_true, Pi.single_eq_of_ne, Pi.single_apply,
       Finsupp.single_apply, ite_smul, one_smul, zero_smul, Sum.inr.injEq,
       MonoidWithZeroHom.map_ite_one_zero, reduceCtorEq]
