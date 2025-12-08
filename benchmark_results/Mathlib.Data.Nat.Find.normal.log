@@ -1,0 +1,7 @@
+✔ [122/123] Built Batteries.WF (238ms)
+✔ [123/123] Built Mathlib.Data.Nat.Find (862ms)
+Build completed successfully (123 jobs).
+
+real	0m1.500s
+user	0m1.738s
+sys	0m0.494s

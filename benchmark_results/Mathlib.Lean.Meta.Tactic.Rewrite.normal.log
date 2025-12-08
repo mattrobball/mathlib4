@@ -1,0 +1,6 @@
+✔ [48/48] Built Mathlib.Lean.Meta.Tactic.Rewrite (333ms)
+Build completed successfully (48 jobs).
+
+real	0m0.801s
+user	0m0.524s
+sys	0m0.311s

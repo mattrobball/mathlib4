@@ -1,0 +1,7 @@
+✔ [51/52] Built Batteries.Classes.RatCast (147ms)
+✔ [52/52] Built Mathlib.Data.Rat.Init (389ms)
+Build completed successfully (52 jobs).
+
+real	0m0.992s
+user	0m0.741s
+sys	0m0.332s

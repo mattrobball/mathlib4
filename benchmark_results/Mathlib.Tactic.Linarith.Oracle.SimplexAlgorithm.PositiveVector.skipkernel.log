@@ -1,0 +1,6 @@
+✔ [51/51] Built Mathlib.Tactic.Linarith.Oracle.SimplexAlgorithm.PositiveVector (402ms)
+Build completed successfully (51 jobs).
+
+real	0m0.784s
+user	0m0.645s
+sys	0m0.281s

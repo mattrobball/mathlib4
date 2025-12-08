@@ -1,0 +1,8 @@
+✔ [5/7] Built Batteries.CodeAction.Deprecated (518ms)
+✔ [6/7] Built Batteries.Tactic.Alias (1.1s)
+✔ [7/7] Built Mathlib.Lean.Expr.Basic (718ms)
+Build completed successfully (7 jobs).
+
+real	0m2.848s
+user	0m2.673s
+sys	0m0.553s

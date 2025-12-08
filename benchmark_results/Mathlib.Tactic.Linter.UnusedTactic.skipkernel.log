@@ -1,0 +1,7 @@
+✔ [6/7] Built Batteries.Tactic.Unreachable (238ms)
+✔ [7/7] Built Mathlib.Tactic.Linter.UnusedTactic (486ms)
+Build completed successfully (7 jobs).
+
+real	0m1.077s
+user	0m0.908s
+sys	0m0.314s

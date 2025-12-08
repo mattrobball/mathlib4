@@ -1,0 +1,8 @@
+✔ [576/578] Built Batteries.Data.DList.Basic (217ms)
+✔ [577/578] Built Batteries.Data.DList.Lemmas (181ms)
+✔ [578/578] Built Mathlib.Data.DList.Instances (744ms)
+Build completed successfully (578 jobs).
+
+real	0m1.610s
+user	0m1.315s
+sys	0m0.647s

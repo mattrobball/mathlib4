@@ -1,0 +1,7 @@
+✔ [164/165] Built Batteries.Tactic.Congr (548ms)
+✔ [165/165] Built Mathlib.Control.Monad.Cont (874ms)
+Build completed successfully (165 jobs).
+
+real	0m1.830s
+user	0m1.851s
+sys	0m0.519s

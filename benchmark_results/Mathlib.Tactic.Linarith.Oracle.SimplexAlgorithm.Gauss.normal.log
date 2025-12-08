@@ -1,0 +1,6 @@
+✔ [49/49] Built Mathlib.Tactic.Linarith.Oracle.SimplexAlgorithm.Gauss (456ms)
+Build completed successfully (49 jobs).
+
+real	0m0.896s
+user	0m0.695s
+sys	0m0.303s

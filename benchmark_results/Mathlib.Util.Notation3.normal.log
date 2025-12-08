@@ -1,0 +1,7 @@
+✔ [54/55] Built Batteries.Lean.Syntax (150ms)
+✔ [55/55] Built Mathlib.Util.Notation3 (4.5s)
+Build completed successfully (55 jobs).
+
+real	0m5.102s
+user	0m5.636s
+sys	0m0.437s

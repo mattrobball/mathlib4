@@ -1,0 +1,7 @@
+✔ [51/52] Built Batteries.Data.String.Matcher (184ms)
+✔ [52/52] Built Mathlib.Tactic.Linter.TextBased (1.0s)
+Build completed successfully (52 jobs).
+
+real	0m1.594s
+user	0m1.644s
+sys	0m0.373s

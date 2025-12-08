@@ -1,0 +1,7 @@
+✔ [53/54] Built Batteries.Tactic.Init (497ms)
+✔ [54/54] Built Mathlib.Data.Int.Init (716ms)
+Build completed successfully (54 jobs).
+
+real	0m1.578s
+user	0m1.874s
+sys	0m0.428s

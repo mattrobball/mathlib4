@@ -1,0 +1,13 @@
+✔ [50/57] Built Batteries.Lean.TagAttribute (190ms)
+✔ [51/57] Built Batteries.Util.ProofWanted (325ms)
+✔ [52/57] Built Batteries.Lean.AttributeExtra (241ms)
+✔ [53/57] Built Batteries.Tactic.SeqFocus (426ms)
+✔ [54/57] Built Batteries.Linter.UnnecessarySeqFocus (662ms)
+✔ [55/57] Built Batteries.Linter (250ms)
+✔ [56/57] Built Batteries.Tactic.Basic (247ms)
+✔ [57/57] Built Mathlib.Tactic.GCongr.ForwardAttr (417ms)
+Build completed successfully (57 jobs).
+
+real	0m2.434s
+user	0m2.556s
+sys	0m0.870s

@@ -1,0 +1,7 @@
+✔ [70/71] Built Batteries.Lean.Meta.UnusedNames (229ms)
+✔ [71/71] Built Mathlib.Tactic.Lift (1.0s)
+Build completed successfully (71 jobs).
+
+real	0m1.745s
+user	0m1.508s
+sys	0m0.446s

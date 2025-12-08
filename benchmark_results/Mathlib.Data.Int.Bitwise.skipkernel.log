@@ -1,0 +1,7 @@
+✔ [573/574] Built Batteries.Data.Int (296ms)
+✔ [574/574] Built Mathlib.Data.Int.Bitwise (1.1s)
+Build completed successfully (574 jobs).
+
+real	0m1.883s
+user	0m2.566s
+sys	0m0.593s

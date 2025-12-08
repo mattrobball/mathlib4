@@ -1,0 +1,12 @@
+✔ [8/14] Built Batteries.Util.LibraryNote (277ms)
+✔ [9/14] Built Batteries.Tactic.Lint.TypeClass (336ms)
+✔ [10/14] Built Batteries.Tactic.OpenPrivate (655ms)
+✔ [11/14] Built Batteries.Tactic.Lint.Frontend (881ms)
+✔ [12/14] Built Batteries.Tactic.Lint.Simp (682ms)
+✔ [13/14] Built Batteries.Tactic.Lint (233ms)
+✔ [14/14] Built Mathlib.Tactic.Linter.Lint (414ms)
+Build completed successfully (14 jobs).
+
+real	0m2.390s
+user	0m3.540s
+sys	0m0.781s

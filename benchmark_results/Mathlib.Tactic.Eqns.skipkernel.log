@@ -1,0 +1,7 @@
+✔ [48/49] Built Batteries.Lean.NameMapAttribute (219ms)
+✔ [49/49] Built Mathlib.Tactic.Eqns (310ms)
+Build completed successfully (49 jobs).
+
+real	0m0.960s
+user	0m0.685s
+sys	0m0.320s

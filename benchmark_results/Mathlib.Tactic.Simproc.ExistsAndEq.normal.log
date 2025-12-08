@@ -1,0 +1,6 @@
+✔ [64/64] Built Mathlib.Tactic.Simproc.ExistsAndEq (1.3s)
+Build completed successfully (64 jobs).
+
+real	0m1.846s
+user	0m2.048s
+sys	0m0.486s

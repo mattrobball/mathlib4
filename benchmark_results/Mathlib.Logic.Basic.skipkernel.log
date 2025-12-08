@@ -1,0 +1,7 @@
+✔ [74/75] Built Batteries.Tactic.Trans (1.5s)
+✔ [75/75] Built Mathlib.Logic.Basic (1.1s)
+Build completed successfully (75 jobs).
+
+real	0m2.949s
+user	0m4.260s
+sys	0m0.686s

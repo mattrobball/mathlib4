@@ -1,0 +1,7 @@
+✔ [100/101] Built Batteries.Classes.Order (408ms)
+✔ [101/101] Built Mathlib.Order.Defs.LinearOrder (1.1s)
+Build completed successfully (101 jobs).
+
+real	0m1.903s
+user	0m2.148s
+sys	0m0.559s

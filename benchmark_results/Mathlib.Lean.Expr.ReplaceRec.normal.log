@@ -1,0 +1,6 @@
+✔ [49/49] Built Mathlib.Lean.Expr.ReplaceRec (330ms)
+Build completed successfully (49 jobs).
+
+real	0m0.804s
+user	0m0.514s
+sys	0m0.307s

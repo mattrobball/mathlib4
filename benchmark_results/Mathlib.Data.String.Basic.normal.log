@@ -1,0 +1,8 @@
+✔ [525/527] Built Batteries.Data.String.Legacy (307ms)
+✔ [526/527] Built Batteries.Data.String.Lemmas (2.1s)
+✔ [527/527] Built Mathlib.Data.String.Basic (1.3s)
+Build completed successfully (527 jobs).
+
+real	0m4.130s
+user	0m7.811s
+sys	0m0.764s

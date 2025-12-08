@@ -1,0 +1,7 @@
+✔ [48/49] Built Batteries.Util.ExtendedBinder (414ms)
+✔ [49/49] Built Mathlib.Data.Set.Defs (887ms)
+Build completed successfully (49 jobs).
+
+real	0m1.718s
+user	0m1.662s
+sys	0m0.414s

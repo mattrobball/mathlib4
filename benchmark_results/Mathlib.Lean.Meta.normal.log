@@ -1,0 +1,29 @@
+✔ [47/60] Built Batteries.Data.List.Init.Lemmas (165ms)
+✔ [49/71] Built Batteries.Lean.Position (219ms)
+✔ [50/71] Built Batteries.Data.List.ArrayMap (236ms)
+✔ [51/71] Built Batteries.Data.List.Count (216ms)
+✔ [52/71] Built Batteries.Control.ForInStep.Basic (217ms)
+✔ [53/71] Built Batteries.Control.ForInStep.Lemmas (279ms)
+✔ [54/71] Built Batteries.Lean.Except (322ms)
+✔ [55/71] Built Batteries.CodeAction.Attr (630ms)
+✔ [56/71] Built Batteries.Lean.EStateM (523ms)
+✔ [57/71] Built Batteries.Data.Array.Match (616ms)
+✔ [58/71] Built Batteries.Data.List.Matcher (243ms)
+✔ [59/71] Built Batteries.CodeAction.Basic (598ms)
+✔ [60/71] Built Batteries.Classes.SatisfiesM (668ms)
+✔ [61/71] Built Batteries.Data.List.Monadic (218ms)
+✔ [62/71] Built Batteries.CodeAction.Misc (1.6s)
+✔ [63/71] Built Batteries.Data.List.Basic (2.4s)
+✔ [64/71] Built Batteries.Data.List.Pairwise (355ms)
+✔ [65/71] Built Batteries.Data.List.Scan (590ms)
+✔ [66/71] Built Batteries.Data.List.Lemmas (3.1s)
+✔ [67/71] Built Batteries.Data.List.Perm (467ms)
+✔ [68/71] Built Batteries.Data.List (268ms)
+✔ [69/71] Built Batteries.CodeAction.Match (589ms)
+✔ [70/71] Built Batteries.CodeAction (260ms)
+✔ [71/71] Built Mathlib.Lean.Meta (450ms)
+Build completed successfully (71 jobs).
+
+real	0m8.006s
+user	0m19.203s
+sys	0m2.519s

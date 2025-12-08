@@ -1,0 +1,7 @@
+✔ [49/50] Built Batteries.Logic (284ms)
+✔ [50/50] Built Mathlib.Data.Prod.PProd (320ms)
+Build completed successfully (50 jobs).
+
+real	0m0.969s
+user	0m0.766s
+sys	0m0.376s

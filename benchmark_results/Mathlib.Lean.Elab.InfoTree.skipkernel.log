@@ -1,0 +1,8 @@
+✔ [7/9] Built Batteries.Tactic.Lint.Basic (459ms)
+✔ [8/9] Built Batteries.Tactic.Lint.Misc (530ms)
+✔ [9/9] Built Mathlib.Lean.Elab.InfoTree (315ms)
+Build completed successfully (9 jobs).
+
+real	0m2.321s
+user	0m1.590s
+sys	0m0.435s

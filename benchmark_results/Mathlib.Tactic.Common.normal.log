@@ -1,0 +1,12 @@
+✔ [442/448] Built LeanSearchClient.Basic (177ms)
+✔ [443/448] Built Batteries.Tactic.Case (1.1s)
+✔ [444/448] Built LeanSearchClient.Syntax (1.1s)
+✔ [445/448] Built Batteries.Tactic.HelpCmd (2.5s)
+✔ [446/448] Built LeanSearchClient.LoogleSyntax (820ms)
+✔ [447/448] Built LeanSearchClient (234ms)
+✔ [448/448] Built Mathlib.Tactic.Common (698ms)
+Build completed successfully (448 jobs).
+
+real	0m4.069s
+user	0m6.622s
+sys	0m1.073s

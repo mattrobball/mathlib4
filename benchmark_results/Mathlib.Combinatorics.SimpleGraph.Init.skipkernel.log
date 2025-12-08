@@ -1,0 +1,15 @@
+✔ [200/214] Built Batteries.Lean.HashSet (189ms)
+✔ [206/214] Built Batteries.Data.BinomialHeap.Basic (3.2s)
+✔ [207/214] Built Aesop.Search.Queue (569ms)
+✔ [208/214] Built Aesop.Saturate (1.5s)
+✔ [209/214] Built Aesop.Search.Main (1.7s)
+✔ [210/214] Built Aesop.Frontend.Saturate (854ms)
+✔ [211/214] Built Aesop.Frontend (502ms)
+✔ [212/214] Built Aesop.Main (903ms)
+✔ [213/214] Built Aesop (497ms)
+✔ [214/214] Built Mathlib.Combinatorics.SimpleGraph.Init (552ms)
+Build completed successfully (214 jobs).
+
+real	0m7.873s
+user	0m10.690s
+sys	0m1.803s

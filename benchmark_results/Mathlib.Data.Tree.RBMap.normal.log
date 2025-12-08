@@ -1,0 +1,7 @@
+✔ [63/64] Built Batteries.Data.RBMap.Basic (1.5s)
+✔ [64/64] Built Mathlib.Data.Tree.RBMap (498ms)
+Build completed successfully (64 jobs).
+
+real	0m2.452s
+user	0m2.791s
+sys	0m0.554s

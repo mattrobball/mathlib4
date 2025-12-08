@@ -1,0 +1,6 @@
+✔ [12/12] Built Mathlib.Tactic.Linter.UnusedInstancesInType (527ms)
+Build completed successfully (12 jobs).
+
+real	0m1.017s
+user	0m0.741s
+sys	0m0.293s

@@ -1,0 +1,7 @@
+✔ [536/537] Built Batteries.Data.Fin.Lemmas (871ms)
+✔ [537/537] Built Mathlib.Data.Fin.Tuple.Basic (2.5s)
+Build completed successfully (537 jobs).
+
+real	0m3.851s
+user	0m7.845s
+sys	0m0.804s

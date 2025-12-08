@@ -1,0 +1,17 @@
+✔ [56/144] Built Batteries.Data.String.Basic (230ms)
+✔ [57/144] Built Batteries.Lean.MonadBacktrack (185ms)
+✔ [58/144] Built Batteries.Lean.Meta.Expr (186ms)
+✔ [59/144] Built Batteries.Data.Array.Basic (296ms)
+✔ [60/144] Built Batteries.Lean.Meta.Basic (317ms)
+✔ [61/144] Built Batteries.Lean.PersistentHashMap (226ms)
+✔ [62/144] Built Batteries.Lean.PersistentHashSet (260ms)
+✔ [63/144] Built Batteries.Lean.Meta.SavedState (232ms)
+✔ [64/144] Built Batteries.Lean.Meta.InstantiateMVars (232ms)
+✔ [72/144] Built Batteries.Data.Array.Merge (874ms)
+✔ [136/144] Built Batteries.Lean.Meta.DiscrTree (199ms)
+✔ [144/144] Built Mathlib.Tactic.Bound.Init (570ms)
+Build completed successfully (144 jobs).
+
+real	0m2.107s
+user	0m4.290s
+sys	0m1.255s

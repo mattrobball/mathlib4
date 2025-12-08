@@ -1,0 +1,6 @@
+✔ [4/4] Built Mathlib.Lean.Elab.Tactic.Meta (438ms)
+Build completed successfully (4 jobs).
+
+real	0m1.054s
+user	0m0.520s
+sys	0m0.522s

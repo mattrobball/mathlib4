@@ -1,0 +1,6 @@
+✔ [394/394] Built Mathlib.Algebra.GroupWithZero.Submonoid.CancelMulZero (617ms)
+Build completed successfully (394 jobs).
+
+real	0m1.077s
+user	0m0.804s
+sys	0m0.394s

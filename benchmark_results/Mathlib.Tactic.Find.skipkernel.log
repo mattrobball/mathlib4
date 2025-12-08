@@ -1,0 +1,7 @@
+✔ [48/49] Built Batteries.Util.Cache (320ms)
+✔ [49/49] Built Mathlib.Tactic.Find (485ms)
+Build completed successfully (49 jobs).
+
+real	0m1.179s
+user	0m1.082s
+sys	0m0.358s

@@ -1,0 +1,7 @@
+✔ [119/120] Built Batteries.Data.Nat.Basic (263ms)
+✔ [120/120] Built Mathlib.Data.Nat.Sqrt (1.2s)
+Build completed successfully (120 jobs).
+
+real	0m1.998s
+user	0m2.228s
+sys	0m0.506s

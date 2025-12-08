@@ -1,0 +1,6 @@
+✔ [4/4] Built Mathlib.Tactic.Linter.UnusedTacticExtension (386ms)
+Build completed successfully (4 jobs).
+
+real	0m0.788s
+user	0m0.555s
+sys	0m0.271s

@@ -1,0 +1,7 @@
+✔ [509/663] Built Batteries.Lean.HashMap (163ms)
+✔ [663/663] Built Mathlib.Tactic.Linarith.Oracle.FourierMotzkin (952ms)
+Build completed successfully (663 jobs).
+
+real	0m1.507s
+user	0m1.591s
+sys	0m0.546s

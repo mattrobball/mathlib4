@@ -1,0 +1,6 @@
+✔ [4/4] Built Mathlib.Tactic.Linter.DeprecatedSyntaxLinter (660ms)
+Build completed successfully (4 jobs).
+
+real	0m1.107s
+user	0m0.933s
+sys	0m0.284s

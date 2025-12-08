@@ -1,0 +1,7 @@
+✔ [9/10] Built Batteries.Lean.Meta.Inaccessible (261ms)
+✔ [10/10] Built Mathlib.Tactic.ExtractGoal (721ms)
+Build completed successfully (10 jobs).
+
+real	0m1.420s
+user	0m1.092s
+sys	0m0.394s

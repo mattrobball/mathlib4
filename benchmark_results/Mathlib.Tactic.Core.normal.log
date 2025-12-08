@@ -1,0 +1,7 @@
+✔ [48/49] Built Batteries.Lean.Expr (343ms)
+✔ [49/49] Built Mathlib.Tactic.Core (751ms)
+Build completed successfully (49 jobs).
+
+real	0m1.515s
+user	0m1.559s
+sys	0m0.439s

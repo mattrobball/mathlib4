@@ -1,0 +1,7 @@
+✔ [73/74] Built Batteries.Tactic.Exact (291ms)
+✔ [74/74] Built Mathlib.Tactic.FunProp.Core (2.8s)
+Build completed successfully (74 jobs).
+
+real	0m3.468s
+user	0m4.425s
+sys	0m0.456s

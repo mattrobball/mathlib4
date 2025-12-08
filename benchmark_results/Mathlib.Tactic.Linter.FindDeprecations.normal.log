@@ -1,0 +1,6 @@
+✔ [48/48] Built Mathlib.Tactic.Linter.FindDeprecations (737ms)
+Build completed successfully (48 jobs).
+
+real	0m1.210s
+user	0m1.201s
+sys	0m0.299s

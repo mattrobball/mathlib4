@@ -1,0 +1,8 @@
+✔ [487/489] Built Batteries.Data.Nat.Lemmas (430ms)
+✔ [488/489] Built Batteries.Data.Fin.Basic (544ms)
+✔ [489/489] Built Mathlib.Data.Fin.Basic (1.4s)
+Build completed successfully (489 jobs).
+
+real	0m2.851s
+user	0m3.708s
+sys	0m0.801s

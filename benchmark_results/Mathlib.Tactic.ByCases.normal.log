@@ -1,0 +1,7 @@
+✔ [80/81] Built Batteries.Tactic.PermuteGoals (323ms)
+✔ [81/81] Built Mathlib.Tactic.ByCases (593ms)
+Build completed successfully (81 jobs).
+
+real	0m1.425s
+user	0m0.991s
+sys	0m0.455s

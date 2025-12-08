@@ -1,0 +1,12 @@
+✔ [70/76] Built Batteries.Control.Lemmas (200ms)
+✔ [71/76] Built Batteries.Control.LawfulMonadState (565ms)
+✔ [72/76] Built Batteries.Control.OptionT (244ms)
+✔ [73/76] Built Batteries.Control.AlternativeMonad (424ms)
+✔ [74/76] Built Batteries.Data.MLList.Basic (597ms)
+✔ [75/76] Built Batteries.Control.Nondet.Basic (326ms)
+✔ [76/76] Built Mathlib.Tactic.Hint (714ms)
+Build completed successfully (76 jobs).
+
+real	0m3.318s
+user	0m3.753s
+sys	0m0.747s

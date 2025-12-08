@@ -1,0 +1,7 @@
+✔ [50/51] Built Batteries.Tactic.GeneralizeProofs (2.1s)
+✔ [51/51] Built Mathlib.Tactic.GeneralizeProofs (302ms)
+Build completed successfully (51 jobs).
+
+real	0m2.827s
+user	0m2.942s
+sys	0m0.389s
