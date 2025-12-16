@@ -491,11 +491,9 @@ theorem finiteMultiplicity_X_sub_C (a : R) (h0 : p ≠ 0) : FiniteMultiplicity (
   rw [degree_X_sub_C]
   decide
 
-/- TODO: stripping out classical for decidability instance parameter might
-make for better ergonomics -/
-/-- The largest power of `X - C a` which divides `p`.
-This *could be* computable via the divisibility algorithm `Polynomial.decidableDvdMonic`,
-as shown by `Polynomial.rootMultiplicity_eq_nat_find_of_nonzero` which has a computable RHS. -/
+theorem Polynomial.Monic.pow {R : Type*} [Semiring R] {p : Polynomial R} (hp :
+    p.Monic) (n : ℕ) : (p ^ n).Monic := sorry
+
 def rootMultiplicity (a : R) (p : R[X]) : ℕ :=
   letI := Classical.decEq R
   if h0 : p = 0 then 0

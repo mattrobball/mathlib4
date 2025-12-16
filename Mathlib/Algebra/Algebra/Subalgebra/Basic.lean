@@ -295,8 +295,8 @@ section
 
 /-! `Subalgebra`s inherit structure from their `Submodule` coercions. -/
 
-
-instance (priority := low) module' [Semiring R'] [SMul R' R] [Module R' A] [IsScalarTower R' R A] :
+instance (priority := low) module' {R' R A : Type*} [CommSemiring R] [Semiring A] [Algebra R A]
+    (S : Subalgebra R A) [Semiring R'] [SMul R' R] [Module R' A] [IsScalarTower R' R A] :
     Module R' S :=
   S.toSubmodule.module'
 

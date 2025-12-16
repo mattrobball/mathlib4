@@ -1,0 +1,2236 @@
+⚠ [1806/1806] Built Mathlib.FieldTheory.Normal.Basic (29s)
+info: Mathlib/FieldTheory/Normal/Basic.lean:121:2: Try this:
+  [apply] refine ?_
+    (@Eq.mp.{0}
+      (@Polynomial.Splits.{u_2}
+        (@Subtype.{u_2 + 1} K fun (x : K) ↦
+          @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+            (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+              (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+            (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+              (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                  (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+              fun (i : ι) ↦ t i)
+            x)
+        (@DivisionSemiring.toSemiring.{u_2}
+          (@Subtype.{u_2 + 1} K fun (x : K) ↦
+            @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+              (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+              (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                    (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                fun (i : ι) ↦ t i)
+              x)
+          (@Semifield.toDivisionSemiring.{u_2}
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                x)
+            (@Field.toSemifield.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)))))
+        (@Polynomial.map.{u_2, u_2}
+          (@Subtype.{u_2 + 1} K fun (x : K) ↦
+            @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+              (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+              E x)
+          (@Subtype.{u_2 + 1} K fun (x : K) ↦
+            @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+              (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+              (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                    (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                fun (i : ι) ↦ t i)
+              x)
+          (@DivisionSemiring.toSemiring.{u_2}
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                E x)
+            (@Semifield.toDivisionSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  E x)
+              (@Field.toSemifield.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    E x)
+                (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2 E))))
+          (@DivisionSemiring.toSemiring.{u_2}
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                x)
+            (@Semifield.toDivisionSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@Field.toSemifield.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)
+                    x)
+                (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)))))
+          (@AlgHom.toRingHom.{u_1, u_2, u_2} F
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                E x)
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                x)
+            (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+            (@DivisionSemiring.toSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  E x)
+              (@Semifield.toDivisionSemiring.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    E x)
+                (@Field.toSemifield.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      E x)
+                  (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2 E))))
+            (@DivisionSemiring.toSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@Semifield.toDivisionSemiring.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)
+                    x)
+                (@Field.toSemifield.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                        (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                        fun (i : ι) ↦ t i)
+                      x)
+                  (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)))))
+            (@IntermediateField.algebra'.{u_1, u_1, u_2} F F K inst inst_1 inst_2 E
+              (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+              (@Algebra.toSMul.{u_1, u_1} F F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                (@CommSemiring.toSemiring.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                (@Algebra.id.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))))
+              inst_2
+              (@IsScalarTower.left.{u_1, u_2} F K
+                (@MonoidWithZero.toMonoid.{u_1} F
+                  (@Semiring.toMonoidWithZero.{u_1} F
+                    (@DivisionSemiring.toSemiring.{u_1} F
+                      (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                (@DistribMulAction.toMulAction.{u_1, u_2} F K
+                  (@MonoidWithZero.toMonoid.{u_1} F
+                    (@Semiring.toMonoidWithZero.{u_1} F
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                  (@AddCommMonoid.toAddMonoid.{u_2} K
+                    (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                      (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                        (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                          (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                            (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1)))))))
+                  (@Module.toDistribMulAction.{u_1, u_2} F K
+                    (@DivisionSemiring.toSemiring.{u_1} F
+                      (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                    (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                      (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                        (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                          (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                            (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1))))))
+                    (@Algebra.toModule.{u_1, u_2} F K
+                      (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                      (@DivisionSemiring.toSemiring.{u_2} K
+                        (@Semifield.toDivisionSemiring.{u_2} K (@Field.toSemifield.{u_2} K inst_1)))
+                      inst_2)))))
+            (@IntermediateField.algebra'.{u_1, u_1, u_2} F F K inst inst_1 inst_2
+              (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                    (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                fun (i : ι) ↦ t i)
+              (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+              (@Algebra.toSMul.{u_1, u_1} F F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                (@CommSemiring.toSemiring.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                (@Algebra.id.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))))
+              inst_2
+              (@IsScalarTower.left.{u_1, u_2} F K
+                (@MonoidWithZero.toMonoid.{u_1} F
+                  (@Semiring.toMonoidWithZero.{u_1} F
+                    (@DivisionSemiring.toSemiring.{u_1} F
+                      (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                (@DistribMulAction.toMulAction.{u_1, u_2} F K
+                  (@MonoidWithZero.toMonoid.{u_1} F
+                    (@Semiring.toMonoidWithZero.{u_1} F
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                  (@AddCommMonoid.toAddMonoid.{u_2} K
+                    (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                      (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                        (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                          (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                            (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1)))))))
+                  (@Module.toDistribMulAction.{u_1, u_2} F K
+                    (@DivisionSemiring.toSemiring.{u_1} F
+                      (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                    (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                      (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                        (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                          (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                            (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1))))))
+                    (@Algebra.toModule.{u_1, u_2} F K
+                      (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                      (@DivisionSemiring.toSemiring.{u_2} K
+                        (@Semifield.toDivisionSemiring.{u_2} K (@Field.toSemifield.{u_2} K inst_1)))
+                      inst_2)))))
+            (@IntermediateField.inclusion.{u_1, u_2} F K inst inst_1 inst_2 E
+              (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                    (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                fun (i : ι) ↦ t i)
+              hE))
+          (@Polynomial.map.{u_1, u_2} F
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                E x)
+            (@CommSemiring.toSemiring.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+            (@DivisionSemiring.toSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  E x)
+              (@Semifield.toDivisionSemiring.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    E x)
+                (@Field.toSemifield.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      E x)
+                  (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2 E))))
+            (@algebraMap.{u_1, u_2} F
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  E x)
+              (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+              (@DivisionSemiring.toSemiring.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    E x)
+                (@Semifield.toDivisionSemiring.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      E x)
+                  (@Field.toSemifield.{u_2}
+                    (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                      @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                          (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                        E x)
+                    (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2 E))))
+              (@IntermediateField.algebra'.{u_1, u_1, u_2} F F K inst inst_1 inst_2 E
+                (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                (@Algebra.toSMul.{u_1, u_1} F F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                  (@CommSemiring.toSemiring.{u_1} F
+                    (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                  (@Algebra.id.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))))
+                inst_2
+                (@IsScalarTower.left.{u_1, u_2} F K
+                  (@MonoidWithZero.toMonoid.{u_1} F
+                    (@Semiring.toMonoidWithZero.{u_1} F
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                  (@DistribMulAction.toMulAction.{u_1, u_2} F K
+                    (@MonoidWithZero.toMonoid.{u_1} F
+                      (@Semiring.toMonoidWithZero.{u_1} F
+                        (@DivisionSemiring.toSemiring.{u_1} F
+                          (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                    (@AddCommMonoid.toAddMonoid.{u_2} K
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K
+                                (@EuclideanDomain.toCommRing.{u_2} K (@Field.toEuclideanDomain.{u_2} K inst_1))))))))
+                    (@Module.toDistribMulAction.{u_1, u_2} F K
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K
+                                (@EuclideanDomain.toCommRing.{u_2} K (@Field.toEuclideanDomain.{u_2} K inst_1)))))))
+                      (@Algebra.toModule.{u_1, u_2} F K
+                        (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                        (@DivisionSemiring.toSemiring.{u_2} K
+                          (@Semifield.toDivisionSemiring.{u_2} K (@Field.toSemifield.{u_2} K inst_1)))
+                        inst_2))))))
+            (@minpoly.{u_1, u_2} F
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@EuclideanDomain.toCommRing.{u_1} F (@Field.toEuclideanDomain.{u_1} F inst))
+              (@DivisionRing.toRing.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)
+                    x)
+                (@Field.toDivisionRing.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                        (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                        fun (i : ι) ↦ t i)
+                      x)
+                  (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i))))
+              (@IntermediateField.algebra'.{u_1, u_1, u_2} F F K inst inst_1 inst_2
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                (@CommRing.toCommSemiring.{u_1} F
+                  (@EuclideanDomain.toCommRing.{u_1} F (@Field.toEuclideanDomain.{u_1} F inst)))
+                (@Algebra.toSMul.{u_1, u_1} F F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                  (@CommSemiring.toSemiring.{u_1} F
+                    (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                  (@Algebra.id.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))))
+                inst_2
+                (@IsScalarTower.left.{u_1, u_2} F K
+                  (@MonoidWithZero.toMonoid.{u_1} F
+                    (@Semiring.toMonoidWithZero.{u_1} F
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                  (@DistribMulAction.toMulAction.{u_1, u_2} F K
+                    (@MonoidWithZero.toMonoid.{u_1} F
+                      (@Semiring.toMonoidWithZero.{u_1} F
+                        (@DivisionSemiring.toSemiring.{u_1} F
+                          (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                    (@AddCommMonoid.toAddMonoid.{u_2} K
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K
+                                (@EuclideanDomain.toCommRing.{u_2} K (@Field.toEuclideanDomain.{u_2} K inst_1))))))))
+                    (@Module.toDistribMulAction.{u_1, u_2} F K
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K
+                                (@EuclideanDomain.toCommRing.{u_2} K (@Field.toEuclideanDomain.{u_2} K inst_1)))))))
+                      (@Algebra.toModule.{u_1, u_2} F K
+                        (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                        (@DivisionSemiring.toSemiring.{u_2} K
+                          (@Semifield.toDivisionSemiring.{u_2} K (@Field.toSemifield.{u_2} K inst_1)))
+                        inst_2)))))
+              x))))
+      (@Polynomial.Splits.{u_2}
+        (@Subtype.{u_2 + 1} K fun (x : K) ↦
+          @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+            (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+              (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+            (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+              (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                  (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+              fun (i : ι) ↦ t i)
+            x)
+        (@DivisionSemiring.toSemiring.{u_2}
+          (@Subtype.{u_2 + 1} K fun (x : K) ↦
+            @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+              (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+              (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                    (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                fun (i : ι) ↦ t i)
+              x)
+          (@Semifield.toDivisionSemiring.{u_2}
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                x)
+            (@Field.toSemifield.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)))))
+        (@Polynomial.map.{u_1, u_2} F
+          (@Subtype.{u_2 + 1} K fun (x : K) ↦
+            @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+              (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+              (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                    (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                fun (i : ι) ↦ t i)
+              x)
+          (@CommSemiring.toSemiring.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+          (@DivisionSemiring.toSemiring.{u_2}
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                x)
+            (@Semifield.toDivisionSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@Field.toSemifield.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)
+                    x)
+                (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)))))
+          (@algebraMap.{u_1, u_2} F
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                x)
+            (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+            (@DivisionSemiring.toSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@Semifield.toDivisionSemiring.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)
+                    x)
+                (@Field.toSemifield.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                        (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                        fun (i : ι) ↦ t i)
+                      x)
+                  (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)))))
+            (@IntermediateField.algebra'.{u_1, u_1, u_2} F F K inst inst_1 inst_2
+              (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                    (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                fun (i : ι) ↦ t i)
+              (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+              (@Algebra.toSMul.{u_1, u_1} F F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                (@CommSemiring.toSemiring.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                (@Algebra.id.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))))
+              inst_2
+              (@IsScalarTower.left.{u_1, u_2} F K
+                (@MonoidWithZero.toMonoid.{u_1} F
+                  (@Semiring.toMonoidWithZero.{u_1} F
+                    (@DivisionSemiring.toSemiring.{u_1} F
+                      (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                (@DistribMulAction.toMulAction.{u_1, u_2} F K
+                  (@MonoidWithZero.toMonoid.{u_1} F
+                    (@Semiring.toMonoidWithZero.{u_1} F
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                  (@AddCommMonoid.toAddMonoid.{u_2} K
+                    (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                      (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                        (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                          (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                            (@CommRing.toNonUnitalCommRing.{u_2} K
+                              (@EuclideanDomain.toCommRing.{u_2} K (@Field.toEuclideanDomain.{u_2} K inst_1))))))))
+                  (@Module.toDistribMulAction.{u_1, u_2} F K
+                    (@DivisionSemiring.toSemiring.{u_1} F
+                      (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                    (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                      (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                        (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                          (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                            (@CommRing.toNonUnitalCommRing.{u_2} K
+                              (@EuclideanDomain.toCommRing.{u_2} K (@Field.toEuclideanDomain.{u_2} K inst_1)))))))
+                    (@Algebra.toModule.{u_1, u_2} F K
+                      (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                      (@DivisionSemiring.toSemiring.{u_2} K
+                        (@Semifield.toDivisionSemiring.{u_2} K (@Field.toSemifield.{u_2} K inst_1)))
+                      inst_2))))))
+          (@minpoly.{u_1, u_2} F
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                x)
+            (@EuclideanDomain.toCommRing.{u_1} F (@Field.toEuclideanDomain.{u_1} F inst))
+            (@DivisionRing.toRing.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@Field.toDivisionRing.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)
+                    x)
+                (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i))))
+            (@IntermediateField.algebra'.{u_1, u_1, u_2} F F K inst inst_1 inst_2
+              (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                    (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                fun (i : ι) ↦ t i)
+              (@CommRing.toCommSemiring.{u_1} F
+                (@EuclideanDomain.toCommRing.{u_1} F (@Field.toEuclideanDomain.{u_1} F inst)))
+              (@Algebra.toSMul.{u_1, u_1} F F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                (@CommSemiring.toSemiring.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                (@Algebra.id.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))))
+              inst_2
+              (@IsScalarTower.left.{u_1, u_2} F K
+                (@MonoidWithZero.toMonoid.{u_1} F
+                  (@Semiring.toMonoidWithZero.{u_1} F
+                    (@DivisionSemiring.toSemiring.{u_1} F
+                      (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                (@DistribMulAction.toMulAction.{u_1, u_2} F K
+                  (@MonoidWithZero.toMonoid.{u_1} F
+                    (@Semiring.toMonoidWithZero.{u_1} F
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                  (@AddCommMonoid.toAddMonoid.{u_2} K
+                    (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                      (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                        (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                          (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                            (@CommRing.toNonUnitalCommRing.{u_2} K
+                              (@EuclideanDomain.toCommRing.{u_2} K (@Field.toEuclideanDomain.{u_2} K inst_1))))))))
+                  (@Module.toDistribMulAction.{u_1, u_2} F K
+                    (@DivisionSemiring.toSemiring.{u_1} F
+                      (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                    (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                      (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                        (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                          (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                            (@CommRing.toNonUnitalCommRing.{u_2} K
+                              (@EuclideanDomain.toCommRing.{u_2} K (@Field.toEuclideanDomain.{u_2} K inst_1)))))))
+                    (@Algebra.toModule.{u_1, u_2} F K
+                      (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                      (@DivisionSemiring.toSemiring.{u_2} K
+                        (@Semifield.toDivisionSemiring.{u_2} K (@Field.toSemifield.{u_2} K inst_1)))
+                      inst_2)))))
+            x)))
+      (@congrArg.{u_2 + 1, 1}
+        (@Polynomial.{u_2}
+          (@Subtype.{u_2 + 1} K fun (x : K) ↦
+            @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+              (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+              (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                    (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                fun (i : ι) ↦ t i)
+              x)
+          (@DivisionSemiring.toSemiring.{u_2}
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                x)
+            (@Semifield.toDivisionSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@Field.toSemifield.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)
+                    x)
+                (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i))))))
+        Prop
+        (@Polynomial.map.{u_2, u_2}
+          (@Subtype.{u_2 + 1} K fun (x : K) ↦
+            @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+              (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+              E x)
+          (@Subtype.{u_2 + 1} K fun (x : K) ↦
+            @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+              (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+              (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                    (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                fun (i : ι) ↦ t i)
+              x)
+          (@DivisionSemiring.toSemiring.{u_2}
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                E x)
+            (@Semifield.toDivisionSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  E x)
+              (@Field.toSemifield.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    E x)
+                (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2 E))))
+          (@DivisionSemiring.toSemiring.{u_2}
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                x)
+            (@Semifield.toDivisionSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@Field.toSemifield.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)
+                    x)
+                (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)))))
+          (@RingHomClass.toRingHom.{u_2, u_2, u_2}
+            (@AlgHom.{u_1, u_2, u_2} F
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  E x)
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+              (@DivisionSemiring.toSemiring.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    E x)
+                (@Semifield.toDivisionSemiring.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      E x)
+                  (@Field.toSemifield.{u_2}
+                    (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                      @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                          (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                        E x)
+                    (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2 E))))
+              (@DivisionSemiring.toSemiring.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)
+                    x)
+                (@Semifield.toDivisionSemiring.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                        (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                        fun (i : ι) ↦ t i)
+                      x)
+                  (@Field.toSemifield.{u_2}
+                    (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                      @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                          (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                        (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                          (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                              (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                              (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                          fun (i : ι) ↦ t i)
+                        x)
+                    (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                      (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                        (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                        fun (i : ι) ↦ t i)))))
+              (@IntermediateField.algebra'.{u_1, u_1, u_2} F F K inst inst_1 inst_2 E
+                (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                (@Algebra.toSMul.{u_1, u_1} F F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                  (@CommSemiring.toSemiring.{u_1} F
+                    (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                  (@Algebra.id.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))))
+                inst_2
+                (@IsScalarTower.left.{u_1, u_2} F K
+                  (@MonoidWithZero.toMonoid.{u_1} F
+                    (@Semiring.toMonoidWithZero.{u_1} F
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                  (@DistribMulAction.toMulAction.{u_1, u_2} F K
+                    (@MonoidWithZero.toMonoid.{u_1} F
+                      (@Semiring.toMonoidWithZero.{u_1} F
+                        (@DivisionSemiring.toSemiring.{u_1} F
+                          (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                    (@AddCommMonoid.toAddMonoid.{u_2} K
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1)))))))
+                    (@Module.toDistribMulAction.{u_1, u_2} F K
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1))))))
+                      (@Algebra.toModule.{u_1, u_2} F K
+                        (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                        (@DivisionSemiring.toSemiring.{u_2} K
+                          (@Semifield.toDivisionSemiring.{u_2} K (@Field.toSemifield.{u_2} K inst_1)))
+                        inst_2)))))
+              (@IntermediateField.algebra'.{u_1, u_1, u_2} F F K inst inst_1 inst_2
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                (@Algebra.toSMul.{u_1, u_1} F F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                  (@CommSemiring.toSemiring.{u_1} F
+                    (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                  (@Algebra.id.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))))
+                inst_2
+                (@IsScalarTower.left.{u_1, u_2} F K
+                  (@MonoidWithZero.toMonoid.{u_1} F
+                    (@Semiring.toMonoidWithZero.{u_1} F
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                  (@DistribMulAction.toMulAction.{u_1, u_2} F K
+                    (@MonoidWithZero.toMonoid.{u_1} F
+                      (@Semiring.toMonoidWithZero.{u_1} F
+                        (@DivisionSemiring.toSemiring.{u_1} F
+                          (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                    (@AddCommMonoid.toAddMonoid.{u_2} K
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1)))))))
+                    (@Module.toDistribMulAction.{u_1, u_2} F K
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1))))))
+                      (@Algebra.toModule.{u_1, u_2} F K
+                        (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                        (@DivisionSemiring.toSemiring.{u_2} K
+                          (@Semifield.toDivisionSemiring.{u_2} K (@Field.toSemifield.{u_2} K inst_1)))
+                        inst_2))))))
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                E x)
+            (@Subtype.{u_2 + 1} K fun (x : ⋯) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K ⋯ ⋯ ⋯))
+                ⋯ ⋯)
+            ⋯ ⋯ ⋯ ⋯ ⋯)
+          ⋯)
+        ⋯ ⋯ ⋯)
+      ⋯)
+info: Mathlib/FieldTheory/Normal/Basic.lean:123:2: Try this:
+  [apply] refine ?_
+    (@Eq.mp.{0}
+      (@Polynomial.Splits.{u_2}
+        (@Subtype.{u_2 + 1} K fun (x : K) ↦
+          @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+            (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+              (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+            (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+              (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                  (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+              fun (i : ι) ↦ t i)
+            x)
+        (@DivisionSemiring.toSemiring.{u_2}
+          (@Subtype.{u_2 + 1} K fun (x : K) ↦
+            @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+              (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+              (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                    (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                fun (i : ι) ↦ t i)
+              x)
+          (@Semifield.toDivisionSemiring.{u_2}
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                x)
+            (@Field.toSemifield.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)))))
+        (@Polynomial.map.{u_2, u_2}
+          (@Subtype.{u_2 + 1} K fun (x : K) ↦
+            @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+              (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+              E x)
+          (@Subtype.{u_2 + 1} K fun (x : K) ↦
+            @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+              (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+              (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                    (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                fun (i : ι) ↦ t i)
+              x)
+          (@DivisionSemiring.toSemiring.{u_2}
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                E x)
+            (@Semifield.toDivisionSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  E x)
+              (@Field.toSemifield.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    E x)
+                (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2 E))))
+          (@DivisionSemiring.toSemiring.{u_2}
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                x)
+            (@Semifield.toDivisionSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@Field.toSemifield.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)
+                    x)
+                (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)))))
+          (@AlgHom.toRingHom.{u_1, u_2, u_2} F
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                E x)
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                x)
+            (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+            (@DivisionSemiring.toSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  E x)
+              (@Semifield.toDivisionSemiring.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    E x)
+                (@Field.toSemifield.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      E x)
+                  (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2 E))))
+            (@DivisionSemiring.toSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@Semifield.toDivisionSemiring.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)
+                    x)
+                (@Field.toSemifield.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                        (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                        fun (i : ι) ↦ t i)
+                      x)
+                  (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)))))
+            (@IntermediateField.algebra'.{u_1, u_1, u_2} F F K inst inst_1 inst_2 E
+              (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+              (@Algebra.toSMul.{u_1, u_1} F F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                (@CommSemiring.toSemiring.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                (@Algebra.id.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))))
+              inst_2
+              (@IsScalarTower.left.{u_1, u_2} F K
+                (@MonoidWithZero.toMonoid.{u_1} F
+                  (@Semiring.toMonoidWithZero.{u_1} F
+                    (@DivisionSemiring.toSemiring.{u_1} F
+                      (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                (@DistribMulAction.toMulAction.{u_1, u_2} F K
+                  (@MonoidWithZero.toMonoid.{u_1} F
+                    (@Semiring.toMonoidWithZero.{u_1} F
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                  (@AddCommMonoid.toAddMonoid.{u_2} K
+                    (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                      (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                        (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                          (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                            (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1)))))))
+                  (@Module.toDistribMulAction.{u_1, u_2} F K
+                    (@DivisionSemiring.toSemiring.{u_1} F
+                      (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                    (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                      (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                        (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                          (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                            (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1))))))
+                    (@Algebra.toModule.{u_1, u_2} F K
+                      (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                      (@DivisionSemiring.toSemiring.{u_2} K
+                        (@Semifield.toDivisionSemiring.{u_2} K (@Field.toSemifield.{u_2} K inst_1)))
+                      inst_2)))))
+            (@IntermediateField.algebra'.{u_1, u_1, u_2} F F K inst inst_1 inst_2
+              (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                    (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                fun (i : ι) ↦ t i)
+              (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+              (@Algebra.toSMul.{u_1, u_1} F F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                (@CommSemiring.toSemiring.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                (@Algebra.id.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))))
+              inst_2
+              (@IsScalarTower.left.{u_1, u_2} F K
+                (@MonoidWithZero.toMonoid.{u_1} F
+                  (@Semiring.toMonoidWithZero.{u_1} F
+                    (@DivisionSemiring.toSemiring.{u_1} F
+                      (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                (@DistribMulAction.toMulAction.{u_1, u_2} F K
+                  (@MonoidWithZero.toMonoid.{u_1} F
+                    (@Semiring.toMonoidWithZero.{u_1} F
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                  (@AddCommMonoid.toAddMonoid.{u_2} K
+                    (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                      (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                        (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                          (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                            (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1)))))))
+                  (@Module.toDistribMulAction.{u_1, u_2} F K
+                    (@DivisionSemiring.toSemiring.{u_1} F
+                      (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                    (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                      (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                        (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                          (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                            (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1))))))
+                    (@Algebra.toModule.{u_1, u_2} F K
+                      (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                      (@DivisionSemiring.toSemiring.{u_2} K
+                        (@Semifield.toDivisionSemiring.{u_2} K (@Field.toSemifield.{u_2} K inst_1)))
+                      inst_2)))))
+            (@IntermediateField.inclusion.{u_1, u_2} F K inst inst_1 inst_2 E
+              (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                    (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                fun (i : ι) ↦ t i)
+              hE))
+          (@Polynomial.map.{u_1, u_2} F
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                E x)
+            (@CommSemiring.toSemiring.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+            (@DivisionSemiring.toSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  E x)
+              (@Semifield.toDivisionSemiring.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    E x)
+                (@Field.toSemifield.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      E x)
+                  (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2 E))))
+            (@algebraMap.{u_1, u_2} F
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  E x)
+              (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+              (@DivisionSemiring.toSemiring.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    E x)
+                (@Semifield.toDivisionSemiring.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      E x)
+                  (@Field.toSemifield.{u_2}
+                    (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                      @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                          (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                        E x)
+                    (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2 E))))
+              (@IntermediateField.algebra'.{u_1, u_1, u_2} F F K inst inst_1 inst_2 E
+                (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                (@Algebra.toSMul.{u_1, u_1} F F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                  (@CommSemiring.toSemiring.{u_1} F
+                    (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                  (@Algebra.id.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))))
+                inst_2
+                (@IsScalarTower.left.{u_1, u_2} F K
+                  (@MonoidWithZero.toMonoid.{u_1} F
+                    (@Semiring.toMonoidWithZero.{u_1} F
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                  (@DistribMulAction.toMulAction.{u_1, u_2} F K
+                    (@MonoidWithZero.toMonoid.{u_1} F
+                      (@Semiring.toMonoidWithZero.{u_1} F
+                        (@DivisionSemiring.toSemiring.{u_1} F
+                          (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                    (@AddCommMonoid.toAddMonoid.{u_2} K
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K
+                                (@EuclideanDomain.toCommRing.{u_2} K (@Field.toEuclideanDomain.{u_2} K inst_1))))))))
+                    (@Module.toDistribMulAction.{u_1, u_2} F K
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K
+                                (@EuclideanDomain.toCommRing.{u_2} K (@Field.toEuclideanDomain.{u_2} K inst_1)))))))
+                      (@Algebra.toModule.{u_1, u_2} F K
+                        (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                        (@DivisionSemiring.toSemiring.{u_2} K
+                          (@Semifield.toDivisionSemiring.{u_2} K (@Field.toSemifield.{u_2} K inst_1)))
+                        inst_2))))))
+            (@minpoly.{u_1, u_2} F
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@EuclideanDomain.toCommRing.{u_1} F (@Field.toEuclideanDomain.{u_1} F inst))
+              (@DivisionRing.toRing.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)
+                    x)
+                (@Field.toDivisionRing.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                        (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                        fun (i : ι) ↦ t i)
+                      x)
+                  (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i))))
+              (@IntermediateField.algebra'.{u_1, u_1, u_2} F F K inst inst_1 inst_2
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                (@CommRing.toCommSemiring.{u_1} F
+                  (@EuclideanDomain.toCommRing.{u_1} F (@Field.toEuclideanDomain.{u_1} F inst)))
+                (@Algebra.toSMul.{u_1, u_1} F F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                  (@CommSemiring.toSemiring.{u_1} F
+                    (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                  (@Algebra.id.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))))
+                inst_2
+                (@IsScalarTower.left.{u_1, u_2} F K
+                  (@MonoidWithZero.toMonoid.{u_1} F
+                    (@Semiring.toMonoidWithZero.{u_1} F
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                  (@DistribMulAction.toMulAction.{u_1, u_2} F K
+                    (@MonoidWithZero.toMonoid.{u_1} F
+                      (@Semiring.toMonoidWithZero.{u_1} F
+                        (@DivisionSemiring.toSemiring.{u_1} F
+                          (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                    (@AddCommMonoid.toAddMonoid.{u_2} K
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K
+                                (@EuclideanDomain.toCommRing.{u_2} K (@Field.toEuclideanDomain.{u_2} K inst_1))))))))
+                    (@Module.toDistribMulAction.{u_1, u_2} F K
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K
+                                (@EuclideanDomain.toCommRing.{u_2} K (@Field.toEuclideanDomain.{u_2} K inst_1)))))))
+                      (@Algebra.toModule.{u_1, u_2} F K
+                        (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                        (@DivisionSemiring.toSemiring.{u_2} K
+                          (@Semifield.toDivisionSemiring.{u_2} K (@Field.toSemifield.{u_2} K inst_1)))
+                        inst_2)))))
+              x))))
+      (@Polynomial.Splits.{u_2}
+        (@Subtype.{u_2 + 1} K fun (x : K) ↦
+          @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+            (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+              (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+            (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+              (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                  (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+              fun (i : ι) ↦ t i)
+            x)
+        (@DivisionSemiring.toSemiring.{u_2}
+          (@Subtype.{u_2 + 1} K fun (x : K) ↦
+            @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+              (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+              (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                    (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                fun (i : ι) ↦ t i)
+              x)
+          (@Semifield.toDivisionSemiring.{u_2}
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                x)
+            (@Field.toSemifield.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)))))
+        (@Polynomial.map.{u_2, u_2}
+          (@Subtype.{u_2 + 1} K fun (x : K) ↦
+            @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+              (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+              E x)
+          (@Subtype.{u_2 + 1} K fun (x : K) ↦
+            @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+              (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+              (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                    (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                fun (i : ι) ↦ t i)
+              x)
+          (@DivisionSemiring.toSemiring.{u_2}
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                E x)
+            (@Semifield.toDivisionSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  E x)
+              (@Field.toSemifield.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    E x)
+                (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2 E))))
+          (@DivisionSemiring.toSemiring.{u_2}
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                x)
+            (@Semifield.toDivisionSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@Field.toSemifield.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)
+                    x)
+                (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)))))
+          (@RingHomClass.toRingHom.{u_2, u_2, u_2}
+            (@AlgHom.{u_1, u_2, u_2} F
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  E x)
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+              (@DivisionSemiring.toSemiring.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    E x)
+                (@Semifield.toDivisionSemiring.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      E x)
+                  (@Field.toSemifield.{u_2}
+                    (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                      @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                          (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                        E x)
+                    (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2 E))))
+              (@DivisionSemiring.toSemiring.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)
+                    x)
+                (@Semifield.toDivisionSemiring.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                        (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                        fun (i : ι) ↦ t i)
+                      x)
+                  (@Field.toSemifield.{u_2}
+                    (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                      @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                          (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                        (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                          (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                              (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                              (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                          fun (i : ι) ↦ t i)
+                        x)
+                    (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                      (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                        (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                        fun (i : ι) ↦ t i)))))
+              (@IntermediateField.algebra'.{u_1, u_1, u_2} F F K inst inst_1 inst_2 E
+                (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                (@Algebra.toSMul.{u_1, u_1} F F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                  (@CommSemiring.toSemiring.{u_1} F
+                    (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                  (@Algebra.id.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))))
+                inst_2
+                (@IsScalarTower.left.{u_1, u_2} F K
+                  (@MonoidWithZero.toMonoid.{u_1} F
+                    (@Semiring.toMonoidWithZero.{u_1} F
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                  (@DistribMulAction.toMulAction.{u_1, u_2} F K
+                    (@MonoidWithZero.toMonoid.{u_1} F
+                      (@Semiring.toMonoidWithZero.{u_1} F
+                        (@DivisionSemiring.toSemiring.{u_1} F
+                          (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                    (@AddCommMonoid.toAddMonoid.{u_2} K
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1)))))))
+                    (@Module.toDistribMulAction.{u_1, u_2} F K
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1))))))
+                      (@Algebra.toModule.{u_1, u_2} F K
+                        (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                        (@DivisionSemiring.toSemiring.{u_2} K
+                          (@Semifield.toDivisionSemiring.{u_2} K (@Field.toSemifield.{u_2} K inst_1)))
+                        inst_2)))))
+              (@IntermediateField.algebra'.{u_1, u_1, u_2} F F K inst inst_1 inst_2
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                (@Algebra.toSMul.{u_1, u_1} F F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                  (@CommSemiring.toSemiring.{u_1} F
+                    (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                  (@Algebra.id.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))))
+                inst_2
+                (@IsScalarTower.left.{u_1, u_2} F K
+                  (@MonoidWithZero.toMonoid.{u_1} F
+                    (@Semiring.toMonoidWithZero.{u_1} F
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                  (@DistribMulAction.toMulAction.{u_1, u_2} F K
+                    (@MonoidWithZero.toMonoid.{u_1} F
+                      (@Semiring.toMonoidWithZero.{u_1} F
+                        (@DivisionSemiring.toSemiring.{u_1} F
+                          (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                    (@AddCommMonoid.toAddMonoid.{u_2} K
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1)))))))
+                    (@Module.toDistribMulAction.{u_1, u_2} F K
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1))))))
+                      (@Algebra.toModule.{u_1, u_2} F K
+                        (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                        (@DivisionSemiring.toSemiring.{u_2} K
+                          (@Semifield.toDivisionSemiring.{u_2} K (@Field.toSemifield.{u_2} K inst_1)))
+                        inst_2))))))
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                E x)
+            (@Subtype.{u_2 + 1} K fun (x : K) ↦
+              @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                  (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                x)
+            (@AlgHom.funLike.{u_1, u_2, u_2} F
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  E x)
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+              (@DivisionSemiring.toSemiring.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    E x)
+                (@Semifield.toDivisionSemiring.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      E x)
+                  (@Field.toSemifield.{u_2}
+                    (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                      @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                          (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                        E x)
+                    (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2 E))))
+              (@DivisionSemiring.toSemiring.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)
+                    x)
+                (@Semifield.toDivisionSemiring.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                        (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                        fun (i : ι) ↦ t i)
+                      x)
+                  (@Field.toSemifield.{u_2}
+                    (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                      @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                          (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                        (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                          (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                              (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                              (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                          fun (i : ι) ↦ t i)
+                        x)
+                    (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                      (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                        (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                        fun (i : ι) ↦ t i)))))
+              (@IntermediateField.algebra'.{u_1, u_1, u_2} F F K inst inst_1 inst_2 E
+                (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                (@Algebra.toSMul.{u_1, u_1} F F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                  (@CommSemiring.toSemiring.{u_1} F
+                    (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                  (@Algebra.id.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))))
+                inst_2
+                (@IsScalarTower.left.{u_1, u_2} F K
+                  (@MonoidWithZero.toMonoid.{u_1} F
+                    (@Semiring.toMonoidWithZero.{u_1} F
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                  (@DistribMulAction.toMulAction.{u_1, u_2} F K
+                    (@MonoidWithZero.toMonoid.{u_1} F
+                      (@Semiring.toMonoidWithZero.{u_1} F
+                        (@DivisionSemiring.toSemiring.{u_1} F
+                          (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                    (@AddCommMonoid.toAddMonoid.{u_2} K
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1)))))))
+                    (@Module.toDistribMulAction.{u_1, u_2} F K
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1))))))
+                      (@Algebra.toModule.{u_1, u_2} F K
+                        (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                        (@DivisionSemiring.toSemiring.{u_2} K
+                          (@Semifield.toDivisionSemiring.{u_2} K (@Field.toSemifield.{u_2} K inst_1)))
+                        inst_2)))))
+              (@IntermediateField.algebra'.{u_1, u_1, u_2} F F K inst inst_1 inst_2
+                (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                  (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                      (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                  fun (i : ι) ↦ t i)
+                (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                (@Algebra.toSMul.{u_1, u_1} F F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                  (@CommSemiring.toSemiring.{u_1} F
+                    (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                  (@Algebra.id.{u_1} F (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))))
+                inst_2
+                (@IsScalarTower.left.{u_1, u_2} F K
+                  (@MonoidWithZero.toMonoid.{u_1} F
+                    (@Semiring.toMonoidWithZero.{u_1} F
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                  (@DistribMulAction.toMulAction.{u_1, u_2} F K
+                    (@MonoidWithZero.toMonoid.{u_1} F
+                      (@Semiring.toMonoidWithZero.{u_1} F
+                        (@DivisionSemiring.toSemiring.{u_1} F
+                          (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))))
+                    (@AddCommMonoid.toAddMonoid.{u_2} K
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1)))))))
+                    (@Module.toDistribMulAction.{u_1, u_2} F K
+                      (@DivisionSemiring.toSemiring.{u_1} F
+                        (@Semifield.toDivisionSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst)))
+                      (@NonUnitalNonAssocSemiring.toAddCommMonoid.{u_2} K
+                        (@NonUnitalNonAssocCommSemiring.toNonUnitalNonAssocSemiring.{u_2} K
+                          (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocCommSemiring.{u_2} K
+                            (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{u_2} K
+                              (@CommRing.toNonUnitalCommRing.{u_2} K (@Field.toCommRing.{u_2} K inst_1))))))
+                      (@Algebra.toModule.{u_1, u_2} F K
+                        (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                        (@DivisionSemiring.toSemiring.{u_2} K
+                          (@Semifield.toDivisionSemiring.{u_2} K (@Field.toSemifield.{u_2} K inst_1)))
+                        inst_2))))))
+            (@Semiring.toNonAssocSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  E x)
+              (@DivisionSemiring.toSemiring.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    E x)
+                (@Semifield.toDivisionSemiring.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      E x)
+                  (@Field.toSemifield.{u_2}
+                    (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                      @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                          (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                        E x)
+                    (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2 E)))))
+            (@Semiring.toNonAssocSemiring.{u_2}
+              (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                  (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                    (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                  (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                    (@ConditionallyCompleteLattice.toSupSet.{u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                    fun (i : ι) ↦ t i)
+                  x)
+              (@DivisionSemiring.toSemiring.{u_2}
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)
+                    x)
+                (@Semifield.toDivisionSemiring.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                        (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                        fun (i : ι) ↦ t i)
+                      x)
+                  (@Field.toSemifield.{u_2}
+                    (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                      @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                          (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                        (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                          (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                              (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                              (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                          fun (i : ι) ↦ t i)
+                        x)
+                    (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2
+                      (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                        (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                        fun (i : ι) ↦ t i))))))
+            (@AlgHomClass.toRingHomClass.{u_2, u_1, u_2, u_2}
+              (@AlgHom.{u_1, u_2, u_2} F
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    E x)
+                (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                  @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                    (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                      (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                    (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                      (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                        (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                      fun (i : ι) ↦ t i)
+                    x)
+                (@Semifield.toCommSemiring.{u_1} F (@Field.toSemifield.{u_1} F inst))
+                (@DivisionSemiring.toSemiring.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      E x)
+                  (@Semifield.toDivisionSemiring.{u_2}
+                    (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                      @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                          (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                        E x)
+                    (@Field.toSemifield.{u_2}
+                      (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                        @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                            (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                          E x)
+                      (@IntermediateField.toField.{u_1, u_2} F K inst inst_1 inst_2 E))))
+                (@DivisionSemiring.toSemiring.{u_2}
+                  (@Subtype.{u_2 + 1} K fun (x : K) ↦
+                    @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                      (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                        (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                      (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) ι
+                        (@ConditionallyCompleteLattice.toSupSet.{u_2}
+                          (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                          (@CompleteLattice.toConditionallyCompleteLattice.{u_2}
+                            (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                            (@IntermediateField.instCompleteLattice.{u_1, u_2} F inst K inst_1 inst_2)))
+                        fun (i : ι) ↦ t i)
+                      x)
+                  (@Semifield.toDivisionSemiring.{u_2}
+                    (@Subtype.{u_2 + 1} K fun (x : ⋯) ↦
+                      @Membership.mem.{u_2, u_2} K (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2)
+                        (@SetLike.instMembership.{u_2, u_2} (@IntermediateField.{u_1, u_2} F K inst inst_1 inst_2) K
+                          (@IntermediateField.instSetLike.{u_1, u_2} F K inst inst_1 inst_2))
+                        (@iSup.{u_2, u_3 + 1} (@IntermediateField.{u_1, u_2} F K ⋯ ⋯ ⋯) ⋯ ⋯ ⋯) ⋯)
+                    ⋯))
+                ⋯ ⋯)
+              ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯ ⋯)
+            ⋯)
+          ⋯))
+      ⋯ ⋯)
+    ⋯
+warning: Mathlib/FieldTheory/Normal/Basic.lean:120:2: Setting options starting with 'debug', 'pp', 'profiler', 'trace' is only intended for development and not for final code. If you intend to submit this contribution to the Mathlib project, please remove 'set_option pp.all'.
+
+Note: This linter can be disabled with `set_option linter.style.setOption false`
+warning: Mathlib/FieldTheory/Normal/Basic.lean:121:0: This line exceeds the 100 character limit, please shorten it!
+
+Note: This linter can be disabled with `set_option linter.style.longLine false`
+warning: Mathlib/FieldTheory/Normal/Basic.lean:123:0: This line exceeds the 100 character limit, please shorten it!
+
+Note: This linter can be disabled with `set_option linter.style.longLine false`
+warning: Mathlib/FieldTheory/Normal/Basic.lean:132:0: This line exceeds the 100 character limit, please shorten it!
+
+Note: This linter can be disabled with `set_option linter.style.longLine false`
+info: Mathlib/FieldTheory/Normal/Basic.lean:134:0: AlgHom.toRingHom_eq_coe.{u, v, w} {R : Type u} {A : Type v} {B : Type w} [CommSemiring R] [Semiring A] [Semiring B]
+  [Algebra R A] [Algebra R B] (f : A →ₐ[R] B) : f.toRingHom = ↑f
+Build completed successfully (1806 jobs).

@@ -1,0 +1,27 @@
+⚠ [1806/1806] Replayed Mathlib.FieldTheory.Normal.Basic
+info: Mathlib/FieldTheory/Normal/Basic.lean:121:2: Try this:
+  [apply] refine ?_
+    (Eq.mp
+      (congrArg Splits
+        (Eq.trans (Polynomial.map_map (algebraMap F ↥E) (↑(inclusion hE)) (minpoly F x))
+          (congrArg (fun x_1 ↦ Polynomial.map x_1 (minpoly F x)) (AlgHom.comp_algebraMap_of_tower F (inclusion hE)))))
+      that₁)
+info: Mathlib/FieldTheory/Normal/Basic.lean:123:2: Try this:
+  [apply] refine ?_
+    (Eq.mp
+      (congrArg (fun _a ↦ (Polynomial.map _a (Polynomial.map (algebraMap F ↥E) (minpoly F x))).Splits)
+        (AlgHom.toRingHom_eq_coe (inclusion hE)))
+      that₂)
+    that₁
+warning: Mathlib/FieldTheory/Normal/Basic.lean:121:0: This line exceeds the 100 character limit, please shorten it!
+
+Note: This linter can be disabled with `set_option linter.style.longLine false`
+warning: Mathlib/FieldTheory/Normal/Basic.lean:123:0: This line exceeds the 100 character limit, please shorten it!
+
+Note: This linter can be disabled with `set_option linter.style.longLine false`
+warning: Mathlib/FieldTheory/Normal/Basic.lean:132:0: This line exceeds the 100 character limit, please shorten it!
+
+Note: This linter can be disabled with `set_option linter.style.longLine false`
+info: Mathlib/FieldTheory/Normal/Basic.lean:134:0: AlgHom.toRingHom_eq_coe.{u, v, w} {R : Type u} {A : Type v} {B : Type w} [CommSemiring R] [Semiring A] [Semiring B]
+  [Algebra R A] [Algebra R B] (f : A →ₐ[R] B) : f.toRingHom = ↑f
+Build completed successfully (1806 jobs).
