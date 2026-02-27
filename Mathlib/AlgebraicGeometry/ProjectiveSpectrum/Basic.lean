@@ -59,6 +59,10 @@ theorem mem_basicOpen (x : Proj 𝒜) :
 theorem basicOpen_mul : basicOpen 𝒜 (f * g) = basicOpen 𝒜 f ⊓ basicOpen 𝒜 g :=
   ProjectiveSpectrum.basicOpen_mul ..
 
+theorem basicOpen_finset_prod {ι' : Type*} (S : Finset ι') (f : ι' → A) :
+    basicOpen 𝒜 (∏ i ∈ S, f i) = ⨅ i ∈ S, basicOpen 𝒜 (f i) :=
+  ProjectiveSpectrum.basicOpen_finset_prod ..
+
 theorem basicOpen_mono (hfg : f ∣ g) : basicOpen 𝒜 g ≤ basicOpen 𝒜 f :=
   (hfg.choose_spec ▸ basicOpen_mul 𝒜 f _).trans_le inf_le_left
 

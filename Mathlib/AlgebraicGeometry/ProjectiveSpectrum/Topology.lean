@@ -371,6 +371,13 @@ theorem basicOpen_mul_le_right (f g : A) : basicOpen 𝒜 (f * g) ≤ basicOpen 
 theorem basicOpen_pow (f : A) (n : ℕ) (hn : 0 < n) : basicOpen 𝒜 (f ^ n) = basicOpen 𝒜 f :=
   TopologicalSpace.Opens.ext <| by simpa using zeroLocus_singleton_pow 𝒜 f n hn
 
+theorem basicOpen_finset_prod {ι' : Type*} (S : Finset ι') (f : ι' → A) :
+    basicOpen 𝒜 (∏ i ∈ S, f i) = ⨅ i ∈ S, basicOpen 𝒜 (f i) := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simp
+  | insert _ _ ha ih => rw [Finset.prod_insert ha, basicOpen_mul, ih, Finset.iInf_insert]
+
 theorem basicOpen_eq_union_of_projection (f : A) :
     basicOpen 𝒜 f = ⨆ i : ℕ, basicOpen 𝒜 (GradedAlgebra.proj 𝒜 i f) :=
   TopologicalSpace.Opens.ext <|
