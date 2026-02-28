@@ -164,6 +164,12 @@ theorem coordProd_eq_erase_mul (S : Finset (Fin (n + 1)))
     coordProd n R S = coordProd n R (S.erase j) * coord n R j := by
   simp only [coordProd, ← Finset.mul_prod_erase S (coord n R) hj, mul_comm]
 
+theorem coordinateBasicOpen_iInf (S : Finset (Fin (n + 1))) :
+    ⨅ i ∈ S, coordinateBasicOpen n R i =
+      Proj.basicOpen (MvPolynomial.homogeneousSubmodule (Fin (n + 1)) R)
+        (coordProd n R S) :=
+  (Proj.basicOpen_finset_prod _ S (coord n R)).symm
+
 end CoordinateProduct
 
 end AlgebraicGeometry.Proj
