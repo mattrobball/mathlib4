@@ -36,6 +36,7 @@ computation of Čech cohomology for O(d) on projective space (Stacks 01XS).
 * `relSimplexComplex_acyclic`: the complex is acyclic for `T.Nonempty` and `T ≠ Finset.univ`.
 * `relSimplexComplex_empty_exactAt`: exact at positive degrees when `T = ∅`.
 * `relSimplexComplex_univ_exactAt`: exact at degree `p ≠ n` when `T = Finset.univ`.
+* `relSimplexComplex_univ_homologyIso`: `H^n(K_univ) ≅ R`.
 
 ## References
 
@@ -848,3 +849,57 @@ instance relSimplexCochain_univ_unique :
   default := ⟨Finset.univ, by rw [Finset.card_univ, Fintype.card_fin], subset_refl _⟩
   uniq := fun ⟨S, _, huniv⟩ =>
     Subtype.ext (Finset.eq_univ_of_forall (fun a => huniv (Finset.mem_univ a)))
+
+/-! ### Homology of K_univ and K_∅ -/
+
+/-- The `AddEquiv` between `relSimplexCochain Finset.univ R n` and `R`, using the fact
+that the cochain domain is a singleton when `T = Finset.univ`. -/
+def relSimplexCochain_univ_addEquiv (R : Type*) [AddCommGroup R] :
+    relSimplexCochain (Finset.univ : Finset (Fin (n + 1))) R n ≃+ R :=
+  { Equiv.funUnique _ R with
+    map_add' := fun _ _ => rfl }
+
+/-- The categorical isomorphism between the degree-`n` object of `K_univ` and
+`AddCommGrp.of R`. -/
+noncomputable def relSimplexComplex_univ_X_iso (R : Type*) [AddCommGroup R] :
+    (relSimplexComplex (Finset.univ : Finset (Fin (n + 1))) R).X n ≅
+      AddCommGrp.of R :=
+  (relSimplexCochain_univ_addEquiv R).toAddCommGrpIso
+
+/-- `H^n(K_univ) ≅ R`: the `n`-th homology of the relative simplex complex for
+`T = Finset.univ` is isomorphic to `R`. -/
+noncomputable def relSimplexComplex_univ_homologyIso (R : Type*) [AddCommGroup R] :
+    (relSimplexComplex (Finset.univ : Finset (Fin (n + 1))) R).homology n ≅
+      AddCommGrp.of R := by
+  set K := relSimplexComplex (Finset.univ : Finset (Fin (n + 1))) R
+  -- The outgoing map is zero because its target K.X(n+1) is zero
+  have hg : (K.sc n).g = 0 := by
+    apply IsZero.eq_of_tgt
+    show IsZero (K.X ((ComplexShape.up ℕ).next n))
+    rw [show (ComplexShape.up ℕ).next n = n + 1 from (ComplexShape.up ℕ).next_eq' rfl]
+    exact relSimplexComplex_univ_isZero_X R (by omega)
+  -- The incoming map is zero: either no predecessor (n=0) or source is zero
+  have hf : (K.sc n).f = 0 := by
+    by_cases hpn : (ComplexShape.up ℕ).prev n = n
+    · change K.d _ n = 0; rw [hpn]
+      exact K.shape _ _ (by simp only [ComplexShape.up_Rel]; omega)
+    · apply IsZero.eq_of_src
+      exact relSimplexComplex_univ_isZero_X R hpn
+  -- Both boundary maps zero → homology ≅ K.X n ≅ R
+  exact (ShortComplex.LeftHomologyData.ofZeros _ hf hg).homologyIso ≪≫
+    relSimplexComplex_univ_X_iso R
+
+/-- For `T = ∅`, the homology at positive degrees is zero. -/
+theorem relSimplexComplex_empty_isZero_homology (R : Type*) [AddCommGroup R]
+    (p : ℕ) :
+    IsZero ((relSimplexComplex (∅ : Finset (Fin (n + 1))) R).homology (p + 1)) := by
+  rw [← HomologicalComplex.exactAt_iff_isZero_homology]
+  exact relSimplexComplex_empty_exactAt R p
+
+/-- For nonempty proper `T ⊂ Fin (n + 1)`, all homology is zero. -/
+theorem relSimplexComplex_isZero_homology (T : Finset (Fin (n + 1)))
+    (hT : T.Nonempty) (hT' : T ≠ Finset.univ)
+    (R : Type*) [AddCommGroup R] (p : ℕ) :
+    IsZero ((relSimplexComplex T R).homology p) := by
+  rw [← HomologicalComplex.exactAt_iff_isZero_homology]
+  exact relSimplexComplex_acyclic T R hT hT' p
