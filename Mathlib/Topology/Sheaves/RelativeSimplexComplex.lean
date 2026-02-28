@@ -1000,3 +1000,171 @@ theorem relSimplexExtendByZero_comp (T T' T'' : Finset (Fin (n + 1)))
   · rfl
   · exact absurd (h₁.trans hTS) hT'S
   · rfl
+
+/-! ### Quotient complex and short exact sequence
+
+For `T' ⊆ T`, the quotient complex `Q = K_{T'}/K_T` consists of cochains on
+`{S : T' ⊆ S, T ⊄ S}` — subsets containing `T'` but not all of `T`. Its differential
+is the same alternating face formula, restricted to this domain. The short exact sequence
+`0 → K_T → K_{T'} → Q → 0` holds degreewise.
+-/
+
+/-- Face closure: `T ⊄ S` implies `T ⊄ eraseNth(S, j)`, since `eraseNth(S, j) ⊆ S`. -/
+private theorem not_subset_eraseNth_of_not_subset {T S : Finset (Fin (n + 1))}
+    {p : ℕ} (hTS : ¬(T ⊆ S)) (hS : S.card = p + 2) (j : Fin (p + 2)) :
+    ¬(T ⊆ (eraseNth S hS j).1) :=
+  fun h => hTS (h.trans (by simp only [eraseNth]; exact erase_subset _ _))
+
+/-- Cochains of the quotient complex: functions from `(p + 1)`-element subsets of
+`Fin (n + 1)` containing `T'` but not all of `T` to `R`. -/
+abbrev relSimplexQuotCochain (T T' : Finset (Fin (n + 1)))
+    (R : Type*) [AddCommGroup R] (p : ℕ) :=
+  ∀ _S : { S : Finset (Fin (n + 1)) // S.card = p + 1 ∧ T' ⊆ S ∧ ¬(T ⊆ S) }, R
+
+/-- The coboundary map of the quotient complex: same alternating face formula as
+`relSimplexδ T'`, restricted to the quotient domain. -/
+def relSimplexQuotδ (T T' : Finset (Fin (n + 1))) (_hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ)
+    (f : relSimplexQuotCochain T T' R p) : relSimplexQuotCochain T T' R (p + 1) :=
+  fun x =>
+    ∑ j : Fin (p + 2),
+      if h : T' ⊆ (eraseNth x.1 x.2.1 j).1
+      then (-1 : ℤ) ^ (j : ℕ) •
+        f ⟨(eraseNth x.1 x.2.1 j).1, (eraseNth x.1 x.2.1 j).2, h,
+          not_subset_eraseNth_of_not_subset x.2.2.2 x.2.1 j⟩
+      else 0
+
+/-- The quotient coboundary as a group homomorphism. -/
+def relSimplexQuotδHom (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ) :
+    relSimplexQuotCochain T T' R p →+ relSimplexQuotCochain T T' R (p + 1) where
+  toFun := relSimplexQuotδ T T' hT'T R p
+  map_zero' := by
+    ext ⟨S, hcard, hT'S, hTS⟩
+    simp only [relSimplexQuotδ, Pi.zero_apply]
+    exact Finset.sum_eq_zero (fun j _ => by split_ifs <;> simp)
+  map_add' := fun f g => by
+    ext ⟨S, hcard, hT'S, hTS⟩
+    simp only [relSimplexQuotδ, Pi.add_apply]
+    rw [← Finset.sum_add_distrib]
+    congr 1; ext j
+    split_ifs with h
+    · rw [smul_add]
+    · rw [add_zero]
+
+/-- `d² = 0` for the quotient complex, via extension by zero to `K_{T'}`. -/
+theorem relSimplexQuotδ_comp_eq_zero (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ)
+    (g : relSimplexQuotCochain T T' R p) :
+    relSimplexQuotδ T T' hT'T R (p + 1) (relSimplexQuotδ T T' hT'T R p g) = 0 := by
+  -- Extend g by zero to K_{T'}
+  set g' : relSimplexCochain T' R p := fun x =>
+    if hTx : T ⊆ x.1 then 0 else g ⟨x.1, x.2.1, x.2.2, hTx⟩ with hg'_def
+  -- Use d² = 0 for K_{T'}
+  have hd2 := relSimplexδ_comp_eq_zero T' R p g'
+  -- Evaluate pointwise at S in quotient domain
+  funext ⟨S, hS, hT'S, hTS⟩
+  have hd2S := congr_fun hd2 ⟨S, hS, hT'S⟩
+  simp only [Pi.zero_apply] at hd2S
+  -- Suffices to show d²_Q(g)(S) = d²_{T'}(g')(S)
+  suffices h : relSimplexQuotδ T T' hT'T R (p + 1) (relSimplexQuotδ T T' hT'T R p g)
+      ⟨S, hS, hT'S, hTS⟩ =
+      relSimplexδ T' R (p + 1) (relSimplexδ T' R p g') ⟨S, hS, hT'S⟩ by
+    simp only [Pi.zero_apply, h, hd2S]
+  -- Unfold the outer sums
+  simp only [relSimplexQuotδ, relSimplexδ_apply]
+  congr 1; ext j
+  split_ifs with hj
+  · -- T' ⊆ eraseNth(S, j): inner sums match
+    congr 1; congr 1; ext k
+    split_ifs with hk
+    · -- T' ⊆ double-erased: g and g' agree (face closure gives T ⊄ double-erased)
+      congr 1
+      simp only [hg'_def, dif_neg (not_subset_eraseNth_of_not_subset
+        (not_subset_eraseNth_of_not_subset hTS hS j)
+        (eraseNth S hS j).2 k)]
+    · rfl
+  · rfl
+
+/-- The quotient cochain complex `Q = K_{T'}/K_T`. -/
+def relSimplexQuotComplex (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] : CochainComplex AddCommGrp ℕ :=
+  CochainComplex.of
+    (fun p => AddCommGrp.of (relSimplexQuotCochain T T' R p))
+    (fun p => AddCommGrp.ofHom (relSimplexQuotδHom T T' hT'T R p))
+    (fun p => AddCommGrp.ext (relSimplexQuotδ_comp_eq_zero T T' hT'T R p))
+
+/-- Restriction from `K_{T'}` to the quotient `Q`: evaluate a cochain at subsets in
+the quotient domain (forgetting `¬(T ⊆ S)`). -/
+def relSimplexRestrict (T T' : Finset (Fin (n + 1))) (_hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ)
+    (f : relSimplexCochain T' R p) : relSimplexQuotCochain T T' R p :=
+  fun x => f ⟨x.1, x.2.1, x.2.2.1⟩
+
+/-- Restriction as a group homomorphism. -/
+def relSimplexRestrictHom (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ) :
+    relSimplexCochain T' R p →+ relSimplexQuotCochain T T' R p where
+  toFun := relSimplexRestrict T T' hT'T R p
+  map_zero' := by ext ⟨S, hcard, hT'S, hTS⟩; simp [relSimplexRestrict]
+  map_add' := fun _ _ => by ext ⟨S, hcard, hT'S, hTS⟩; simp [relSimplexRestrict]
+
+/-- Restriction commutes with the coboundary:
+`δ_Q(restrict(f)) = restrict(δ_{T'}(f))`. -/
+theorem relSimplexRestrict_comm (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ)
+    (f : relSimplexCochain T' R p) :
+    relSimplexQuotδ T T' hT'T R p (relSimplexRestrict T T' hT'T R p f) =
+      relSimplexRestrict T T' hT'T R (p + 1) (relSimplexδ T' R p f) := by
+  funext ⟨S, hS, hT'S, hTS⟩
+  simp only [relSimplexQuotδ, relSimplexRestrict, relSimplexδ_apply]
+
+/-- Restriction as a chain map `K_{T'} ⟶ Q`. -/
+def relSimplexRestrictMap (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] :
+    relSimplexComplex T' R ⟶ relSimplexQuotComplex T T' hT'T R :=
+  CochainComplex.ofHom
+    (fun p => AddCommGrp.of (relSimplexCochain T' R p))
+    (fun p => AddCommGrp.ofHom (relSimplexδHom T' R p))
+    (fun p => AddCommGrp.ext (relSimplexδ_comp_eq_zero T' R p))
+    (fun p => AddCommGrp.of (relSimplexQuotCochain T T' R p))
+    (fun p => AddCommGrp.ofHom (relSimplexQuotδHom T T' hT'T R p))
+    (fun p => AddCommGrp.ext (relSimplexQuotδ_comp_eq_zero T T' hT'T R p))
+    (fun p => AddCommGrp.ofHom (relSimplexRestrictHom T T' hT'T R p))
+    (fun p => AddCommGrp.ext (fun f =>
+      relSimplexRestrict_comm T T' hT'T R p f))
+
+/-- The composition `extend ≫ restrict` is zero: extending by zero then restricting
+to the quotient domain gives zero. -/
+theorem relSimplexExtend_restrict_comp_zero (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ)
+    (f : relSimplexCochain T R p) :
+    relSimplexRestrict T T' hT'T R p (relSimplexExtendByZero T T' hT'T R p f) = 0 := by
+  ext ⟨S, hcard, hT'S, hTS⟩
+  simp only [relSimplexRestrict, relSimplexExtendByZero, dif_neg hTS, Pi.zero_apply]
+
+/-- Exactness: if a cochain in `K_{T'}` restricts to zero in `Q`, then it is in the
+image of the extension map from `K_T`. -/
+theorem relSimplexSES_exact (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ) (g : relSimplexCochain T' R p)
+    (hg : relSimplexRestrict T T' hT'T R p g = 0) :
+    ∃ f : relSimplexCochain T R p,
+      relSimplexExtendByZero T T' hT'T R p f = g := by
+  refine ⟨fun x => g ⟨x.1, x.2.1, hT'T.trans x.2.2⟩, ?_⟩
+  ext ⟨S, hcard, hT'S⟩
+  simp only [relSimplexExtendByZero]
+  split_ifs with hTS
+  · rfl
+  · have := congr_fun hg ⟨S, hcard, hT'S, hTS⟩
+    simpa [relSimplexRestrict] using this.symm
+
+/-- The restriction map is surjective: every quotient cochain lifts to `K_{T'}`. -/
+theorem relSimplexRestrict_surjective (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ) :
+    Function.Surjective (relSimplexRestrictHom T T' hT'T R p) := by
+  intro h
+  refine ⟨fun x =>
+    if hTS : T ⊆ x.1 then 0 else h ⟨x.1, x.2.1, x.2.2, hTS⟩, ?_⟩
+  ext ⟨S, hcard, hT'S, hTS⟩
+  simp only [relSimplexRestrictHom, relSimplexRestrict, AddMonoidHom.coe_mk,
+    ZeroHom.coe_mk, dif_neg hTS]
