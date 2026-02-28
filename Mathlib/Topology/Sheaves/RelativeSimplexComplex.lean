@@ -6,8 +6,10 @@ Authors: Matt Diamond
 import Mathlib.Topology.Sheaves.CechCochainComplex
 import Mathlib.Algebra.Homology.Homotopy
 import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
+import Mathlib.Algebra.Homology.ShortComplex.Ab
 import Mathlib.Order.Interval.Finset.Fin
 import Mathlib.Algebra.Category.Grp.Abelian
+import Mathlib.Algebra.Category.Grp.Zero
 
 /-!
 # Relative Simplex Cochain Complex
@@ -32,13 +34,15 @@ computation of Čech cohomology for O(d) on projective space (Stacks 01XS).
 * `relSimplexδ_comp_eq_zero`: `d² = 0`.
 * `relSimplexHomotopy_eq`: the homotopy equation `δ ∘ h + h ∘ δ = id`.
 * `relSimplexComplex_acyclic`: the complex is acyclic for `T.Nonempty` and `T ≠ Finset.univ`.
+* `relSimplexComplex_empty_exactAt`: exact at positive degrees when `T = ∅`.
+* `relSimplexComplex_univ_exactAt`: exact at degree `p ≠ n` when `T = Finset.univ`.
 
 ## References
 
 * [Stacks Project, Tag 01XS](https://stacks.math.columbia.edu/tag/01XS)
 -/
 
-open Finset TopCat CategoryTheory
+open Finset TopCat CategoryTheory CategoryTheory.Limits
 
 variable {n p : ℕ}
 
@@ -789,3 +793,58 @@ theorem relSimplexComplex_acyclic (T : Finset (Fin (n + 1))) (R : Type*) [AddCom
       relSimplexδHom, relSimplexHomotopyHom, AddMonoidHom.mk'_apply]
     rw [add_comm]
     exact (relSimplexHomotopy_eq T v hv R p f S).symm
+
+/-! ### Boundary cases: T = ∅ and T = Finset.univ -/
+
+/-- When `T = ∅`, the relative simplex complex is exact at all positive degrees.
+Every subset contains `∅`, so the homotopy equation applies for any `v`. -/
+theorem relSimplexComplex_empty_exactAt (R : Type*) [AddCommGroup R] (p : ℕ) :
+    (relSimplexComplex (∅ : Finset (Fin (n + 1))) R).ExactAt (p + 1) := by
+  set K := relSimplexComplex (∅ : Finset (Fin (n + 1))) R
+  have hv : (0 : Fin (n + 1)) ∉ (∅ : Finset (Fin (n + 1))) := Finset.notMem_empty _
+  have hKd : ∀ j, K.d j (j + 1) = AddCommGrp.ofHom (relSimplexδHom ∅ R j) :=
+    fun j => by simp [K, relSimplexComplex]
+  rw [HomologicalComplex.exactAt_iff' K p (p + 1) (p + 2) (by simp) (by simp),
+    ShortComplex.ab_exact_iff]
+  intro f hf
+  have hg : (K.sc' p (p + 1) (p + 2)).g = K.d (p + 1) (p + 2) := rfl
+  have hfi : (K.sc' p (p + 1) (p + 2)).f = K.d p (p + 1) := rfl
+  have hf' : relSimplexδ ∅ R (p + 1) f = 0 := by
+    rw [hg, hKd] at hf; exact hf
+  have goal' : relSimplexδ ∅ R p (relSimplexHomotopy ∅ 0 hv R p f) = f := by
+    ext S
+    have key := relSimplexHomotopy_eq ∅ 0 hv R p f S
+    rw [hf', relSimplexHomotopy_map_zero, Pi.zero_apply, add_zero] at key
+    exact key
+  exact ⟨relSimplexHomotopy ∅ 0 hv R p f, by rw [hfi, hKd]; exact goal'⟩
+
+/-- When `T = Finset.univ`, the only subset of `Fin (n + 1)` with `(p + 1)` elements
+containing all of `Fin (n + 1)` is `Finset.univ` itself, requiring `p + 1 = n + 1`. -/
+theorem relSimplexCochain_univ_isEmpty (hp : p + 1 ≠ n + 1) :
+    IsEmpty { S : Finset (Fin (n + 1)) // S.card = p + 1 ∧ Finset.univ ⊆ S } := by
+  constructor; rintro ⟨S, hcard, huniv⟩
+  have hS : S = Finset.univ := le_antisymm (Finset.subset_univ S) huniv
+  exact hp (by rw [← hcard, hS, Finset.card_univ, Fintype.card_fin])
+
+/-- When `T = Finset.univ` and `p ≠ n`, the cochain group at degree `p` is zero. -/
+theorem relSimplexComplex_univ_isZero_X (R : Type*) [AddCommGroup R] (hp : p ≠ n) :
+    IsZero ((relSimplexComplex (Finset.univ : Finset (Fin (n + 1))) R).X p) := by
+  have hempty := relSimplexCochain_univ_isEmpty (show p + 1 ≠ n + 1 by omega)
+  have hsub : Subsingleton (relSimplexCochain (Finset.univ : Finset (Fin (n + 1))) R p) :=
+    ⟨fun f g => funext fun x => hempty.elim x⟩
+  exact @AddCommGrp.isZero_of_subsingleton _ hsub
+
+/-- When `T = Finset.univ` and `p ≠ n`, the complex is exact at degree `p`. -/
+theorem relSimplexComplex_univ_exactAt (R : Type*) [AddCommGroup R] (hp : p ≠ n) :
+    (relSimplexComplex (Finset.univ : Finset (Fin (n + 1))) R).ExactAt p := by
+  rw [HomologicalComplex.exactAt_iff]
+  exact ShortComplex.exact_of_isZero_X₂ _ (relSimplexComplex_univ_isZero_X R hp)
+
+/-- When `T = Finset.univ`, the unique `(n + 1)`-element subset of `Fin (n + 1)` containing
+all elements is `Finset.univ` itself. -/
+instance relSimplexCochain_univ_unique :
+    Unique { S : Finset (Fin (n + 1)) // S.card = n + 1 ∧
+      (Finset.univ : Finset (Fin (n + 1))) ⊆ S } where
+  default := ⟨Finset.univ, by rw [Finset.card_univ, Fintype.card_fin], subset_refl _⟩
+  uniq := fun ⟨S, _, huniv⟩ =>
+    Subtype.ext (Finset.eq_univ_of_forall (fun a => huniv (Finset.mem_univ a)))
