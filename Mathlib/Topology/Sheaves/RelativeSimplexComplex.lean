@@ -10,6 +10,8 @@ import Mathlib.Algebra.Homology.ShortComplex.Ab
 import Mathlib.Order.Interval.Finset.Fin
 import Mathlib.Algebra.Category.Grp.Abelian
 import Mathlib.Algebra.Category.Grp.Zero
+import Mathlib.Algebra.Homology.HomologicalComplexAbelian
+import Mathlib.Algebra.Homology.HomologySequence
 
 /-!
 # Relative Simplex Cochain Complex
@@ -1168,3 +1170,115 @@ theorem relSimplexRestrict_surjective (T T' : Finset (Fin (n + 1))) (hT'T : T' �
   ext ⟨S, hcard, hT'S, hTS⟩
   simp only [relSimplexRestrictHom, relSimplexRestrict, AddMonoidHom.coe_mk,
     ZeroHom.coe_mk, dif_neg hTS]
+
+/-! ### Short exact sequence of chain complexes and long exact sequence in homology
+
+We lift the degreewise SES `0 → K_T → K_{T'} → Q → 0` to Mathlib's categorical
+framework, obtaining a `ShortExact` short complex of cochain complexes. This yields
+the connecting homomorphism `δ : H^p(Q) → H^{p+1}(K_T)` and the long exact sequence
+in cohomology.
+-/
+
+/-- The composition `extend ≫ restrict` is zero as chain maps. -/
+theorem relSimplexExtend_restrict_comp (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] :
+    relSimplexExtend T T' hT'T R ≫ relSimplexRestrictMap T T' hT'T R = 0 := by
+  ext p : 1
+  simp only [HomologicalComplex.comp_f, HomologicalComplex.zero_f_apply,
+    relSimplexExtend, relSimplexRestrictMap, CochainComplex.ofHom_f]
+  exact AddCommGrp.ext (fun f =>
+    relSimplexExtend_restrict_comp_zero T T' hT'T R p f)
+
+/-- The short complex `K_T ⟶ K_{T'} ⟶ Q` of cochain complexes. -/
+def relSimplexSES (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] :
+    ShortComplex (CochainComplex AddCommGrp ℕ) :=
+  ShortComplex.mk
+    (relSimplexExtend T T' hT'T R)
+    (relSimplexRestrictMap T T' hT'T R)
+    (relSimplexExtend_restrict_comp T T' hT'T R)
+
+/-- The degreewise short complex `K_T(p) ⟶ K_{T'}(p) ⟶ Q(p)` is short exact. -/
+theorem relSimplexSES_degreewise_shortExact (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ) :
+    ((relSimplexSES T T' hT'T R).map
+      (HomologicalComplex.eval AddCommGrp (ComplexShape.up ℕ) p)).ShortExact := by
+  refine ShortComplex.ShortExact.mk' ?exact ?mono ?epi
+  case exact =>
+    rw [ShortComplex.ab_exact_iff]
+    intro x₂ hx₂
+    have hx₂' : relSimplexRestrict T T' hT'T R p x₂ = 0 := by
+      have : ((relSimplexSES T T' hT'T R).map
+          (HomologicalComplex.eval AddCommGrp (ComplexShape.up ℕ) p)).g x₂ = 0 := hx₂
+      simp only [relSimplexSES, ShortComplex.map_g, HomologicalComplex.eval_map,
+        relSimplexRestrictMap, CochainComplex.ofHom_f, AddCommGrp.ofHom_apply] at this
+      exact this
+    obtain ⟨f, hf⟩ := relSimplexSES_exact T T' hT'T R p x₂ hx₂'
+    refine ⟨f, ?_⟩
+    show ((relSimplexSES T T' hT'T R).map
+        (HomologicalComplex.eval AddCommGrp (ComplexShape.up ℕ) p)).f f = x₂
+    simp only [relSimplexSES, ShortComplex.map_f, HomologicalComplex.eval_map,
+      relSimplexExtend, CochainComplex.ofHom_f, AddCommGrp.ofHom_apply]
+    exact hf
+  case mono =>
+    rw [AddCommGrp.mono_iff_injective]
+    show Function.Injective
+      ((relSimplexSES T T' hT'T R).map
+        (HomologicalComplex.eval AddCommGrp (ComplexShape.up ℕ) p)).f
+    simp only [relSimplexSES, ShortComplex.map_f, HomologicalComplex.eval_map,
+      relSimplexExtend, CochainComplex.ofHom_f]
+    exact relSimplexExtendByZero_injective T T' hT'T R p
+  case epi =>
+    rw [AddCommGrp.epi_iff_surjective]
+    show Function.Surjective
+      ((relSimplexSES T T' hT'T R).map
+        (HomologicalComplex.eval AddCommGrp (ComplexShape.up ℕ) p)).g
+    simp only [relSimplexSES, ShortComplex.map_g, HomologicalComplex.eval_map,
+      relSimplexRestrictMap, CochainComplex.ofHom_f]
+    exact relSimplexRestrict_surjective T T' hT'T R p
+
+/-- The short complex `K_T ⟶ K_{T'} ⟶ Q` is short exact. -/
+theorem relSimplexSES_shortExact (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] :
+    (relSimplexSES T T' hT'T R).ShortExact :=
+  HomologicalComplex.shortExact_of_degreewise_shortExact _
+    (relSimplexSES_degreewise_shortExact T T' hT'T R)
+
+/-- The connecting homomorphism `δ : H^p(Q) → H^{p+1}(K_T)` from the long exact
+sequence associated to `0 → K_T → K_{T'} → Q → 0`. -/
+noncomputable def relSimplexδ_connecting (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ) :
+    (relSimplexQuotComplex T T' hT'T R).homology p ⟶
+      (relSimplexComplex T R).homology (p + 1) :=
+  (relSimplexSES_shortExact T T' hT'T R).δ p (p + 1) rfl
+
+/-- Exactness of `H^p(Q) →^{δ} H^{p+1}(K_T) → H^{p+1}(K_{T'})` in the long exact
+sequence. -/
+theorem relSimplexSES_homology_exact₁ (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ) :
+    (ShortComplex.mk _ _
+      (ShortComplex.ShortExact.δ_comp (relSimplexSES_shortExact T T' hT'T R)
+        p (p + 1) rfl)).Exact :=
+  ShortComplex.ShortExact.homology_exact₁
+    (relSimplexSES_shortExact T T' hT'T R) p (p + 1) rfl
+
+/-- Exactness of `H^p(K_T) → H^p(K_{T'}) → H^p(Q)` in the long exact sequence. -/
+theorem relSimplexSES_homology_exact₂ (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ) :
+    (ShortComplex.mk (HomologicalComplex.homologyMap
+        (relSimplexSES T T' hT'T R).f p)
+      (HomologicalComplex.homologyMap (relSimplexSES T T' hT'T R).g p)
+      (by rw [← HomologicalComplex.homologyMap_comp,
+        (relSimplexSES T T' hT'T R).zero, HomologicalComplex.homologyMap_zero])).Exact :=
+  ShortComplex.ShortExact.homology_exact₂
+    (relSimplexSES_shortExact T T' hT'T R) p
+
+/-- Exactness of `H^p(K_{T'}) → H^p(Q) →^{δ} H^{p+1}(K_T)` in the long exact
+sequence. -/
+theorem relSimplexSES_homology_exact₃ (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ) :
+    (ShortComplex.mk _ _
+      (ShortComplex.ShortExact.comp_δ (relSimplexSES_shortExact T T' hT'T R)
+        p (p + 1) rfl)).Exact :=
+  ShortComplex.ShortExact.homology_exact₃
+    (relSimplexSES_shortExact T T' hT'T R) p (p + 1) rfl
