@@ -1282,3 +1282,73 @@ theorem relSimplexSES_homology_exact₃ (T T' : Finset (Fin (n + 1))) (hT'T : T'
         p (p + 1) rfl)).Exact :=
   ShortComplex.ShortExact.homology_exact₃
     (relSimplexSES_shortExact T T' hT'T R) p (p + 1) rfl
+
+/-! ### Homological consequences of acyclicity
+
+When `K_T` is acyclic (`T.Nonempty`, `T ≠ univ`), the LES collapses to give an
+isomorphism `H^p(K_{T'}) ≅ H^p(Q)` via the quotient map. When `K_{T'}` is acyclic,
+the connecting homomorphism `δ` becomes an isomorphism `H^p(Q) ≅ H^{p+1}(K_T)`.
+-/
+
+/-- When `K_T` is acyclic, the induced map `H^p(K_{T'}) → H^p(Q)` is mono. -/
+theorem relSimplexSES_homologyMap_g_mono (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ)
+    (hT : T.Nonempty) (hT_ne : T ≠ Finset.univ) :
+    Mono (HomologicalComplex.homologyMap (relSimplexSES T T' hT'T R).g p) :=
+  (relSimplexSES_homology_exact₂ T T' hT'T R p).mono_g
+    ((relSimplexComplex_isZero_homology T hT hT_ne R p).eq_zero_of_src _)
+
+/-- When `K_T` is acyclic, the induced map `H^p(K_{T'}) → H^p(Q)` is epi. -/
+theorem relSimplexSES_homologyMap_g_epi (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ)
+    (hT : T.Nonempty) (hT_ne : T ≠ Finset.univ) :
+    Epi (HomologicalComplex.homologyMap (relSimplexSES T T' hT'T R).g p) :=
+  (relSimplexSES_homology_exact₃ T T' hT'T R p).epi_f
+    ((relSimplexComplex_isZero_homology T hT hT_ne R (p + 1)).eq_zero_of_tgt _)
+
+/-- When `K_T` is acyclic, the induced map `H^p(K_{T'}) → H^p(Q)` is an isomorphism. -/
+theorem relSimplexSES_homologyMap_g_isIso (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ)
+    (hT : T.Nonempty) (hT_ne : T ≠ Finset.univ) :
+    IsIso (HomologicalComplex.homologyMap (relSimplexSES T T' hT'T R).g p) := by
+  haveI := relSimplexSES_homologyMap_g_mono T T' hT'T R p hT hT_ne
+  haveI := relSimplexSES_homologyMap_g_epi T T' hT'T R p hT hT_ne
+  exact isIso_of_mono_of_epi _
+
+/-- When `K_T` is acyclic, `H^p(K_{T'}) ≅ H^p(Q)` via the quotient map on homology. -/
+noncomputable def relSimplexSES_homology_quotient_iso
+    (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ)
+    (hT : T.Nonempty) (hT_ne : T ≠ Finset.univ) :
+    (relSimplexComplex T' R).homology p ≅
+      (relSimplexQuotComplex T T' hT'T R).homology p := by
+  haveI := relSimplexSES_homologyMap_g_isIso T T' hT'T R p hT hT_ne
+  exact asIso (HomologicalComplex.homologyMap (relSimplexSES T T' hT'T R).g p)
+
+/-- When `K_{T'}` is acyclic, `δ : H^p(Q) → H^{p+1}(K_T)` is mono. -/
+theorem relSimplexSES_δ_mono (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ)
+    (hT' : T'.Nonempty) (hT'_ne : T' ≠ Finset.univ) :
+    Mono ((relSimplexSES_shortExact T T' hT'T R).δ p (p + 1) rfl) :=
+  (relSimplexSES_homology_exact₃ T T' hT'T R p).mono_g
+    ((relSimplexComplex_isZero_homology T' hT' hT'_ne R p).eq_zero_of_src _)
+
+/-- When `K_{T'}` is acyclic, `δ : H^p(Q) → H^{p+1}(K_T)` is epi. -/
+theorem relSimplexSES_δ_epi (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ)
+    (hT' : T'.Nonempty) (hT'_ne : T' ≠ Finset.univ) :
+    Epi ((relSimplexSES_shortExact T T' hT'T R).δ p (p + 1) rfl) :=
+  (relSimplexSES_homology_exact₁ T T' hT'T R p).epi_f
+    ((relSimplexComplex_isZero_homology T' hT' hT'_ne R (p + 1)).eq_zero_of_tgt _)
+
+/-- When `K_{T'}` is acyclic, the connecting homomorphism `δ : H^p(Q) ≅ H^{p+1}(K_T)`. -/
+noncomputable def relSimplexSES_δ_iso (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ)
+    (hT' : T'.Nonempty) (hT'_ne : T' ≠ Finset.univ) :
+    (relSimplexQuotComplex T T' hT'T R).homology p ≅
+      (relSimplexComplex T R).homology (p + 1) := by
+  haveI := relSimplexSES_δ_mono T T' hT'T R p hT' hT'_ne
+  haveI := relSimplexSES_δ_epi T T' hT'T R p hT' hT'_ne
+  haveI : IsIso ((relSimplexSES_shortExact T T' hT'T R).δ p (p + 1) rfl) :=
+    isIso_of_mono_of_epi _
+  exact asIso ((relSimplexSES_shortExact T T' hT'T R).δ p (p + 1) rfl)
