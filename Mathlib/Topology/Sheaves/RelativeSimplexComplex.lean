@@ -903,3 +903,100 @@ theorem relSimplexComplex_isZero_homology (T : Finset (Fin (n + 1)))
     IsZero ((relSimplexComplex T R).homology p) := by
   rw [← HomologicalComplex.exactAt_iff_isZero_homology]
   exact relSimplexComplex_acyclic T R hT hT' p
+
+/-! ### Extension by zero
+
+For `T' ⊆ T`, the **extension-by-zero** map embeds `K_T` into `K_{T'}` as a subcomplex.
+Given a cochain `f` on `T`-supersets, we extend it to all `T'`-supersets by setting
+`f(S) = 0` when `T ⊄ S`. This is an injective chain map, and gives a filtration:
+`K_univ ↪ ··· ↪ K_∅`.
+-/
+
+/-- Extension by zero: given `T' ⊆ T`, extend a cochain on `T`-supersets to
+`T'`-supersets by setting it to zero on subsets not containing `T`. -/
+def relSimplexExtendByZero (T T' : Finset (Fin (n + 1))) (_hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ)
+    (f : relSimplexCochain T R p) : relSimplexCochain T' R p :=
+  fun x => if hTS : T ⊆ x.1 then f ⟨x.1, x.2.1, hTS⟩ else 0
+
+/-- Extension by zero as a group homomorphism. -/
+def relSimplexExtendByZeroHom (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ) :
+    relSimplexCochain T R p →+ relSimplexCochain T' R p where
+  toFun := relSimplexExtendByZero T T' hT'T R p
+  map_zero' := by
+    ext ⟨S, hcard, hT'S⟩
+    simp only [relSimplexExtendByZero, Pi.zero_apply]
+    split_ifs <;> simp
+  map_add' := fun f g => by
+    ext ⟨S, hcard, hT'S⟩
+    simp only [relSimplexExtendByZero, Pi.add_apply]
+    split_ifs <;> simp
+
+/-- Extension by zero commutes with the coboundary:
+`δ_{T'}(extend(f)) = extend(δ_T(f))`. -/
+theorem relSimplexExtendByZero_comm (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ)
+    (f : relSimplexCochain T R p) :
+    relSimplexδ T' R p (relSimplexExtendByZero T T' hT'T R p f) =
+      relSimplexExtendByZero T T' hT'T R (p + 1) (relSimplexδ T R p f) := by
+  funext ⟨S, hS, hT'S⟩
+  simp only [relSimplexδ_apply, relSimplexExtendByZero]
+  by_cases hTS : T ⊆ S
+  · -- T ⊆ S: both sides are the same sum
+    rw [dif_pos hTS]; congr 1; ext j
+    by_cases hTe : T ⊆ (eraseNth S hS j).1
+    · rw [dif_pos (hT'T.trans hTe), dif_pos hTe, dif_pos hTe]
+    · rw [dif_neg hTe]
+      split_ifs with hT'e
+      · exact smul_zero _
+      · rfl
+  · -- T ⊄ S: RHS = 0, and each LHS term is 0
+    rw [dif_neg hTS]
+    apply Finset.sum_eq_zero; intro j _
+    have hTe : ¬(T ⊆ (eraseNth S hS j).1) := fun h =>
+      hTS (h.trans (by simp only [eraseNth]; exact erase_subset _ _))
+    split_ifs with hT'e
+    · exact smul_zero _
+    · rfl
+
+/-- Extension by zero as a chain map `K_T ⟶ K_{T'}` for `T' ⊆ T`. -/
+def relSimplexExtend (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] :
+    relSimplexComplex T R ⟶ relSimplexComplex T' R :=
+  CochainComplex.ofHom
+    (fun p => AddCommGrp.of (relSimplexCochain T R p))
+    (fun p => AddCommGrp.ofHom (relSimplexδHom T R p))
+    (fun p => AddCommGrp.ext (relSimplexδ_comp_eq_zero T R p))
+    (fun p => AddCommGrp.of (relSimplexCochain T' R p))
+    (fun p => AddCommGrp.ofHom (relSimplexδHom T' R p))
+    (fun p => AddCommGrp.ext (relSimplexδ_comp_eq_zero T' R p))
+    (fun p => AddCommGrp.ofHom (relSimplexExtendByZeroHom T T' hT'T R p))
+    (fun p => AddCommGrp.ext (fun f =>
+      relSimplexExtendByZero_comm T T' hT'T R p f))
+
+/-- Extension by zero is injective: if `extend(f) = 0` then `f = 0`. -/
+theorem relSimplexExtendByZero_injective (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
+    (R : Type*) [AddCommGroup R] (p : ℕ) :
+    Function.Injective (relSimplexExtendByZeroHom T T' hT'T R p) := by
+  intro f g h
+  ext ⟨S, hcard, hTS⟩
+  have := congr_fun h ⟨S, hcard, hT'T.trans hTS⟩
+  simp only [relSimplexExtendByZeroHom, relSimplexExtendByZero, AddMonoidHom.coe_mk,
+    ZeroHom.coe_mk, dif_pos hTS] at this
+  exact this
+
+/-- Composition of extension-by-zero maps: `extend T' T'' ∘ extend T T' = extend T T''`
+for `T'' ⊆ T' ⊆ T`. -/
+theorem relSimplexExtendByZero_comp (T T' T'' : Finset (Fin (n + 1)))
+    (h₁ : T' ⊆ T) (h₂ : T'' ⊆ T') (R : Type*) [AddCommGroup R] (p : ℕ)
+    (f : relSimplexCochain T R p) :
+    relSimplexExtendByZero T' T'' h₂ R p (relSimplexExtendByZero T T' h₁ R p f) =
+      relSimplexExtendByZero T T'' (h₂.trans h₁) R p f := by
+  funext ⟨S, hcard, hT''S⟩
+  simp only [relSimplexExtendByZero]
+  split_ifs with hT'S hTS hTS
+  · rfl
+  · rfl
+  · exact absurd (h₁.trans hTS) hT'S
+  · rfl
