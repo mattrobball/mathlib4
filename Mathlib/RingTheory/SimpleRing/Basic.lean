@@ -59,10 +59,13 @@ instance _root_.DivisionRing.isSimpleRing (A : Type*) [DivisionRing A] : IsSimpl
 lemma injective_ringHom_or_subsingleton_codomain
     {R S : Type*} [NonAssocRing R] [IsSimpleRing R] [NonAssocSemiring S]
     (f : R →+* S) : Function.Injective f ∨ Subsingleton S :=
-  simple.eq_bot_or_eq_top (TwoSidedIdeal.ker f) |>.imp (TwoSidedIdeal.ker_eq_bot _ |>.1)
+  simple.eq_bot_or_eq_top (TwoSidedIdeal.ker f.toNonUnitalRingHom) |>.imp
+    (TwoSidedIdeal.ker_eq_bot f.toNonUnitalRingHom |>.1)
     (fun h => subsingleton_iff_zero_eq_one.1 <| by
-      have mem : 1 ∈ TwoSidedIdeal.ker f := h.symm ▸ TwoSidedIdeal.mem_top _
-      rwa [TwoSidedIdeal.mem_ker, map_one, eq_comm] at mem)
+      have mem : 1 ∈ TwoSidedIdeal.ker f.toNonUnitalRingHom := h.symm ▸ TwoSidedIdeal.mem_top _
+      rw [TwoSidedIdeal.mem_ker] at mem
+      change f 1 = 0 at mem
+      rwa [map_one, eq_comm] at mem)
 
 protected theorem _root_.RingHom.injective
     {R S : Type*} [NonAssocRing R] [IsSimpleRing R] [NonAssocSemiring S] [Nontrivial S]
@@ -76,7 +79,8 @@ lemma iff_injective_ringHom_or_subsingleton_codomain (R : Type u) [NonAssocRing 
   mp _ _ _ := injective_ringHom_or_subsingleton_codomain
   mpr H := of_eq_bot_or_eq_top fun I => H I.ringCon.mk' |>.imp
     (fun h => le_antisymm
-      (fun _ hx => TwoSidedIdeal.ker_eq_bot _ |>.2 h ▸ I.ker_ringCon_mk'.symm ▸ hx) bot_le)
+      (fun _ hx => TwoSidedIdeal.ker_eq_bot I.ringCon.mk'.toNonUnitalRingHom |>.2 h ▸
+        I.ker_ringCon_mk'.symm ▸ hx) bot_le)
     (fun h => le_antisymm le_top fun x _ => I.mem_iff _ |>.2 (Quotient.eq'.1 (h.elim x 0)))
 
 universe u in

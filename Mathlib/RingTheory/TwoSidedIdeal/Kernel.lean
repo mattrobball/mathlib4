@@ -26,8 +26,7 @@ namespace TwoSidedIdeal
 section ker
 
 variable {R S : Type*} [NonUnitalNonAssocRing R] [NonUnitalNonAssocSemiring S]
-variable {F : Type*} [FunLike F R S] [NonUnitalRingHomClass F R S]
-variable (f : F)
+variable (f : R →ₙ+* S)
 
 /--
 The kernel of a ring homomorphism, as a two-sided ideal.
@@ -59,7 +58,7 @@ variable {R : Type*} [NonAssocRing R]
 The kernel of the ring homomorphism `R → R⧸I` is `I`.
 -/
 @[simp]
-lemma ker_ringCon_mk' (I : TwoSidedIdeal R) : ker I.ringCon.mk' = I :=
+lemma ker_ringCon_mk' (I : TwoSidedIdeal R) : ker I.ringCon.mk'.toNonUnitalRingHom = I :=
   le_antisymm
     (fun _ h => by simpa using I.rel_iff _ _ |>.1 (Quotient.eq'.1 h))
     (fun _ h => Quotient.sound' <| I.rel_iff _ _ |>.2 (by simpa using h))

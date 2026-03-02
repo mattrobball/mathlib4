@@ -48,8 +48,7 @@ namespace TwoSidedIdeal
 section NonUnitalNonAssocRing
 
 variable {R S : Type*} [NonUnitalNonAssocRing R] [NonUnitalNonAssocRing S]
-variable {F : Type*} [FunLike F R S]
-variable (f : F)
+variable (f : R →ₙ+* S)
 
 /--
 The smallest two-sided ideal containing a set.
@@ -119,8 +118,6 @@ lemma map_mono {I J : TwoSidedIdeal R} (h : I ≤ J) :
     map f I ≤ map f J :=
   span_mono <| Set.image_mono h
 
-variable [NonUnitalRingHomClass F R S]
-
 /--
 Preimage of a two-sided ideal, as a two-sided ideal. -/
 def comap : TwoSidedIdeal S →o TwoSidedIdeal R where
@@ -156,16 +153,16 @@ lemma _root_.RingEquiv.mapTwoSidedIdeal_symm (e : R ≃+* S) :
 
 end NonUnitalNonAssocRing
 
-section NonAssocRing
+section comapComp
 
 variable {R S T : Type*}
-variable [NonAssocRing R] [NonAssocRing S] [NonAssocRing T]
+variable [NonUnitalNonAssocRing R] [NonUnitalNonAssocRing S] [NonUnitalNonAssocRing T]
 
-lemma comap_comap (I : TwoSidedIdeal T) (f : R →+* S) (g : S →+* T) :
+lemma comap_comap (I : TwoSidedIdeal T) (f : R →ₙ+* S) (g : S →ₙ+* T) :
     (I.comap g).comap f = I.comap (g.comp f) := by
   ext; simp [mem_comap]
 
-end NonAssocRing
+end comapComp
 
 section NonUnitalRing
 
