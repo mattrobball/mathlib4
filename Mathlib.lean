@@ -1192,6 +1192,7 @@ import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.StructureSheaf
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.StructureSheafAcyclicity
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.StructureSheafCohomology
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Topology
+import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.TwistedCohomology
 import Mathlib.AlgebraicGeometry.Properties
 import Mathlib.AlgebraicGeometry.PullbackCarrier
 import Mathlib.AlgebraicGeometry.Pullbacks

@@ -230,7 +230,7 @@ theorem algebraicCocycle_primitive_of_extraction_zero_pos (p : ℕ)
     intro a ha _
     have hne : a.negSupport.Nonempty := by
       rwa [Finset.nonempty_iff_ne_empty, ne_eq, LaurentExp.negSupport_empty_iff]
-    have hne' : a.negSupport ≠ Finset.univ := a.negSupport_ne_univ
+    have hne' : a.negSupport ≠ Finset.univ := a.negSupport_ne_univ (le_refl 0)
     set K := _root_.relSimplexComplex a.negSupport R
     have hKd : ∀ j, K.d j (j + 1) = AddCommGrp.ofHom
         (_root_.relSimplexδHom a.negSupport R j) :=

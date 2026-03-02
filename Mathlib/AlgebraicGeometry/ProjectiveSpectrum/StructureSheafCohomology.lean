@@ -835,7 +835,7 @@ theorem algebraicCocycle_zero_of_extraction_zero
   · -- a ≠ 0: K_{negSupport(a)} is acyclic, so the 0-cocycle is 0
     have hne : a.negSupport.Nonempty := by
       rwa [Finset.nonempty_iff_ne_empty, ne_eq, LaurentExp.negSupport_empty_iff]
-    have hne' : a.negSupport ≠ Finset.univ := a.negSupport_ne_univ
+    have hne' : a.negSupport ≠ Finset.univ := a.negSupport_ne_univ (le_refl 0)
     have hac := _root_.relSimplexComplex_acyclic a.negSupport R hne hne'
     -- Acyclicity at degree 0 for ℕ-indexed complex means ker(d⁰) = 0
     show componentHom a 0 f ⟨S, hS, ha⟩ = 0

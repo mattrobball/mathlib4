@@ -11,11 +11,12 @@ import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.CechCohomology
 
 For the structure sheaf `𝒪` on projective n-space `Proj(R[x₀,...,xₙ])`, the algebraic
 Čech complex decomposes as a direct sum of relative simplex complexes `K_T`, indexed by
-**Laurent exponents**: integer vectors `a : Fin(n+1) → ℤ` with `∑ aᵢ = 0`.
+**Laurent exponents**: integer vectors `a : Fin(n+1) → ℤ` with `∑ aᵢ = d`.
 
-Each monomial `∏ xᵢ^aᵢ` in the degree-zero localization `R[x₀,...,xₙ]_(coordProd S)`
-defines a basis element, and its **negative support** `T(a) = {i : aᵢ < 0}` determines
-which localization it lives in (it requires `T(a) ⊆ S`). This gives a bijection between
+The degree parameter `d` defaults to `0` for the structure sheaf. Each monomial
+`∏ xᵢ^aᵢ` in the degree-`d` localization `R[x₀,...,xₙ]_(coordProd S)` defines a
+basis element, and its **negative support** `T(a) = {i : aᵢ < 0}` determines which
+localization it lives in (it requires `T(a) ⊆ S`). This gives a bijection between
 the cochains of the algebraic complex and a direct sum of `K_{T(a)}` cochains.
 
 Combined with the acyclicity results from `RelativeSimplexComplex.lean`, this yields:
@@ -24,7 +25,7 @@ Combined with the acyclicity results from `RelativeSimplexComplex.lean`, this yi
 
 ## Main definitions
 
-* `AlgebraicGeometry.Proj.LaurentExp`: Degree-zero Laurent exponents.
+* `AlgebraicGeometry.Proj.LaurentExp`: Laurent exponents of degree `d` (default 0).
 * `AlgebraicGeometry.Proj.negSupport`: The negative support of a Laurent exponent.
 
 ## References
@@ -49,27 +50,28 @@ private abbrev 𝒜 (n : ℕ) (R : Type u) [CommRing R] :=
 
 /-! ### Laurent exponents and negative support -/
 
-/-- A degree-zero Laurent exponent: an integer vector `a : Fin (n+1) → ℤ` with `∑ aᵢ = 0`.
-These index the Laurent monomials in the degree-zero localization. -/
-def LaurentExp (n : ℕ) := { a : Fin (n + 1) → ℤ // ∑ i, a i = 0 }
+/-- A Laurent exponent of degree `d`: an integer vector `a : Fin (n+1) → ℤ` with `∑ aᵢ = d`.
+These index the Laurent monomials in the degree-`d` localization. When `d = 0` (the default),
+these are the degree-zero Laurent monomials used for the structure sheaf. -/
+def LaurentExp (n : ℕ) (d : ℤ := 0) := { a : Fin (n + 1) → ℤ // ∑ i, a i = d }
 
 namespace LaurentExp
 
-variable {n : ℕ}
+variable {n : ℕ} {d : ℤ}
 
 instance : Zero (LaurentExp n) := ⟨⟨0, by simp⟩⟩
 
-instance : DecidableEq (LaurentExp n) := Subtype.instDecidableEq
+instance : DecidableEq (LaurentExp n d) := Subtype.instDecidableEq
 
 /-- The negative support: the set of indices where the exponent is strictly negative. -/
-def negSupport (a : LaurentExp n) : Finset (Fin (n + 1)) :=
+def negSupport (a : LaurentExp n d) : Finset (Fin (n + 1)) :=
   Finset.univ.filter (fun i => decide (a.1 i < 0))
 
-theorem mem_negSupport_iff (a : LaurentExp n) (i : Fin (n + 1)) :
+theorem mem_negSupport_iff (a : LaurentExp n d) (i : Fin (n + 1)) :
     i ∈ negSupport a ↔ a.1 i < 0 := by
   simp [negSupport]
 
-theorem not_mem_negSupport_iff (a : LaurentExp n) (i : Fin (n + 1)) :
+theorem not_mem_negSupport_iff (a : LaurentExp n d) (i : Fin (n + 1)) :
     i ∉ negSupport a ↔ 0 ≤ a.1 i := by
   rw [mem_negSupport_iff]; omega
 
@@ -80,8 +82,9 @@ theorem negSupport_zero : negSupport (0 : LaurentExp n) = ∅ := by
   change ¬ (0 : ℤ) < 0; omega
 
 /-- The negative support cannot be all of `Fin (n + 1)`: if all `aᵢ < 0` then
-`∑ aᵢ < 0`, contradicting `∑ aᵢ = 0`. -/
-theorem negSupport_ne_univ (a : LaurentExp n) : negSupport a ≠ Finset.univ := by
+`∑ aᵢ < 0`, contradicting `∑ aᵢ = d ≥ 0`. -/
+theorem negSupport_ne_univ (a : LaurentExp n d) (hd : 0 ≤ d) :
+    negSupport a ≠ Finset.univ := by
   intro h
   have hlt : ∀ i, a.1 i < 0 := fun i =>
     (mem_negSupport_iff a i).mp (h ▸ mem_univ i)
@@ -89,8 +92,7 @@ theorem negSupport_ne_univ (a : LaurentExp n) : negSupport a ≠ Finset.univ := 
     (fun i _ => hlt i) ⟨⟨0, Nat.zero_lt_succ n⟩, mem_univ _⟩
   linarith [a.2]
 
-/-- If `negSupport a = ∅`, then all `aᵢ ≥ 0`, and combined with `∑ aᵢ = 0`
-this forces `a = 0`. -/
+/-- If `negSupport a = ∅` for a degree-0 Laurent exponent, then `a = 0`. -/
 theorem negSupport_empty_iff (a : LaurentExp n) :
     negSupport a = ∅ ↔ a = (0 : LaurentExp n) := by
   constructor
@@ -105,6 +107,14 @@ theorem negSupport_empty_iff (a : LaurentExp n) :
       rw [Finset.add_sum_erase _ _ (Finset.mem_univ i)]; exact a.2
     show a.1 i = 0; linarith
   · rintro rfl; exact negSupport_zero
+
+/-- If `negSupport a = ∅`, then all entries are nonneg. -/
+theorem negSupport_empty_iff_nonneg (a : LaurentExp n d) :
+    negSupport a = ∅ ↔ ∀ i, 0 ≤ a.1 i := by
+  constructor
+  · intro h i; rw [← not_mem_negSupport_iff]; rw [h]; exact Finset.notMem_empty _
+  · intro h; rw [Finset.eq_empty_iff_forall_notMem]
+    intro i; rw [not_mem_negSupport_iff]; exact h i
 
 end LaurentExp
 
@@ -188,14 +198,14 @@ section MonomialElements
 
 namespace LaurentExp
 
-variable {n : ℕ}
+variable {n : ℕ} {d : ℤ}
 
 /-- The clearing power: maximum of `(-aᵢ).toNat` for `i ∈ S`. This ensures
 `aᵢ + clearingPow a S ≥ 0` for all `i ∈ S`. Returns `0` for `S = ∅`. -/
-def clearingPow (a : LaurentExp n) (S : Finset (Fin (n + 1))) : ℕ :=
+def clearingPow (a : LaurentExp n d) (S : Finset (Fin (n + 1))) : ℕ :=
   S.sup (fun i => (-a.1 i).toNat)
 
-theorem clearingPow_nonneg (a : LaurentExp n) (S : Finset (Fin (n + 1)))
+theorem clearingPow_nonneg (a : LaurentExp n d) (S : Finset (Fin (n + 1)))
     (i : Fin (n + 1)) (hi : i ∈ S) :
     0 ≤ a.1 i + ↑(a.clearingPow S) := by
   have : (-a.1 i).toNat ≤ a.clearingPow S :=
@@ -203,11 +213,11 @@ theorem clearingPow_nonneg (a : LaurentExp n) (S : Finset (Fin (n + 1)))
   omega
 
 /-- The numerator exponent for the monomial element at index `i`. -/
-def numExp (a : LaurentExp n) (S : Finset (Fin (n + 1)))
+def numExp (a : LaurentExp n d) (S : Finset (Fin (n + 1)))
     (i : Fin (n + 1)) : ℕ :=
   if i ∈ S then (a.1 i + ↑(a.clearingPow S)).toNat else (a.1 i).toNat
 
-private theorem numExp_cast (a : LaurentExp n) (S : Finset (Fin (n + 1)))
+private theorem numExp_cast (a : LaurentExp n d) (S : Finset (Fin (n + 1)))
     (hS : a.negSupport ⊆ S) (i : Fin (n + 1)) :
     (a.numExp S i : ℤ) = a.1 i + if i ∈ S then ↑(a.clearingPow S) else 0 := by
   simp only [numExp]
@@ -217,17 +227,38 @@ private theorem numExp_cast (a : LaurentExp n) (S : Finset (Fin (n + 1)))
     rw [add_zero]
     exact Int.toNat_of_nonneg this
 
-/-- The sum of numerator exponents equals `clearingPow * |S|`. -/
-theorem numExp_sum (a : LaurentExp n) (S : Finset (Fin (n + 1)))
+/-- The sum of numerator exponents: `∑ numExp = clearingPow * |S| + d.toNat`.
+For degree-0 exponents this gives `clearingPow * |S|`. For nonneg degree `d`,
+this gives the numerator degree in the shifted module localization. -/
+theorem numExp_sum (a : LaurentExp n d) (S : Finset (Fin (n + 1)))
     (hS : a.negSupport ⊆ S) :
-    ∑ i : Fin (n + 1), a.numExp S i = a.clearingPow S * S.card := by
-  suffices h : (↑(∑ i : Fin (n + 1), a.numExp S i) : ℤ) =
-      ↑(a.clearingPow S * S.card) by exact_mod_cast h
-  push_cast
-  simp_rw [a.numExp_cast S hS]
-  rw [Finset.sum_add_distrib, a.2, zero_add]
+    (∑ i : Fin (n + 1), a.numExp S i : ℤ) =
+      ↑(a.clearingPow S) * ↑S.card + d := by
+  push_cast [a.numExp_cast S hS]
+  rw [Finset.sum_add_distrib, a.2]
   have : Finset.univ.filter (fun x : Fin (n + 1) => x ∈ S) = S := by ext x; simp
   rw [← Finset.sum_filter, this, Finset.sum_const, nsmul_eq_mul, mul_comm]
+  ring
+
+/-- Specialization of `numExp_sum` for degree-0 exponents, giving a `ℕ` equality. -/
+theorem numExp_sum_zero (a : LaurentExp n (0 : ℤ)) (S : Finset (Fin (n + 1)))
+    (hS : a.negSupport ⊆ S) :
+    ∑ i : Fin (n + 1), a.numExp S i = a.clearingPow S * S.card := by
+  have h := numExp_sum a S hS
+  simp only [Int.natCast_ediv, CharP.cast_eq_zero, add_zero] at h
+  exact_mod_cast h
+
+/-- Specialization of `numExp_sum` for nonneg-degree exponents, giving a `ℕ` equality. -/
+theorem numExp_sum_nonneg (a : LaurentExp n d) (S : Finset (Fin (n + 1)))
+    (hS : a.negSupport ⊆ S) (hd : 0 ≤ d) :
+    ∑ i : Fin (n + 1), a.numExp S i = a.clearingPow S * S.card + d.toNat := by
+  have h := numExp_sum a S hS
+  -- h : (↑(∑ numExp) : ℤ) = ↑cp * ↑|S| + d
+  -- Goal: ∑ numExp = cp * |S| + d.toNat (in ℕ)
+  have key : (↑(a.clearingPow S * S.card + d.toNat) : ℤ) =
+      ↑(a.clearingPow S) * ↑S.card + d := by
+    push_cast; exact (Int.toNat_of_nonneg hd).symm ▸ rfl
+  exact_mod_cast h.trans key.symm
 
 end LaurentExp
 
@@ -249,7 +280,7 @@ def monomialElem (a : LaurentExp n) (S : Finset (Fin (n + 1)))
         (fun _ : Fin (n + 1) => (1 : ℕ)) (coord n R) (fun i => a.numExp S i)
         (fun i _ => coord_mem_homogeneousSubmodule n R i)
       simp only [smul_eq_mul, mul_one] at h
-      rwa [a.numExp_sum S hS] at h)
+      rwa [a.numExp_sum_zero S hS] at h)
 
 /-- The Away localization at `coordProd S` is spanned over `𝒜₀` by monomials.
 This specializes `Away.span_mk_prod_pow_eq_top` to coordinate variables. -/
@@ -282,7 +313,7 @@ namespace LaurentExp
 
 /-- Erasing an index with nonneg exponent does not change the clearing power.
 When `0 ≤ a.1 j`, the term `(-a.1 j).toNat = 0` does not affect the sup. -/
-theorem clearingPow_erase {a : LaurentExp n} {S : Finset (Fin (n + 1))}
+theorem clearingPow_erase {d : ℤ} {a : LaurentExp n d} {S : Finset (Fin (n + 1))}
     {j : Fin (n + 1)} (hj : j ∈ S) (hjnn : 0 ≤ a.1 j) :
     a.clearingPow (S.erase j) = a.clearingPow S := by
   apply le_antisymm
@@ -295,7 +326,7 @@ theorem clearingPow_erase {a : LaurentExp n} {S : Finset (Fin (n + 1))}
         (Finset.mem_erase.mpr ⟨heq, hi⟩)
 
 /-- `numExp` is unchanged at indices distinct from the erased element. -/
-theorem numExp_erase_of_ne {a : LaurentExp n} {S : Finset (Fin (n + 1))}
+theorem numExp_erase_of_ne {d : ℤ} {a : LaurentExp n d} {S : Finset (Fin (n + 1))}
     {j i : Fin (n + 1)} (hj : j ∈ S) (hjnn : 0 ≤ a.1 j) (hne : i ≠ j) :
     a.numExp (S.erase j) i = a.numExp S i := by
   simp only [numExp, clearingPow_erase hj hjnn]
@@ -307,7 +338,7 @@ theorem numExp_erase_of_ne {a : LaurentExp n} {S : Finset (Fin (n + 1))}
 
 /-- At the erased index, `numExp` at the face plus the clearing power gives `numExp`
 at the full set. -/
-theorem numExp_erase_add {a : LaurentExp n} {S : Finset (Fin (n + 1))}
+theorem numExp_erase_add {d : ℤ} {a : LaurentExp n d} {S : Finset (Fin (n + 1))}
     {j : Fin (n + 1)} (hj : j ∈ S) (hjnn : 0 ≤ a.1 j) :
     a.numExp (S.erase j) j + a.clearingPow S = a.numExp S j := by
   simp only [numExp, Finset.notMem_erase, ↓reduceIte, hj, clearingPow_erase hj hjnn]
@@ -332,7 +363,7 @@ def monomialElemMod (a : LaurentExp n) (S : Finset (Fin (n + 1)))
         (fun _ : Fin (n + 1) => (1 : ℕ)) (coord n R) (fun i => a.numExp S i)
         (fun i _ => coord_mem_homogeneousSubmodule n R i)
       simp only [smul_eq_mul, mul_one] at h
-      rwa [a.numExp_sum S hS] at h)
+      rwa [a.numExp_sum_zero S hS] at h)
 
 /-- The numerator identity: multiplying the face numerator by the erased coordinate
 power gives the full numerator. -/
@@ -395,7 +426,7 @@ namespace LaurentExp
 /-- Characterization of when the negative support is contained in a face:
 `negSupport a ⊆ eraseNth T hT j` iff the erased element `nthElem T hT j`
 has nonneg exponent in `a`, given that `negSupport a ⊆ T`. -/
-theorem negSupport_subset_eraseNth_iff (a : LaurentExp n)
+theorem negSupport_subset_eraseNth_iff {d : ℤ} (a : LaurentExp n d)
     {p : ℕ} {T : Finset (Fin (n + 1))} (hT : T.card = p + 2)
     (j : Fin (p + 2)) (hfull : a.negSupport ⊆ T) :
     a.negSupport ⊆ (TopCat.eraseNth T hT j).1 ↔
@@ -477,18 +508,20 @@ attribute [local instance] mvPolynomialGrading
 
 namespace LaurentExp
 
+variable {d : ℤ}
+
 /-- The Finsupp encoding the numerator exponents for Laurent exponent `a` at set `S`.
 This is the `Finsupp` version of `numExp a S`. -/
-def numFinsupp (a : LaurentExp n) (S : Finset (Fin (n + 1))) : Fin (n + 1) →₀ ℕ :=
+def numFinsupp (a : LaurentExp n d) (S : Finset (Fin (n + 1))) : Fin (n + 1) →₀ ℕ :=
   Finsupp.equivFunOnFinite.symm (a.numExp S)
 
 @[simp]
-theorem numFinsupp_apply (a : LaurentExp n) (S : Finset (Fin (n + 1)))
+theorem numFinsupp_apply (a : LaurentExp n d) (S : Finset (Fin (n + 1)))
     (i : Fin (n + 1)) : a.numFinsupp S i = a.numExp S i := rfl
 
 /-- `numFinsupp` is injective: if two Laurent exponents produce the same numerator
 exponent pattern at a common containing set `S`, they must be equal. -/
-theorem numFinsupp_injective {a a' : LaurentExp n} {S : Finset (Fin (n + 1))}
+theorem numFinsupp_injective {a a' : LaurentExp n d} {S : Finset (Fin (n + 1))}
     (hS : a.negSupport ⊆ S) (hS' : a'.negSupport ⊆ S)
     (h : a.numFinsupp S = a'.numFinsupp S) : a = a' := by
   have heq : ∀ i, a.numExp S i = a'.numExp S i := fun i => DFunLike.congr_fun h i
@@ -501,16 +534,28 @@ theorem numFinsupp_injective {a a' : LaurentExp n} {S : Finset (Fin (n + 1))}
     omega
   by_cases hSe : S = ∅
   · subst hSe
-    have ha := (a.negSupport_empty_iff).mp (Finset.subset_empty.mp hS)
-    have ha' := (a'.negSupport_empty_iff).mp (Finset.subset_empty.mp hS')
-    rw [ha, ha']
+    -- All entries are nonneg (negSupport ⊆ ∅), so numExp i = (aᵢ).toNat
+    refine Subtype.ext (funext fun i => ?_)
+    have ha : 0 ≤ a.1 i := (a.not_mem_negSupport_iff i).mp
+      (fun hm => absurd (hS hm) (Finset.notMem_empty _))
+    have ha' : 0 ≤ a'.1 i := (a'.not_mem_negSupport_iff i).mp
+      (fun hm => absurd (hS' hm) (Finset.notMem_empty _))
+    have := heq i
+    unfold numExp at this; rw [if_neg (Finset.notMem_empty _),
+      if_neg (Finset.notMem_empty _)] at this
+    omega
   · have hcpS : a.clearingPow S = a'.clearingPow S := by
-      have hsumEq : ∑ i : Fin (n + 1), a.numExp S i = ∑ i, a'.numExp S i :=
-        Finset.sum_congr rfl fun i _ => heq i
+      have hsumEq : (∑ i : Fin (n + 1), (a.numExp S i : ℤ)) =
+          ∑ i, (a'.numExp S i : ℤ) :=
+        Finset.sum_congr rfl fun i _ => by exact_mod_cast heq i
       rw [a.numExp_sum S hS, a'.numExp_sum S hS'] at hsumEq
+      -- hsumEq : ↑cp * ↑|S| + d = ↑cp' * ↑|S| + d
       have hpos : 0 < S.card :=
         Finset.card_pos.mpr (by rwa [Finset.nonempty_iff_ne_empty])
-      exact mul_right_cancel₀ hpos.ne' hsumEq
+      have hmul : a.clearingPow S * S.card = a'.clearingPow S * S.card := by
+        exact_mod_cast (show (↑(a.clearingPow S) : ℤ) * ↑S.card =
+          ↑(a'.clearingPow S) * ↑S.card by linarith)
+      exact mul_right_cancel₀ hpos.ne' hmul
     refine Subtype.ext (funext fun i => ?_)
     by_cases hi : i ∈ S
     · have := heq i
