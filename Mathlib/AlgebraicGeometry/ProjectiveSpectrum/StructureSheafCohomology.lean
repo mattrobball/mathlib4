@@ -938,34 +938,6 @@ noncomputable def algebraicComplex_H0_iso :
       (QuotientAddGroup.quotientBot.trans kerEquiv)
   exact totalEquiv.toAddCommGrpIso
 
-/-- `Hᵖ(algebraicComplex) = 0` for `p > 0`.
-
-The proof strategy reduces to kernel acyclicity: since
-`embeddingChainMap ≫ extractionChainMap = 𝟙`, the sequence
-`0 → ker(extraction) → algebraicComplex → K_∅ → 0` splits. Hence
-`H^{p+1}(algebraicComplex) ≅ H^{p+1}(K_∅) ⊕ H^{p+1}(ker)`. Since
-`H^{p+1}(K_∅) = 0` (by `relSimplexComplex_empty_isZero_homology`), it suffices
-to show the kernel complex is acyclic.
-
-**Kernel acyclicity**: Given a `(p+1)`-cocycle `f` with `extractionHom f = 0`:
-1. Each `componentHom a (p+1) f` is a cocycle in `K_{negSupport(a)}`
-   (by `component_comm_δ`).
-2. For `a = 0`: `componentHom 0 = extractionHom = 0` by hypothesis.
-3. For `a ≠ 0`: `K_{negSupport(a)}` is acyclic (by `relSimplexComplex_acyclic`),
-   so `∃ g_a, relSimplexδ g_a = componentHom a (p+1) f`.
-4. Define `G(S) = ∑_a g_a(S) • monomialElemMod(a)(S)` (finite sum).
-5. Then `monomialCoeffMod b (algebraicδ G)(T) = relSimplexδ(g_b)(T) = f_b(T)`
-   by `monomialCoeffMod_coordRestrict` and orthogonality.
-6. By `monomialCoeffMod_determines_zero`, `algebraicδ G = f`.
-
-**Missing infrastructure** (to be proved in a follow-up file):
-- Module-level orthogonality: `monomialCoeffMod a (r • monomialElemMod a') = r · δ_{a,a'}`
-- Finite support of monomial coefficients (from `coordProd_away_span_eq_top`)
-- Multiplicativity of `monomialCoeff` with `constRingElemHom` scalars -/
-theorem algebraicComplex_acyclic_pos (p : ℕ) :
-    IsZero ((algebraicComplex n R (𝒜 n R)).homology (p + 1)) := by
-  sorry
-
 end CohomologyH0
 
 end AlgebraicGeometry.Proj
