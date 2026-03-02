@@ -142,11 +142,11 @@ If `R` and `S` are isomorphic as rings, then two-sided ideals of `R` and two-sid
 order isomorphic.
 -/
 def _root_.RingEquiv.mapTwoSidedIdeal (e : R ≃+* S) : TwoSidedIdeal R ≃o TwoSidedIdeal S :=
-  OrderIso.ofHomInv (comap e.symm) (comap e) (by ext; simp [mem_comap])
-    (by ext; simp [mem_comap])
+  OrderIso.ofHomInv (comap e.symm.toNonUnitalRingHom) (comap e.toNonUnitalRingHom)
+    (by ext; simp [mem_comap]) (by ext; simp [mem_comap])
 
 lemma _root_.RingEquiv.mapTwoSidedIdeal_apply (e : R ≃+* S) (I : TwoSidedIdeal R) :
-    e.mapTwoSidedIdeal I = I.comap e.symm := rfl
+    e.mapTwoSidedIdeal I = I.comap e.symm.toNonUnitalRingHom := rfl
 
 lemma _root_.RingEquiv.mapTwoSidedIdeal_symm (e : R ≃+* S) :
     e.mapTwoSidedIdeal.symm = e.symm.mapTwoSidedIdeal := rfl
