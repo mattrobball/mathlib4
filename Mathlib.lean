@@ -1180,13 +1180,17 @@ import Mathlib.AlgebraicGeometry.OpenImmersion
 import Mathlib.AlgebraicGeometry.Over
 import Mathlib.AlgebraicGeometry.PointsPi
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Basic
+import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.CechCohomology
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.CechCover
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.GradedTilde
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.GradedTilde.TwistingSheaf
+import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.MonomialDecomposition
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.ProjectiveSpace
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Proper
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Scheme
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.StructureSheaf
+import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.StructureSheafAcyclicity
+import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.StructureSheafCohomology
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Topology
 import Mathlib.AlgebraicGeometry.Properties
 import Mathlib.AlgebraicGeometry.PullbackCarrier
@@ -6399,6 +6403,7 @@ import Mathlib.Topology.Sheaves.MayerVietoris
 import Mathlib.Topology.Sheaves.PUnit
 import Mathlib.Topology.Sheaves.Presheaf
 import Mathlib.Topology.Sheaves.PresheafOfFunctions
+import Mathlib.Topology.Sheaves.RelativeSimplexComplex
 import Mathlib.Topology.Sheaves.Sheaf
 import Mathlib.Topology.Sheaves.SheafCondition.EqualizerProducts
 import Mathlib.Topology.Sheaves.SheafCondition.OpensLeCover
