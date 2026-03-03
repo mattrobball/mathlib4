@@ -906,6 +906,25 @@ theorem relSimplexComplex_isZero_homology (T : Finset (Fin (n + 1)))
   rw [← HomologicalComplex.exactAt_iff_isZero_homology]
   exact relSimplexComplex_acyclic T R hT hT' p
 
+/-- Given that `K_T` is exact at degree `p + 1`, a `(p+1)`-cocycle can be written as
+a coboundary. This factors out the common pattern of unwrapping `ExactAt` to extract
+a primitive via `ShortComplex.ab_exact_iff`. -/
+theorem relSimplexComplex_get_primitive (T : Finset (Fin (n + 1)))
+    (R : Type*) [AddCommGroup R] (p : ℕ)
+    (hexact : (relSimplexComplex T R).ExactAt (p + 1))
+    (f : relSimplexCochain T R (p + 1))
+    (hf : relSimplexδHom T R (p + 1) f = 0) :
+    ∃ g : relSimplexCochain T R p, relSimplexδHom T R p g = f := by
+  set K := relSimplexComplex T R
+  have hKd : ∀ j, K.d j (j + 1) = AddCommGrp.ofHom (relSimplexδHom T R j) :=
+    fun j => by simp [K, relSimplexComplex]
+  rw [HomologicalComplex.exactAt_iff' K p (p + 1) (p + 2)
+      (by simp) (by simp), ShortComplex.ab_exact_iff] at hexact
+  have hker : (K.sc' p (p + 1) (p + 2)).g.hom f = 0 := by
+    show K.d (p + 1) (p + 2) f = 0; rw [hKd]; exact hf
+  obtain ⟨g, hg⟩ := hexact f hker
+  exact ⟨g, by rwa [show (K.sc' p (p + 1) (p + 2)).f = K.d p (p + 1) from rfl, hKd] at hg⟩
+
 /-! ### Extension by zero
 
 For `T' ⊆ T`, the **extension-by-zero** map embeds `K_T` into `K_{T'}` as a subcomplex.
