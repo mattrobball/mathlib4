@@ -183,4 +183,44 @@ instance shift.decomposition (𝓜 : ι → σ) (d : ι)
 
 end Decomposition
 
+/-! ### Integer shift for ℕ-graded modules -/
+
+section IntShift
+
+variable {σ : Type*} [Bot σ]
+
+/-- Integer shift of an `ℕ`-graded type by `d : ℤ`. When `(n : ℤ) + d ≥ 0`, the degree-`n`
+component is `𝓜 ((n : ℤ) + d).toNat`; otherwise it is `⊥`.
+
+This extends `shift` to negative `d`: for `d ≥ 0`, `intShift 𝓜 d = shift 𝓜 d.toNat`.
+The typical use case is `𝓜 = 𝒜` (the homogeneous submodules of a polynomial ring), where
+`intShift 𝒜 d` represents the grading of the twisted sheaf `𝒪(d)` for any `d ∈ ℤ`. -/
+def intShift (𝓜 : ℕ → σ) (d : ℤ) : ℕ → σ :=
+  fun n => if 0 ≤ (n : ℤ) + d then 𝓜 ((n : ℤ) + d).toNat else ⊥
+
+@[simp]
+theorem intShift_apply_of_nonneg (𝓜 : ℕ → σ) (d : ℤ) (n : ℕ)
+    (h : 0 ≤ (n : ℤ) + d) : intShift 𝓜 d n = 𝓜 ((n : ℤ) + d).toNat := by
+  simp [intShift, h]
+
+@[simp]
+theorem intShift_apply_of_neg (𝓜 : ℕ → σ) (d : ℤ) (n : ℕ)
+    (h : (n : ℤ) + d < 0) : intShift 𝓜 d n = ⊥ := by
+  simp [intShift, not_le.mpr h]
+
+/-- For `d ≥ 0`, `intShift` agrees with `shift`: `(n : ℤ) + d ≥ 0` always holds and
+`((n : ℤ) + d).toNat = n + d.toNat`. -/
+theorem intShift_eq_shift (𝓜 : ℕ → σ) (d : ℤ) (hd : 0 ≤ d) :
+    intShift 𝓜 d = shift 𝓜 d.toNat := by
+  ext n
+  show (if 0 ≤ (n : ℤ) + d then 𝓜 ((n : ℤ) + d).toNat else ⊥) = 𝓜 (n + d.toNat)
+  rw [if_pos (add_nonneg (Nat.cast_nonneg n) hd)]
+  congr 1; omega
+
+@[simp]
+theorem intShift_zero (𝓜 : ℕ → σ) : intShift 𝓜 0 = 𝓜 := by
+  ext n; simp [intShift]
+
+end IntShift
+
 end GradedModule

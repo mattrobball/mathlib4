@@ -81,15 +81,35 @@ theorem negSupport_zero : negSupport (0 : LaurentExp n) = ∅ := by
   intro i; rw [mem_negSupport_iff]
   change ¬ (0 : ℤ) < 0; omega
 
-/-- The negative support cannot be all of `Fin (n + 1)`: if all `aᵢ < 0` then
-`∑ aᵢ < 0`, contradicting `∑ aᵢ = d ≥ 0`. -/
-theorem negSupport_ne_univ (a : LaurentExp n d) (hd : 0 ≤ d) :
-    negSupport a ≠ Finset.univ := by
+/-- The negative support cannot be all of `Fin (n + 1)` when `d > -(n + 1)`: if all
+`aᵢ < 0` then each `aᵢ ≤ -1`, so `∑ aᵢ ≤ -(n + 1)`, contradicting `∑ aᵢ = d > -(n + 1)`. -/
+theorem negSupport_ne_univ_of_gt (a : LaurentExp n d)
+    (hd : -(↑(n + 1) : ℤ) < d) : negSupport a ≠ Finset.univ := by
   intro h
   have hlt : ∀ i, a.1 i < 0 := fun i =>
     (mem_negSupport_iff a i).mp (h ▸ mem_univ i)
-  have : ∑ i, a.1 i < 0 := Finset.sum_neg (f := a.1) (s := Finset.univ)
-    (fun i _ => hlt i) ⟨⟨0, Nat.zero_lt_succ n⟩, mem_univ _⟩
+  have hle : ∀ i, a.1 i ≤ -1 := fun i => Int.le_sub_one_iff.mpr (hlt i)
+  have hsum : ∑ i, a.1 i ≤ -(↑(n + 1) : ℤ) := by
+    calc ∑ i, a.1 i ≤ ∑ _i : Fin (n + 1), (-1 : ℤ) :=
+        Finset.sum_le_sum fun i _ => hle i
+    _ = _ := by simp [Finset.sum_const, Finset.card_univ, Fintype.card_fin]
+  linarith [a.2]
+
+/-- The negative support cannot be all of `Fin (n + 1)`: if all `aᵢ < 0` then
+`∑ aᵢ < 0`, contradicting `∑ aᵢ = d ≥ 0`. -/
+theorem negSupport_ne_univ (a : LaurentExp n d) (hd : 0 ≤ d) :
+    negSupport a ≠ Finset.univ :=
+  a.negSupport_ne_univ_of_gt (by linarith [Int.natCast_pos.mpr (Nat.zero_lt_succ n)])
+
+/-- For `d < 0`, the negative support is always nonempty: if all `aᵢ ≥ 0` then
+`∑ aᵢ ≥ 0`, contradicting `∑ aᵢ = d < 0`. -/
+theorem negSupport_nonempty_of_neg (a : LaurentExp n d) (hd : d < 0) :
+    a.negSupport.Nonempty := by
+  rw [Finset.nonempty_iff_ne_empty]
+  intro h
+  have hall : ∀ i, 0 ≤ a.1 i := by
+    intro i; rw [← not_mem_negSupport_iff]; rw [h]; exact Finset.notMem_empty _
+  have : 0 ≤ ∑ i, a.1 i := Finset.sum_nonneg fun i _ => hall i
   linarith [a.2]
 
 /-- If `negSupport a = ∅` for a degree-0 Laurent exponent, then `a = 0`. -/
@@ -259,6 +279,30 @@ theorem numExp_sum_nonneg (a : LaurentExp n d) (S : Finset (Fin (n + 1)))
       ↑(a.clearingPow S) * ↑S.card + d := by
     push_cast; exact (Int.toNat_of_nonneg hd).symm ▸ rfl
   exact_mod_cast h.trans key.symm
+
+/-- The clearing power times the face cardinality plus `d` is nonneg whenever
+`negSupport ⊆ S`. This is the key arithmetic fact enabling monomial element
+construction for all `d ∈ ℤ` (not just `d ≥ 0`): each summand
+`aᵢ + (if i ∈ S then clearingPow else 0)` is nonneg, so their sum
+`d + clearingPow * |S|` is nonneg. -/
+theorem clearingPow_mul_card_add_nonneg (a : LaurentExp n d)
+    (S : Finset (Fin (n + 1))) (hS : a.negSupport ⊆ S) :
+    0 ≤ ↑(a.clearingPow S) * ↑S.card + d := by
+  have h := numExp_sum a S hS
+  have hnn : (0 : ℤ) ≤ ∑ i : Fin (n + 1), ↑(a.numExp S i) := by
+    exact_mod_cast Finset.sum_nonneg fun i _ => Nat.zero_le _
+  linarith
+
+/-- Generalization of `numExp_sum_nonneg` that works for all `d ∈ ℤ` (not just `d ≥ 0`).
+The sum of numerator exponents equals `(clearingPow * |S| + d).toNat`, which is well-defined
+since `clearingPow * |S| + d ≥ 0` when `negSupport ⊆ S`. -/
+theorem numExp_sum_int (a : LaurentExp n d) (S : Finset (Fin (n + 1)))
+    (hS : a.negSupport ⊆ S) :
+    ∑ i : Fin (n + 1), a.numExp S i =
+      (↑(a.clearingPow S) * ↑S.card + d).toNat := by
+  have h := numExp_sum a S hS
+  have hnn := a.clearingPow_mul_card_add_nonneg S hS
+  exact_mod_cast h.trans (Int.toNat_of_nonneg hnn).symm
 
 end LaurentExp
 
