@@ -185,28 +185,25 @@ private theorem monomialCoeffShiftFun_wd (a : LaurentExp n d)
 /-- Generalized monomial coefficient extraction from the shifted module localization.
 Defined via `val` (injection into `LocalizedModule`) and `LocalizedModule.liftOn`. -/
 def monomialCoeffShift (a : LaurentExp n d) (S : Finset (Fin (n + 1)))
-    (_hS : a.negSupport ⊆ S) :
-    HomogeneousLocalizedModule.Away (𝒜 n R) (GradedModule.shift (𝒜 n R) d.toNat)
-      (coordProd n R S) → R := fun x =>
+    (x : HomogeneousLocalizedModule.Away (𝒜 n R) (GradedModule.shift (𝒜 n R) d.toNat)
+      (coordProd n R S)) : R :=
   x.val.liftOn (monomialCoeffShiftFun a S) (monomialCoeffShiftFun_wd a S)
 
 /-- `monomialCoeffShift` as an `AddMonoidHom`. -/
-def monomialCoeffShiftHom (a : LaurentExp n d) (S : Finset (Fin (n + 1)))
-    (hS : a.negSupport ⊆ S) :
+def monomialCoeffShiftHom (a : LaurentExp n d) (S : Finset (Fin (n + 1))) :
     HomogeneousLocalizedModule.Away (𝒜 n R) (GradedModule.shift (𝒜 n R) d.toNat)
       (coordProd n R S) →+ R where
-  toFun := monomialCoeffShift a S hS
+  toFun := monomialCoeffShift a S
   map_zero' := by
-    show monomialCoeffShift a S hS 0 = 0
+    show monomialCoeffShift a S 0 = 0
     simp only [monomialCoeffShift, HomogeneousLocalizedModule.val_zero]
-    change LocalizedModule.liftOn 0 _ _ = 0
     rw [show (0 : LocalizedModule (Submonoid.powers (coordProd n R S))
         (MvPolynomial (Fin (n + 1)) R)) = LocalizedModule.mk 0 1 from by
       rw [LocalizedModule.zero_mk], LocalizedModule.liftOn_mk]
     simp [monomialCoeffShiftFun, mul_zero, MvPolynomial.coeff_zero]
   map_add' x y := by
-    show monomialCoeffShift a S hS (x + y) =
-      monomialCoeffShift a S hS x + monomialCoeffShift a S hS y
+    show monomialCoeffShift a S (x + y) =
+      monomialCoeffShift a S x + monomialCoeffShift a S y
     simp only [monomialCoeffShift, HomogeneousLocalizedModule.val_add]
     refine LocalizedModule.induction_on₂ (fun m1 m2 s1 s2 => ?_) x.val y.val
     rw [LocalizedModule.mk_add_mk, LocalizedModule.liftOn_mk,
@@ -258,7 +255,7 @@ variable (d : ℤ) (hd : 0 ≤ d)
 /-- Extracting the coefficient of a monomial at itself gives `1`. -/
 theorem monomialCoeffShift_self (a : LaurentExp n d)
     (S : Finset (Fin (n + 1))) (hS : a.negSupport ⊆ S) :
-    monomialCoeffShift a S hS (monomialElemShift (R := R) d hd a S hS) = 1 := by
+    monomialCoeffShift a S (monomialElemShift (R := R) d hd a S hS) = 1 := by
   simp only [monomialCoeffShift, monomialElemShift,
     HomogeneousLocalizedModule.Away.val_mk,
     LocalizedModule.liftOn_mk, monomialCoeffShiftFun]
@@ -272,7 +269,7 @@ theorem monomialCoeffShift_self (a : LaurentExp n d)
 theorem monomialCoeffShift_ne {a a' : LaurentExp n d}
     {S : Finset (Fin (n + 1))} (hS : a.negSupport ⊆ S) (hS' : a'.negSupport ⊆ S)
     (hne : a ≠ a') :
-    monomialCoeffShift a S hS (monomialElemShift (R := R) d hd a' S hS') = 0 := by
+    monomialCoeffShift a S (monomialElemShift (R := R) d hd a' S hS') = 0 := by
   simp only [monomialCoeffShift, monomialElemShift,
     HomogeneousLocalizedModule.Away.val_mk,
     LocalizedModule.liftOn_mk, monomialCoeffShiftFun]
@@ -307,7 +304,7 @@ theorem monomialCoeffShift_smulMonomialElemShift
     (a a' : LaurentExp n d)
     (S : Finset (Fin (n + 1))) (hS : a.negSupport ⊆ S) (hS' : a'.negSupport ⊆ S)
     (r : R) :
-    monomialCoeffShift a S hS
+    monomialCoeffShift a S
       (smulMonomialElemShift (R := R) d hd r a' S hS') =
     if a = a' then r else 0 := by
   simp only [monomialCoeffShift, smulMonomialElemShift,
@@ -322,7 +319,10 @@ theorem monomialCoeffShift_smulMonomialElemShift
     MvPolynomial.coeff_C_mul, prod_coord_pow_eq_monomial, coordProd_pow_eq_monomial,
     MvPolynomial.monomial_mul, one_mul, MvPolynomial.coeff_monomial]
   by_cases h : a = a'
-  · subst h; rw [if_pos rfl, if_pos (add_comm _ _), mul_one]
+  · subst h
+    rw [if_pos rfl]
+    simp only [LaurentExp.numFinsupp]
+    rw [if_pos (add_comm _ _), mul_one]
   · rw [if_neg h]
     rw [if_neg, mul_zero]
     intro heq
@@ -361,13 +361,12 @@ theorem monomialCoeffShift_coordRestrict (a : LaurentExp n d)
     {p : ℕ} {T : Finset (Fin (n + 1))} (hT : T.card = p + 2)
     (j : Fin (p + 2))
     (hface : a.negSupport ⊆ (TopCat.eraseNth T hT j).1)
-    (hfull : a.negSupport ⊆ T)
     (x : HomogeneousLocalizedModule.Away (𝒜 n R)
       (GradedModule.shift (𝒜 n R) d.toNat)
       (coordProd n R (TopCat.eraseNth T hT j).1)) :
-    monomialCoeffShift a T hfull
+    monomialCoeffShift a T
       (coordRestrict n R (GradedModule.shift (𝒜 n R) d.toNat) T hT j x) =
-    monomialCoeffShift a (TopCat.eraseNth T hT j).1 hface x := by
+    monomialCoeffShift a (TopCat.eraseNth T hT j).1 x := by
   revert hface x
   set j_elem := TopCat.nthElem T hT j
   set face := (TopCat.eraseNth T hT j).1
@@ -384,14 +383,13 @@ theorem monomialCoeffShift_coordRestrict (a : LaurentExp n d)
     a.clearingPow_erase (TopCat.nthElem_mem T hT j) hj_nn
   set cp := a.clearingPow T
   -- RHS: unfold to polynomial coefficient
-  have hRHS : monomialCoeffShift a face hface ⟦q⟧ =
+  have hRHS : monomialCoeffShift a face ⟦q⟧ =
       MvPolynomial.coeff (a.numFinsupp face + coordProdFinsupp face N)
         ((coordProd n R face) ^ cp *
           (q.num : MvPolynomial (Fin (n + 1)) R)) := by
     simp only [monomialCoeffShift, HomogeneousLocalizedModule.val_mk,
       LocalizedModule.liftOn_mk, monomialCoeffShiftFun]
     rw [← hcp_eq]
-    exact coeff_shift_coordProdFinsupp_eq_of_pow_eq (R := R) face _ _ _
   rw [hRHS]; clear hRHS
   -- LHS: unfold coordRestrict and monomialCoeffShift
   simp only [monomialCoeffShift, coordRestrict]
@@ -485,7 +483,7 @@ theorem monomialCoeffShift_coordRestrict_vanish (a : LaurentExp n d)
     (x : HomogeneousLocalizedModule.Away (𝒜 n R)
       (GradedModule.shift (𝒜 n R) d.toNat)
       (coordProd n R (TopCat.eraseNth T hT j).1)) :
-    monomialCoeffShift a T hfull
+    monomialCoeffShift a T
       (coordRestrict n R (GradedModule.shift (𝒜 n R) d.toNat) T hT j x) = 0 := by
   refine Quotient.inductionOn x fun q => ?_
   set j_elem := TopCat.nthElem T hT j
@@ -540,9 +538,6 @@ theorem monomialCoeffShift_coordRestrict_vanish (a : LaurentExp n d)
       LaurentExp.numFinsupp_apply, LaurentExp.numExp, if_pos hj_mem,
       coordProdFinsupp_apply_mem hj_mem] at this
     have hnn := a.clearingPow_nonneg T j_elem hj_mem
-    have : (a.1 j_elem + ↑cp).toNat < cp := by
-      suffices h : (↑((a.1 j_elem + ↑cp).toNat) : ℤ) < ↑cp by exact_mod_cast h
-      rw [Int.toNat_of_nonneg hnn]; linarith
     omega
 
 end ShiftFaceCompat
@@ -557,8 +552,8 @@ variable {d : ℤ}
 theorem monomialCoeffShift_determines_zero (hd : 0 ≤ d) (S : Finset (Fin (n + 1)))
     (x : HomogeneousLocalizedModule.Away (𝒜 n R)
       (GradedModule.shift (𝒜 n R) d.toNat) (coordProd n R S))
-    (h : ∀ (a : LaurentExp n d) (hS : a.negSupport ⊆ S),
-      monomialCoeffShift a S hS x = 0) :
+    (h : ∀ (a : LaurentExp n d) (_ : a.negSupport ⊆ S),
+      monomialCoeffShift a S x = 0) :
     x = 0 := by
   revert h; refine Quotient.inductionOn x fun q h => ?_
   suffices hnum : (q.num : MvPolynomial (Fin (n + 1)) R) = 0 by
@@ -636,11 +631,16 @@ theorem monomialCoeffShift_determines_zero (hd : 0 ≤ d) (S : Finset (Fin (n + 
       have : a.val i = ↑(m i) := by simp [ha_def, hiS]
       rw [this, Int.toNat_natCast]; omega
   -- Coefficient computation
-  have hcoeff : monomialCoeffShift a S hns ⟦q⟧ =
+  have hcoeff : monomialCoeffShift a S ⟦q⟧ =
       MvPolynomial.coeff m (↑q.num : MvPolynomial _ R) := by
-    simp only [monomialCoeffShift, HomogeneousLocalizedModule.val_mk,
-      LocalizedModule.liftOn_mk, monomialCoeffShiftFun]
-    rw [coeff_shift_coordProdFinsupp_eq_of_pow_eq (R := R) S _ _ _, hindex]
+    show (HomogeneousLocalizedModule.mk q).val.liftOn
+      (monomialCoeffShiftFun a S) (monomialCoeffShiftFun_wd a S) = _
+    rw [HomogeneousLocalizedModule.val_mk, LocalizedModule.liftOn_mk,
+      show monomialCoeffShiftFun a S ((q.num : MvPolynomial _ R),
+        ⟨(q.den : MvPolynomial _ R), q.den_mem⟩) =
+        MvPolynomial.coeff (a.numFinsupp S + coordProdFinsupp S N)
+        ((coordProd n R S) ^ a.clearingPow S * (q.num : MvPolynomial _ R)) from rfl,
+      hindex]
     exact coeff_coordProd_pow_mul S _ m _
   exact absurd (hcoeff.symm.trans (h a hns)) (Finsupp.mem_support_iff.mp hm)
 
@@ -648,38 +648,39 @@ theorem monomialCoeffShift_determines_zero (hd : 0 ≤ d) (S : Finset (Fin (n + 
 theorem monomialCoeffShift_finite_support (S : Finset (Fin (n + 1)))
     (x : HomogeneousLocalizedModule.Away (𝒜 n R)
       (GradedModule.shift (𝒜 n R) d.toNat) (coordProd n R S)) :
-    {a : LaurentExp n d | ∃ hS : a.negSupport ⊆ S,
-      monomialCoeffShift a S hS x ≠ 0}.Finite := by
+    {a : LaurentExp n d | ∃ _ : a.negSupport ⊆ S,
+      monomialCoeffShift a S x ≠ 0}.Finite := by
   revert x; refine Quotient.ind fun q => ?_
   set N := q.den_mem.choose
   set num := (q.num : MvPolynomial (Fin (n + 1)) R)
   let φ : LaurentExp n d → Fin (n + 1) →₀ ℕ := fun a =>
     a.numFinsupp S + coordProdFinsupp S N - coordProdFinsupp S (a.clearingPow S)
-  have hφ_spec : ∀ a (hns : a.negSupport ⊆ S),
-      monomialCoeffShift a S hns ⟦q⟧ ≠ 0 →
+  have hφ_spec : ∀ a (_ : a.negSupport ⊆ S),
+      monomialCoeffShift a S ⟦q⟧ ≠ 0 →
       coordProdFinsupp S (a.clearingPow S) ≤
         a.numFinsupp S + coordProdFinsupp S N ∧
-      monomialCoeffShift a S hns ⟦q⟧ = MvPolynomial.coeff (φ a) num := by
-    intro a hns hne
-    have hraw : monomialCoeffShift a S hns ⟦q⟧ =
+      monomialCoeffShift a S ⟦q⟧ = MvPolynomial.coeff (φ a) num := by
+    intro a _hns hne
+    have hraw : monomialCoeffShift a S ⟦q⟧ =
         MvPolynomial.coeff (a.numFinsupp S + coordProdFinsupp S N)
           ((coordProd n R S) ^ a.clearingPow S * num) := by
-      simp only [monomialCoeffShift, HomogeneousLocalizedModule.val_mk,
-        LocalizedModule.liftOn_mk, monomialCoeffShiftFun]
-      exact coeff_shift_coordProdFinsupp_eq_of_pow_eq (R := R) S _ _ _
+      show (HomogeneousLocalizedModule.mk q).val.liftOn
+        (monomialCoeffShiftFun a S) (monomialCoeffShiftFun_wd a S) = _
+      rw [HomogeneousLocalizedModule.val_mk, LocalizedModule.liftOn_mk]
+      rfl
     rw [coordProd_pow_eq_monomial, MvPolynomial.coeff_monomial_mul'] at hraw
     split_ifs at hraw with h
     · exact ⟨h, by rw [hraw, one_mul]⟩
     · exact (hne hraw).elim
   -- φ maps nonzero set into support(num)
-  have hφ_mem : ∀ a ∈ {a | ∃ hns : a.negSupport ⊆ S,
-      monomialCoeffShift a S hns ⟦q⟧ ≠ 0}, φ a ∈ num.support := by
+  have hφ_mem : ∀ a ∈ {a | ∃ _ : a.negSupport ⊆ S,
+      monomialCoeffShift a S ⟦q⟧ ≠ 0}, φ a ∈ num.support := by
     intro a ⟨hns, hne⟩
     rw [MvPolynomial.mem_support_iff]
     rwa [← (hφ_spec a hns hne).2]
   -- φ is injective on nonzero set
   have hφ_inj : Set.InjOn φ
-      {a | ∃ hns : a.negSupport ⊆ S, monomialCoeffShift a S hns ⟦q⟧ ≠ 0} := by
+      {a | ∃ _ : a.negSupport ⊆ S, monomialCoeffShift a S ⟦q⟧ ≠ 0} := by
     intro a ⟨ha_ns, ha_ne⟩ a' ⟨ha'_ns, ha'_ne⟩ hφeq
     refine Subtype.ext (funext fun i => ?_)
     have hφi : (a.numFinsupp S + coordProdFinsupp S N -
@@ -741,13 +742,13 @@ def componentHomShift (a : LaurentExp n d) (p : ℕ) :
       HomogeneousLocalizedModule.Away (𝒜 n R)
         (GradedModule.shift (𝒜 n R) d.toNat) (coordProd n R S.1)) →+
     _root_.relSimplexCochain a.negSupport R p where
-  toFun := fun f ⟨S, hS, hns⟩ => monomialCoeffShift a S hns (f ⟨S, hS⟩)
+  toFun := fun f ⟨S, hS, _hns⟩ => monomialCoeffShift a S (f ⟨S, hS⟩)
   map_zero' := by
-    ext ⟨S, hS, hns⟩; simp only [Pi.zero_apply]
-    exact (monomialCoeffShiftHom a S hns).map_zero
+    ext ⟨S, hS, _hns⟩; simp only [Pi.zero_apply]
+    exact (monomialCoeffShiftHom a S).map_zero
   map_add' x y := by
-    ext ⟨S, hS, hns⟩; simp only [Pi.add_apply]
-    exact (monomialCoeffShiftHom a S hns).map_add (x ⟨S, hS⟩) (y ⟨S, hS⟩)
+    ext ⟨S, hS, _hns⟩; simp only [Pi.add_apply]
+    exact (monomialCoeffShiftHom a S).map_add (x ⟨S, hS⟩) (y ⟨S, hS⟩)
 
 /-- The component extraction commutes with differentials. -/
 theorem componentShift_comm_δ (a : LaurentExp n d) (p : ℕ)
@@ -760,15 +761,58 @@ theorem componentShift_comm_δ (a : LaurentExp n d) (p : ℕ)
   ext ⟨T, hT, hfull⟩
   simp only [componentHomShift, AddMonoidHom.coe_mk, ZeroHom.coe_mk,
     algebraicδ, _root_.relSimplexδHom, _root_.relSimplexδ_apply]
-  show (monomialCoeffShiftHom a T hfull) _ = _
+  show (monomialCoeffShiftHom a T) _ = _
   rw [map_sum]
   congr 1; ext j
   rw [map_zsmul]
   simp only [monomialCoeffShiftHom, AddMonoidHom.coe_mk, ZeroHom.coe_mk]
   split_ifs with hface
-  · congr 1; exact monomialCoeffShift_coordRestrict a hT j hface hfull _
+  · congr 1; exact monomialCoeffShift_coordRestrict a hT j hface _
   · rw [monomialCoeffShift_coordRestrict_vanish a hT j hface hfull _, smul_zero]
 
 end ShiftComponentChainMap
+
+/-! ### Bridge: degree-0 coefficient agrees with zero-exponent extraction -/
+
+section ZeroBridge
+
+/-- When `a = 0` (degree 0), `monomialCoeffShift` agrees with `zeroExpCoeffMod`.
+This bridges the general shifted coefficient extraction with the degree-0 extraction
+used by `extractionHom`. -/
+theorem monomialCoeffShift_zero_eq (S : Finset (Fin (n + 1)))
+    (x : HomogeneousLocalizedModule.Away (𝒜 n R) (𝒜 n R) (coordProd n R S)) :
+    monomialCoeffShift (0 : LaurentExp n 0) S x = zeroExpCoeffMod (R := R) S x := by
+  refine Quotient.inductionOn x fun q => ?_
+  -- LHS: unfold via val_mk, liftOn_mk
+  show (HomogeneousLocalizedModule.mk q).val.liftOn
+    (monomialCoeffShiftFun (0 : LaurentExp n 0) S)
+    (monomialCoeffShiftFun_wd (0 : LaurentExp n 0) S) = _
+  rw [HomogeneousLocalizedModule.val_mk, LocalizedModule.liftOn_mk]
+  -- monomialCoeffShiftFun at a=0: clearingPow=0, numFinsupp=0
+  simp only [monomialCoeffShiftFun]
+  have h1 : (0 : LaurentExp n 0).clearingPow S = 0 := by
+    unfold LaurentExp.clearingPow
+    simp only [show ∀ i, (0 : LaurentExp n 0).1 i = 0 from fun _ => rfl, neg_zero,
+      Int.toNat_zero]
+    exact (Finset.sup_eq_bot_iff _ _).mpr (fun _ _ => rfl)
+  have h2 : (0 : LaurentExp n 0).numFinsupp S = 0 := by
+    ext i; simp [LaurentExp.numFinsupp_apply, LaurentExp.numExp, h1,
+      show (0 : LaurentExp n 0).1 i = 0 from rfl]
+  rw [h1, h2, zero_add, pow_zero, one_mul]
+  -- RHS: zeroExpCoeffMod S ⟦q⟧ = coeff (coordProdFinsupp S N) q.num, definitionally
+  rfl
+
+/-- `componentHomShift` at `a = 0` agrees with `extractionHom`. -/
+theorem componentHomShift_zero_apply (p : ℕ)
+    (f : ∀ S : {S : Finset (Fin (n + 1)) // S.card = p + 1},
+      HomogeneousLocalizedModule.Away (𝒜 n R) (𝒜 n R) (coordProd n R S.1))
+    {S : Finset (Fin (n + 1))} (hS : S.card = p + 1)
+    (hns : (0 : LaurentExp n 0).negSupport ⊆ S) :
+    componentHomShift (0 : LaurentExp n 0) p f ⟨S, hS, hns⟩ =
+    extractionHom p f ⟨S, hS, Finset.empty_subset S⟩ := by
+  simp only [componentHomShift, extractionHom, AddMonoidHom.coe_mk, ZeroHom.coe_mk]
+  exact monomialCoeffShift_zero_eq S (f ⟨S, hS⟩)
+
+end ZeroBridge
 
 end AlgebraicGeometry.Proj

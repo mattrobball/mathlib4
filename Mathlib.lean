@@ -1184,6 +1184,7 @@ import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.CechCohomology
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.CechCover
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.GradedTilde
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.GradedTilde.TwistingSheaf
+import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.MonomialCoefficient
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.MonomialDecomposition
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.ProjectiveSpace
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Proper
