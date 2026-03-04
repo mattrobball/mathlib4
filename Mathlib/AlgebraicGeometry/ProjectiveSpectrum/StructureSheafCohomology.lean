@@ -182,17 +182,17 @@ theorem algebraicCocycle_zero_of_extraction_zero
   funext ⟨S, hS⟩
   apply monomialCoeffShift_determines_zero (le_refl (0 : ℤ))
   intro a ha
-  -- componentHomShift a 0 f is a 0-cocycle in K_{negSupport(a)}
+  -- componentHom a 0 f is a 0-cocycle in K_{negSupport(a)}
   have hcomp_cocycle :
-      _root_.relSimplexδHom a.negSupport R 0 (componentHomShift a 0 f) = 0 := by
-    rw [← componentShift_comm_δ a 0 f]
-    change componentHomShift a 1 (algebraicδ n R (𝒜 n R) 0 f) = 0
+      _root_.relSimplexδHom a.negSupport R 0 (componentHom a 0 f) = 0 := by
+    rw [← component_comm_δ a 0 f]
+    change componentHom a 1 (algebraicδ n R (𝒜 n R) 0 f) = 0
     rw [hcocycle, map_zero]
   by_cases ha0 : a = (0 : LaurentExp n)
-  · -- a = 0: componentHomShift reduces to extractionHom, which is 0
+  · -- a = 0: componentHom reduces to extractionHom, which is 0
     subst ha0
-    change componentHomShift 0 0 f ⟨S, hS, ha⟩ = 0
-    rw [componentHomShift_zero_apply 0 f hS ha]
+    change componentHom 0 0 f ⟨S, hS, ha⟩ = 0
+    rw [componentHom_zero_apply 0 f hS ha]
     exact congr_fun hextract ⟨S, hS, Finset.empty_subset S⟩
   · -- a ≠ 0: K_{negSupport(a)} is acyclic, so the 0-cocycle is 0
     have hne : a.negSupport.Nonempty := by
@@ -200,8 +200,8 @@ theorem algebraicCocycle_zero_of_extraction_zero
     have hne' : a.negSupport ≠ Finset.univ := a.negSupport_ne_univ (le_refl 0)
     have hac := _root_.relSimplexComplex_acyclic a.negSupport R hne hne'
     -- Acyclicity at degree 0 for ℕ-indexed complex means ker(d⁰) = 0
-    show componentHomShift a 0 f ⟨S, hS, ha⟩ = 0
-    suffices hz : componentHomShift a 0 f = 0 from congr_fun hz ⟨S, hS, ha⟩
+    show componentHom a 0 f ⟨S, hS, ha⟩ = 0
+    suffices hz : componentHom a 0 f = 0 from congr_fun hz ⟨S, hS, ha⟩
     set K := _root_.relSimplexComplex a.negSupport R
     -- K is exact at degree 0 (from acyclicity): ker(g) ≤ range(f)
     have hker_le := ((K.sc 0).ab_exact_iff_ker_le_range).mp (hac 0)
@@ -213,9 +213,9 @@ theorem algebraicCocycle_zero_of_extraction_zero
       have : (K.sc 0).f.hom = 0 := congr_arg AddCommGrp.Hom.hom hf_zero
       rw [this]; exact AddMonoidHom.range_zero
     -- Our element is in ker(g): the differential kills it
-    have hg_mem : componentHomShift a 0 f ∈ (K.sc 0).g.hom.ker := by
+    have hg_mem : componentHom a 0 f ∈ (K.sc 0).g.hom.ker := by
       rw [AddMonoidHom.mem_ker]
-      show K.d 0 ((ComplexShape.up ℕ).next 0) (componentHomShift a 0 f) = 0
+      show K.d 0 ((ComplexShape.up ℕ).next 0) (componentHom a 0 f) = 0
       rw [(ComplexShape.up ℕ).next_eq' (show (0 : ℕ) + 1 = 1 from rfl),
         show K.d 0 1 = AddCommGrp.ofHom
           (_root_.relSimplexδHom a.negSupport R 0) from
