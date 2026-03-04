@@ -665,43 +665,98 @@ noncomputable def algebraicComplex_shift_H0_iso (hd : 0 ≤ (d_nat : ℤ)) :
 
 end H0Shift
 
-/-! ### H^n(𝒪(-(n+1))) ≅ R -/
+/-! ### H^n(𝒪(d)) ≅ 𝒜_m for d ≤ -(n+1), m = -d-(n+1) -/
 
 section HnNegTwist
 
-/-- The all-(-1) Laurent exponent of degree `-(n+1)`: the unique Laurent exponent whose
-negative support is all of `Fin (n + 1)`. -/
-private def allNegOne : LaurentExp n (-(↑(n + 1) : ℤ)) :=
-  ⟨fun _ => -1, by
-    simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul]
-    push_cast; ring⟩
+/-! #### Dual Finsupp bijection
 
-private theorem allNegOne_negSupport :
-    (allNegOne (n := n)).negSupport = Finset.univ := by
-  ext i; simp [LaurentExp.mem_negSupport_iff, allNegOne]
+For `d ≤ -(n+1)`, set `m = (-d - (n+1)).toNat`. The all-negative Laurent exponents
+(those with `negSupport = univ`) biject with degree-`m` monomials via `aᵢ ↦ -aᵢ - 1`.
+-/
 
-private theorem eq_allNegOne_of_negSupport_eq_univ
-    (a : LaurentExp n (-(↑(n + 1) : ℤ)))
-    (h : a.negSupport = Finset.univ) : a = allNegOne := by
-  refine Subtype.ext (funext fun i => ?_); show a.1 i = -1
-  have hi : a.1 i < 0 := (a.mem_negSupport_iff i).mp (h ▸ Finset.mem_univ i)
-  by_contra hne; have hlt : a.1 i ≤ -2 := by omega
-  have : ∑ j, a.1 j ≤ -(↑(n + 1) : ℤ) - 1 :=
-    calc ∑ j, a.1 j
-      = a.1 i + ∑ j ∈ Finset.univ.erase i, a.1 j :=
-        (Finset.add_sum_erase _ _ (Finset.mem_univ i)).symm
-      _ ≤ -2 + (-(↑n : ℤ)) := by
-        refine add_le_add hlt ?_
-        calc ∑ j ∈ Finset.univ.erase i, a.1 j
-          ≤ ∑ _ ∈ Finset.univ.erase i, (-1 : ℤ) :=
-            Finset.sum_le_sum fun j _ => Int.le_sub_one_iff.mpr
-              ((a.mem_negSupport_iff j).mp (h ▸ Finset.mem_univ j))
-          _ = -(↑n : ℤ) := by
-            simp only [Finset.sum_const, Finset.card_erase_of_mem (Finset.mem_univ i),
-              Finset.card_univ, Fintype.card_fin, smul_eq_mul]
-            push_cast; ring
-      _ = -(↑(n + 1) : ℤ) - 1 := by push_cast; ring
-  linarith [a.2]
+/-- Map an all-negative Laurent exponent to a polynomial `Finsupp`: `aᵢ ↦ (-aᵢ - 1)`. -/
+private def dualFinsupp (d : ℤ) (a : LaurentExp n d) (_h : a.negSupport = Finset.univ) :
+    Fin (n + 1) →₀ ℕ :=
+  Finsupp.equivFunOnFinite.invFun (fun i => (-a.1 i - 1).toNat)
+
+private theorem dualFinsupp_apply (d : ℤ) (a : LaurentExp n d)
+    (h : a.negSupport = Finset.univ) (i : Fin (n + 1)) :
+    dualFinsupp d a h i = (-a.1 i - 1).toNat := by
+  simp [dualFinsupp]
+
+private theorem dualFinsupp_apply_int (d : ℤ) (a : LaurentExp n d)
+    (h : a.negSupport = Finset.univ) (i : Fin (n + 1)) :
+    (dualFinsupp d a h i : ℤ) = -a.1 i - 1 := by
+  rw [dualFinsupp_apply]
+  exact Int.toNat_of_nonneg (by
+    have := (a.mem_negSupport_iff i).mp (h ▸ Finset.mem_univ i); omega)
+
+private theorem dualFinsupp_degree (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
+    (a : LaurentExp n d) (h : a.negSupport = Finset.univ) :
+    (dualFinsupp d a h).degree = (-d - ↑(n + 1)).toNat := by
+  simp only [Finsupp.degree]
+  rw [Finset.sum_subset (Finset.subset_univ _)
+    (fun i _ hi => Finsupp.notMem_support_iff.mp hi)]
+  suffices h_int : (∑ i, (dualFinsupp d a h i : ℤ)) =
+      ((-d - ↑(n + 1)).toNat : ℤ) by exact_mod_cast h_int
+  simp_rw [dualFinsupp_apply_int d a h]
+  rw [Int.toNat_of_nonneg (by omega)]
+  simp_rw [show ∀ i : Fin (n + 1), -a.1 i - 1 = -a.1 i + (-1) from fun _ => by ring]
+  rw [Finset.sum_add_distrib, Finset.sum_neg_distrib]
+  simp [a.2, Fintype.card_fin]; ring
+
+/-- Map a polynomial `Finsupp` of degree `m` to an all-negative Laurent exponent:
+`bᵢ ↦ -(bᵢ : ℤ) - 1`. -/
+private def inverseDualExp (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
+    (b : Fin (n + 1) →₀ ℕ) (hb : b.degree = (-d - ↑(n + 1)).toNat) :
+    LaurentExp n d :=
+  ⟨fun i => -(b i : ℤ) - 1, by
+    simp only [Finsupp.degree] at hb
+    have hb' : ∑ i : Fin (n + 1), b i = (-d - ↑(n + 1)).toNat := by
+      rwa [Finset.sum_subset (Finset.subset_univ _)
+        (fun i _ hi => Finsupp.notMem_support_iff.mp hi)] at hb
+    have hb_int : (∑ i, (b i : ℤ)) = -d - ↑(n + 1) := by
+      zify at hb'; rwa [Int.toNat_of_nonneg (by omega)] at hb'
+    simp_rw [show ∀ i : Fin (n + 1), -(b i : ℤ) - 1 = -(b i : ℤ) + (-1) from
+      fun _ => by ring]
+    rw [Finset.sum_add_distrib, Finset.sum_neg_distrib]
+    simp [hb_int, Fintype.card_fin]; ring⟩
+
+private theorem inverseDualExp_apply (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
+    (b : Fin (n + 1) →₀ ℕ) (hb : b.degree = (-d - ↑(n + 1)).toNat)
+    (i : Fin (n + 1)) :
+    (inverseDualExp d hd b hb).1 i = -(b i : ℤ) - 1 := rfl
+
+private theorem inverseDualExp_negSupport (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
+    (b : Fin (n + 1) →₀ ℕ) (hb : b.degree = (-d - ↑(n + 1)).toNat) :
+    (inverseDualExp d hd b hb).negSupport = Finset.univ := by
+  ext i; simp [LaurentExp.mem_negSupport_iff, inverseDualExp_apply]; omega
+
+private theorem dualFinsupp_inverseDualExp (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
+    (b : Fin (n + 1) →₀ ℕ) (hb : b.degree = (-d - ↑(n + 1)).toNat) :
+    dualFinsupp d (inverseDualExp d hd b hb)
+      (inverseDualExp_negSupport d hd b hb) = b := by
+  ext i; rw [dualFinsupp_apply, inverseDualExp_apply]; omega
+
+private theorem inverseDualExp_dualFinsupp (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
+    (a : LaurentExp n d) (h : a.negSupport = Finset.univ) :
+    inverseDualExp d hd (dualFinsupp d a h) (dualFinsupp_degree d hd a h) = a := by
+  refine Subtype.ext (funext fun i => ?_)
+  rw [inverseDualExp_apply, dualFinsupp_apply_int]; ring
+
+private theorem dualFinsupp_injective (d : ℤ) (_hd : d ≤ -(↑(n + 1) : ℤ))
+    (a a' : LaurentExp n d)
+    (h : a.negSupport = Finset.univ) (h' : a'.negSupport = Finset.univ)
+    (heq : dualFinsupp d a h = dualFinsupp d a' h') : a = a' := by
+  refine Subtype.ext (funext fun i => ?_)
+  have hi : dualFinsupp d a h i = dualFinsupp d a' h' i := DFunLike.congr_fun heq i
+  rw [dualFinsupp_apply, dualFinsupp_apply] at hi
+  have ha := (a.mem_negSupport_iff i).mp (h ▸ Finset.mem_univ i)
+  have ha' := (a'.mem_negSupport_iff i).mp (h' ▸ Finset.mem_univ i)
+  omega
+
+/-! #### Helper lemmas for cast -/
 
 private lemma algebraicComplex_XIsoOfEq_eval
     {𝓜 : ℕ → Submodule R (MvPolynomial (Fin (n + 1)) R)} [SetLike.GradedSMul (𝒜 n R) 𝓜]
@@ -721,23 +776,46 @@ private lemma relSimplexCochain_cast_eval (T : Finset (Fin (n + 1)))
     f ⟨S, hS'⟩ := by
   subst hk; rfl
 
+/-! #### All-negative polynomial extraction -/
+
+/-- Extract the "all-negative polynomial" from a localized module element:
+for each all-negative Laurent exponent `a` (with `negSupport = univ`), collect its
+monomial coefficient as a term `monomial(dualFinsupp(a), coeff_a(x))`.
+The result is a homogeneous polynomial of degree `m = (-d-(n+1)).toNat`. -/
+private noncomputable def allNegPoly (d : ℤ) (_hd : d ≤ -(↑(n + 1) : ℤ))
+    (x : HomogeneousLocalizedModule.Away (𝒜 n R)
+      (GradedModule.intShift (𝒜 n R) d) (coordProd n R Finset.univ)) :
+    MvPolynomial (Fin (n + 1)) R :=
+  (monomialCoeff_finite_support (d := d) Finset.univ x).toFinset.sum fun a =>
+    if h : a.negSupport = Finset.univ then
+      MvPolynomial.monomial (dualFinsupp d a h)
+        (monomialCoeff a Finset.univ x)
+    else 0
+
+private theorem allNegPoly_mem (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
+    (x : HomogeneousLocalizedModule.Away (𝒜 n R)
+      (GradedModule.intShift (𝒜 n R) d) (coordProd n R Finset.univ)) :
+    allNegPoly d hd x ∈ (𝒜 n R) ((-d - ↑(n + 1)).toNat) := by
+  apply Submodule.sum_mem; intro a _
+  split_ifs with h
+  · rw [MvPolynomial.mem_homogeneousSubmodule]
+    exact MvPolynomial.isHomogeneous_monomial _ (dualFinsupp_degree d hd a h)
+  · exact zero_mem _
+
 set_option maxHeartbeats 800000 in
 -- The proof assembles a quotient equivalence from monomial coefficient extraction,
 -- requiring extensive unfolding of the algebraic complex and localization machinery.
-/-- `Hⁿ(𝒪(-(n+1))) ≅ R`: the `n`-th cohomology of the twisted structure sheaf
-`𝒪(-(n+1))` on projective `n`-space is isomorphic to the base ring. -/
-noncomputable def algebraicComplex_intShift_Hn_iso :
-    (algebraicComplex n R (GradedModule.intShift (𝒜 n R)
-      (-(↑(n + 1) : ℤ)))).homology n ≅ AddCommGrp.of R := by
-  set d := -(↑(n + 1) : ℤ) with hd_def
+/-- `Hⁿ(𝒪(d)) ≅ 𝒜_m` for `d ≤ -(n+1)` with `m = -d-(n+1)`: the top cohomology of the
+twisted structure sheaf on projective `n`-space is the graded component of degree `m`. -/
+noncomputable def algebraicComplex_intShift_Hn_iso_general
+    (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ)) :
+    (algebraicComplex n R (GradedModule.intShift (𝒜 n R) d)).homology n ≅
+    AddCommGrp.of ↥((𝒜 n R) ((-d - ↑(n + 1)).toNat)) := by
+  set m := (-d - ↑(n + 1)).toNat with hm_def
   set 𝓜 := GradedModule.intShift (𝒜 n R) d
   set A := algebraicComplex n R 𝓜
-  set a₀ := allNegOne (n := n)
-  have hd_neg : d < 0 := by simp [d]; omega
+  have hd_neg : d < 0 := by omega
   have huniv : (Finset.univ : Finset (Fin (n + 1))).card = n + 1 := by simp
-  have hns_all : ∀ (S : Finset (Fin (n + 1))), S.card = n + 1 → a₀.negSupport ⊆ S :=
-    fun S hS => by rw [allNegOne_negSupport,
-      Finset.eq_univ_of_card S (hS.trans (Fintype.card_fin _).symm)]
   -- Step 1: Unwrap homology via short complex
   refine A.homologyIsoSc' _ n (n + 1) rfl ((ComplexShape.up ℕ).next_eq' rfl) ≪≫ ?_
   set SA := A.sc' ((ComplexShape.up ℕ).prev n) n (n + 1)
@@ -755,318 +833,448 @@ noncomputable def algebraicComplex_intShift_Hn_iso :
     fun f => by rw [AddMonoidHom.mem_ker, hg_hom, AddMonoidHom.zero_apply]
   have hAd : ∀ j, A.d j (j + 1) = AddCommGrp.ofHom (algebraicδ n R 𝓜 j) :=
     fun j => by simp [A, algebraicComplex]
-  -- Step 3: Define extraction at a₀
-  set ext_map : SA.g.hom.ker →+ R := {
+  -- All Laurent exponents have nonempty negSupport (d < 0)
+  have hnonempty : ∀ a : LaurentExp n d, a.negSupport.Nonempty :=
+    fun a => a.negSupport_nonempty_of_neg hd_neg
+  -- Step 3: Define extraction map ext_map : ker(g) →+ 𝒜_m
+  set ext_map : SA.g.hom.ker →+ ↥((𝒜 n R) m) := {
     toFun := fun ⟨f, _⟩ =>
-      monomialCoeff a₀ Finset.univ (f ⟨Finset.univ, huniv⟩)
-    map_zero' := (monomialCoeffHom a₀ Finset.univ).map_zero
+      ⟨allNegPoly d hd (f ⟨Finset.univ, huniv⟩),
+       allNegPoly_mem d hd (f ⟨Finset.univ, huniv⟩)⟩
+    map_zero' := by
+      refine Subtype.ext ?_; show allNegPoly d hd 0 = 0
+      simp only [allNegPoly]
+      apply Finset.sum_eq_zero; intro a _
+      split_ifs with h
+      · have h0 : monomialCoeff (𝓜 := 𝓜) a Finset.univ 0 = 0 :=
+          (monomialCoeffHom (𝓜 := 𝓜) a Finset.univ).map_zero
+        rw [h0, MvPolynomial.monomial_zero]
+      · rfl
     map_add' := fun ⟨f, _⟩ ⟨g, _⟩ => by
-      show monomialCoeff a₀ Finset.univ ((f + g) ⟨Finset.univ, huniv⟩) =
-        monomialCoeff a₀ Finset.univ (f ⟨Finset.univ, huniv⟩) +
-        monomialCoeff a₀ Finset.univ (g ⟨Finset.univ, huniv⟩)
-      rw [Pi.add_apply]
-      exact (monomialCoeffHom a₀ Finset.univ).map_add _ _ }
+      refine Subtype.ext ?_
+      show allNegPoly d hd ((f + g) ⟨Finset.univ, huniv⟩) =
+        allNegPoly d hd (f ⟨Finset.univ, huniv⟩) +
+        allNegPoly d hd (g ⟨Finset.univ, huniv⟩)
+      rw [Pi.add_apply]; simp only [allNegPoly]
+      -- Terms vanish outside finite support
+      have hvan : ∀ (y : HomogeneousLocalizedModule.Away (𝒜 n R) 𝓜
+          (coordProd n R Finset.univ)) (a : LaurentExp n d),
+          a ∉ (monomialCoeff_finite_support (d := d) Finset.univ y).toFinset →
+          (if h : a.negSupport = Finset.univ then MvPolynomial.monomial
+            (dualFinsupp d a h) (monomialCoeff a Finset.univ y)
+          else (0 : MvPolynomial (Fin (n + 1)) R)) = 0 := by
+        intro y a ha; split_ifs with h
+        · have : monomialCoeff (𝓜 := 𝓜) a Finset.univ y = 0 := by
+            by_contra hne
+            exact ha ((monomialCoeff_finite_support (d := d) Finset.univ y).mem_toFinset.mpr
+              ⟨Finset.subset_univ _, hne⟩)
+          rw [this, MvPolynomial.monomial_zero]
+        · rfl
+      -- Extend all sums to a common finite set
+      set U := (monomialCoeff_finite_support (d := d) Finset.univ
+            (f ⟨_, huniv⟩ + g ⟨_, huniv⟩)).toFinset ∪
+          ((monomialCoeff_finite_support (d := d) Finset.univ (f ⟨_, huniv⟩)).toFinset ∪
+            (monomialCoeff_finite_support (d := d) Finset.univ (g ⟨_, huniv⟩)).toFinset)
+      rw [Finset.sum_subset Finset.subset_union_left (fun a _ ha => hvan _ a ha),
+        Finset.sum_subset (Finset.subset_union_left.trans Finset.subset_union_right)
+          (fun a _ ha => hvan _ a ha),
+        Finset.sum_subset (Finset.subset_union_right.trans Finset.subset_union_right)
+          (fun a _ ha => hvan _ a ha),
+        ← Finset.sum_add_distrib]
+      exact Finset.sum_congr rfl fun a _ => by
+        split_ifs with h
+        · have := (monomialCoeffHom (𝓜 := 𝓜) a Finset.univ).map_add
+            (f ⟨_, huniv⟩) (g ⟨_, huniv⟩)
+          simp only [monomialCoeffHom, AddMonoidHom.coe_mk, ZeroHom.coe_mk] at this
+          rw [this, map_add]
+        · simp }
+  -- Helper: convert weight-1 homogeneity to Finsupp.degree
+  have hdeg_of_coeff : ∀ (q : MvPolynomial (Fin (n + 1)) R),
+      q.IsHomogeneous m → ∀ (b : Fin (n + 1) →₀ ℕ),
+      MvPolynomial.coeff b q ≠ 0 → b.degree = m := fun q hq b hne =>
+    (congr_fun Finsupp.degree_eq_weight_one b).trans (hq hne)
   -- Step 4: Extraction is surjective
   have h_surj : Function.Surjective ext_map := by
-    intro r
-    refine ⟨⟨fun ⟨S, hS⟩ =>
-      smulMonomialElemIntShift (R := R) r a₀ S (hns_all S hS), hker_mem _⟩, ?_⟩
-    show monomialCoeff a₀ Finset.univ
-      (smulMonomialElemIntShift (R := R) r a₀ Finset.univ (hns_all _ huniv)) = r
-    rw [monomialCoeffIntShift_smulMonomialElemIntShift a₀ a₀ Finset.univ
-      (hns_all _ huniv) (hns_all _ huniv) r, if_pos rfl]
+    intro ⟨p, hp⟩
+    simp only [MvPolynomial.mem_homogeneousSubmodule] at hp
+    have hsd := hdeg_of_coeff p hp
+    -- Construct preimage: ∑ smulMonomialElemIntShift over p.support at univ
+    set fval : HomogeneousLocalizedModule.Away (𝒜 n R) 𝓜 (coordProd n R Finset.univ) :=
+      p.support.attach.sum fun ⟨b, hb⟩ =>
+        smulMonomialElemIntShift (R := R) (MvPolynomial.coeff b p)
+          (inverseDualExp d hd b (hsd b (Finsupp.mem_support_iff.mp hb))) Finset.univ
+          (by rw [inverseDualExp_negSupport])
+    -- Lift to a function on all S with card = n+1
+    refine ⟨⟨fun ⟨S, hS⟩ => if heq : S = Finset.univ then heq ▸ fval else 0,
+      hker_mem _⟩, Subtype.ext ?_⟩
+    -- Evaluate at univ (dite reduces since univ = univ)
+    show allNegPoly d hd (dite (Finset.univ = Finset.univ) (fun heq => heq ▸ fval)
+      (fun _ => 0)) = p
+    simp only [dite_true]
+    -- Need: allNegPoly d hd fval = p
+    -- Compute monomialCoeff of fval via orthogonality
+    have hmcoeff : ∀ (a : LaurentExp n d) (h : a.negSupport = Finset.univ),
+        monomialCoeff (𝓜 := 𝓜) a Finset.univ fval =
+        MvPolynomial.coeff (dualFinsupp d a h) p := by
+      intro a ha
+      show monomialCoeff (𝓜 := 𝓜) a Finset.univ fval = _
+      -- Distribute monomialCoeff over the sum and apply orthogonality
+      have hsum : monomialCoeff (𝓜 := 𝓜) a Finset.univ fval =
+          ∑ x ∈ p.support.attach, (if a = inverseDualExp d hd x.1
+            (hsd x.1 (Finsupp.mem_support_iff.mp x.2))
+          then MvPolynomial.coeff x.1 p else 0) := by
+        change (monomialCoeffHom (𝓜 := 𝓜) a Finset.univ) fval = _
+        rw [map_sum]; refine Finset.sum_congr rfl fun ⟨b', hb'⟩ _ => ?_
+        simp only [monomialCoeffHom, AddMonoidHom.coe_mk, ZeroHom.coe_mk]
+        exact monomialCoeffIntShift_smulMonomialElemIntShift _ a Finset.univ _
+          (Finset.subset_univ _) _
+      rw [hsum]; clear hsum
+      -- Key lemma: from heq : a = inverseDualExp b', derive dualFinsupp a = b'
+      have hdual_eq : ∀ (b' : Fin (n + 1) →₀ ℕ) (hb' : b'.degree = m),
+          a = inverseDualExp d hd b' hb' → dualFinsupp d a ha = b' := fun b' _ heq => by
+        ext i; rw [dualFinsupp_apply]
+        have := congr_fun (Subtype.ext_iff.mp heq) i
+        rw [inverseDualExp_apply] at this; omega
+      -- Now: ∑ ⟨b',hb'⟩, (if a = inverseDualExp b' then coeff b' p else 0) = coeff(dual a)(p)
+      by_cases hmem : dualFinsupp d a ha ∈ p.support
+      · rw [Finset.sum_eq_single ⟨dualFinsupp d a ha, hmem⟩ ?_ ?_]
+        · exact if_pos (inverseDualExp_dualFinsupp d hd a ha).symm
+        · intro ⟨b', hb'⟩ _ hne; apply if_neg; intro heq
+          exact hne (Subtype.ext (hdual_eq b' _ heq).symm)
+        · intro habs; exact absurd (Finset.mem_attach _ _) habs
+      · rw [Finset.sum_eq_zero, MvPolynomial.notMem_support_iff.mp hmem]
+        intro ⟨b', hb'⟩ _; apply if_neg; intro heq
+        exact hmem (by rw [hdual_eq b' _ heq]; exact hb')
+    -- Now show allNegPoly d hd fval = p
+    rw [← MvPolynomial.support_sum_monomial_coeff p]
+    simp only [allNegPoly]; ext b
+    simp only [MvPolynomial.coeff_sum, apply_dite (MvPolynomial.coeff b),
+      MvPolynomial.coeff_monomial, MvPolynomial.coeff_zero]
+    by_cases hb_deg : b.degree = m
+    · -- Both sides equal MvPolynomial.coeff b p
+      -- Helper: dualFinsupp a h₁ = b implies a = inverseDualExp b
+      have hinv : ∀ (a : LaurentExp n d) (h₁ : a.negSupport = Finset.univ),
+          dualFinsupp d a h₁ = b → a = inverseDualExp d hd b hb_deg := by
+        intro a h₁ h₂; refine Subtype.ext (funext fun i => ?_)
+        rw [inverseDualExp_apply]
+        have := DFunLike.congr_fun h₂ i; rw [dualFinsupp_apply] at this
+        have ha := (a.mem_negSupport_iff i).mp (h₁ ▸ Finset.mem_univ i); omega
+      set a₀ := inverseDualExp d hd b hb_deg
+      have ha₀_ns := inverseDualExp_negSupport d hd b hb_deg
+      -- RHS: simplify to coeff b p
+      conv_rhs => rw [Finset.sum_ite_eq']
+      -- LHS: use Finset.sum_eq_single or sum_eq_zero based on a₀ membership
+      by_cases hmem₀ : a₀ ∈
+          (monomialCoeff_finite_support (d := d) Finset.univ fval).toFinset
+      · -- a₀ ∈ S: LHS = monomialCoeff a₀ fval = coeff b p, RHS = coeff b p
+        have key := hmcoeff (inverseDualExp d hd b hb_deg)
+          (inverseDualExp_negSupport d hd b hb_deg)
+        rw [dualFinsupp_inverseDualExp] at key
+        -- key : monomialCoeff a₀ univ fval = coeff b p
+        have hcoeff_ne : MvPolynomial.coeff b p ≠ 0 := by
+          rw [← key]
+          exact ((monomialCoeff_finite_support (d := d) Finset.univ fval).mem_toFinset.mp
+            hmem₀).2
+        rw [if_pos (MvPolynomial.mem_support_iff.mpr hcoeff_ne)]
+        rw [Finset.sum_eq_single a₀ ?_ ?_]
+        · rw [dif_pos ha₀_ns, if_pos (dualFinsupp_inverseDualExp d hd b hb_deg)]
+          exact key
+        · intro a _ hne; by_cases h₁ : a.negSupport = Finset.univ
+          · rw [dif_pos h₁]; apply if_neg; intro h₂; exact hne (hinv a h₁ h₂)
+          · rw [dif_neg h₁]
+        · intro habs; exact absurd hmem₀ habs
+      · -- a₀ ∉ S: LHS = 0, coeff b p = 0
+        have key := hmcoeff (inverseDualExp d hd b hb_deg)
+          (inverseDualExp_negSupport d hd b hb_deg)
+        rw [dualFinsupp_inverseDualExp] at key
+        -- key : monomialCoeff a₀ univ fval = coeff b p
+        have hcoeff_zero : MvPolynomial.coeff b p = 0 := by
+          by_contra h
+          exact hmem₀ ((monomialCoeff_finite_support (d := d)
+            Finset.univ fval).mem_toFinset.mpr
+            ⟨Finset.subset_univ _, by rw [key]; exact h⟩)
+        rw [if_neg (MvPolynomial.notMem_support_iff.mpr hcoeff_zero)]
+        exact Finset.sum_eq_zero fun a _ => by
+          by_cases h₁ : a.negSupport = Finset.univ
+          · rw [dif_pos h₁]; apply if_neg; intro h₂
+            exact hmem₀ (by rw [show a₀ = a from (hinv a h₁ h₂).symm]; assumption)
+          · rw [dif_neg h₁]
+    · -- Both sides are 0 (degree mismatch / homogeneity)
+      rw [Finset.sum_eq_zero (fun v hv => if_neg (fun heq => by
+          subst heq; exact hb_deg (hsd v (Finsupp.mem_support_iff.mp hv))))]
+      exact Finset.sum_eq_zero fun a _ => by
+        by_cases h₁ : a.negSupport = Finset.univ
+        · rw [dif_pos h₁]; apply if_neg
+          intro h₂; exact hb_deg (by subst h₂; exact dualFinsupp_degree d hd a h₁)
+        · simp [dif_neg h₁]
   -- Step 5: ker(ext_map) = range(abToCycles)
+  -- Helper: extract coefficient of dualFinsupp(a) from allNegPoly
+  have hallneg_of_zero : ∀ (x : HomogeneousLocalizedModule.Away (𝒜 n R) 𝓜
+      (coordProd n R Finset.univ)),
+      allNegPoly d hd x = 0 → ∀ (a : LaurentExp n d) (_ : a.negSupport = Finset.univ),
+      monomialCoeff (𝓜 := 𝓜) a Finset.univ x = 0 := by
+    intro x hx a ha
+    have : MvPolynomial.coeff (dualFinsupp d a ha) (allNegPoly d hd x) = 0 := by
+      rw [hx, MvPolynomial.coeff_zero]
+    simp only [allNegPoly, MvPolynomial.coeff_sum, apply_dite (MvPolynomial.coeff _),
+      MvPolynomial.coeff_monomial, MvPolynomial.coeff_zero] at this
+    rwa [Finset.sum_eq_single a (fun a' _ hne => by
+        by_cases h₁ : a'.negSupport = Finset.univ
+        · rw [dif_pos h₁, if_neg]; intro heq
+          exact hne (dualFinsupp_injective d hd a' a h₁ ha heq)
+        · rw [dif_neg h₁])
+      (fun habs => by
+        rw [dif_pos ha, if_pos rfl]; by_contra hne
+        exact habs ((monomialCoeff_finite_support (d := d) Finset.univ x).mem_toFinset.mpr
+          ⟨Finset.subset_univ _, hne⟩)),
+      dif_pos ha, if_pos rfl] at this
   have h_ker_eq : ext_map.ker = SA.abToCycles.range := by
     ext ⟨f, hf_ker⟩
     constructor
-    · -- Forward: extraction zero ⟹ coboundary (monomial decomposition)
-      intro hext; rw [AddMonoidHom.mem_ker] at hext
-      -- hext : monomialCoeff a₀ univ (f ⟨univ, huniv⟩) = 0
-      -- Goal: ⟨f, hf_ker⟩ ∈ SA.abToCycles.range, i.e., ∃ g, SA.f.hom g = f
-      -- For each Laurent exponent a with nonzero component,
-      -- a₀-component = 0 (by hext) and for a ≠ a₀, K_{negSupport a} is acyclic
-      -- (nonempty and proper), giving primitives. Assemble into G with δG = f.
-      -- Cocycle condition (vacuous: no (n+2)-element subsets)
+    · -- ker ⊆ range: ext_map(f) = 0 implies f = SA.f(G)
+      intro hext
+      rw [AddMonoidHom.mem_ker] at hext
+      have hext' : allNegPoly d hd (f ⟨Finset.univ, huniv⟩) = 0 :=
+        Subtype.ext_iff.mp hext
+      have hallneg := hallneg_of_zero _ hext'
+      -- The only face of size n+1 is univ
+      have hallneg_T : ∀ (a : LaurentExp n d) (_ : a.negSupport = Finset.univ)
+          (T : Finset (Fin (n + 1))) (hT : T.card = n + 1) (_ : a.negSupport ⊆ T),
+          monomialCoeff (𝓜 := 𝓜) a T (f ⟨T, hT⟩) = 0 := by
+        intro a ha T hT _
+        have : T = Finset.univ := by
+          rw [← Finset.card_eq_iff_eq_univ]; simpa using hT
+        subst this; exact hallneg a ha
+      -- Cocycle condition: algebraicδ n f = 0 (target type is empty)
       have hfδ : algebraicδ n R 𝓜 n f = 0 := by
-        funext ⟨U, hU⟩; exact absurd (Finset.card_le_univ U)
-          (by rw [Fintype.card_fin]; omega)
+        funext ⟨S, hS⟩
+        exact absurd (Finset.card_le_univ S) (by rw [Fintype.card_fin]; omega)
       have hcomp_cocycle : ∀ a : LaurentExp n d,
-          _root_.relSimplexδHom a.negSupport R n
-            (componentHom a n f) = 0 := by
+          _root_.relSimplexδHom a.negSupport R n (componentHom a n f) = 0 := by
         intro a; rw [← component_comm_δ a n f, hfδ, map_zero]
-      -- a₀-component is 0
-      have ha₀_zero : componentHom a₀ n f = 0 := by
-        ext ⟨S, hS, hns⟩
-        simp only [componentHom, AddMonoidHom.mk'_apply, Pi.zero_apply]
-        have hS_eq : S = Finset.univ :=
-          Finset.eq_univ_of_card S (hS.trans (Fintype.card_fin _).symm)
-        subst hS_eq; convert hext using 2
-      -- For a ≠ a₀: negSupport nonempty and proper, K_T acyclic
-      have hne_univ : ∀ a : LaurentExp n d, a ≠ a₀ → a.negSupport ≠ Finset.univ :=
-        fun a ha h => ha (eq_allNegOne_of_negSupport_eq_univ a h)
-      have hnonempty : ∀ a : LaurentExp n d, a.negSupport.Nonempty :=
-        fun a => a.negSupport_nonempty_of_neg hd_neg
-      by_cases hrel : (ComplexShape.up ℕ).Rel ((ComplexShape.up ℕ).prev n) n
-      · -- Rel case (n ≥ 1): construct coboundary via monomial decomposition
-        set p := (ComplexShape.up ℕ).prev n
-        have hprev_succ : p + 1 = n := hrel
-        -- Finite set of Laurent exponents with nonzero components
-        set B : Set (LaurentExp n d) :=
-          ⋃ T : {T : Finset (Fin (n + 1)) // T.card = n + 1},
-            {a : LaurentExp n d | ∃ _ : a.negSupport ⊆ T.1,
-              monomialCoeff a T.1 (f T) ≠ 0}
-        have hB_finite : B.Finite :=
-          Set.finite_iUnion fun T => monomialCoeff_finite_support T.1 (f T)
-        set B_fin := hB_finite.toFinset
-        -- a₀ ∉ B_fin (its component is 0)
-        have ha₀_nmem : a₀ ∉ B_fin := by
-          rw [Set.Finite.mem_toFinset]; intro hB
-          obtain ⟨⟨T, hT⟩, hns, hne⟩ := Set.mem_iUnion.mp hB
-          exact hne (congr_fun ha₀_zero ⟨T, hT, hns⟩)
-        have hB_ne : ∀ a ∈ B_fin, a ≠ a₀ := fun a ha h => ha₀_nmem (h ▸ ha)
-        -- Get primitive at degree p for each a ∈ B_fin
-        -- Cast cocycle from degree n to degree p + 1 using hprev_succ
-        have hprimitive : ∀ a ∈ B_fin,
-            ∃ ga : _root_.relSimplexCochain a.negSupport R p,
-              _root_.relSimplexδHom a.negSupport R p ga =
-                Eq.mp (congr_arg (_root_.relSimplexCochain a.negSupport R)
-                  hprev_succ.symm) (componentHom a n f) := by
+      -- Finite set of nonzero exponents
+      set B : Set (LaurentExp n d) :=
+        ⋃ T : {T : Finset (Fin (n + 1)) // T.card = n + 1},
+          {a : LaurentExp n d | ∃ _ : a.negSupport ⊆ T.1,
+            monomialCoeff (𝓜 := 𝓜) a T.1 (f T) ≠ 0}
+      have hB_finite : B.Finite :=
+        Set.finite_iUnion fun T => monomialCoeff_finite_support T.1 (f T)
+      set B_fin := hB_finite.toFinset
+      have hne_univ_B : ∀ a ∈ B_fin, a.negSupport ≠ Finset.univ := by
+        intro a ha habs
+        rw [Set.Finite.mem_toFinset] at ha
+        obtain ⟨⟨T, hT⟩, hns, hne⟩ := Set.mem_iUnion.mp ha
+        exact hne (hallneg_T a habs T hT hns)
+      by_cases hn0 : n = 0
+      · -- n = 0: f = 0 since all exponents have negSupport = univ
+        subst hn0
+        have hf_zero : f = 0 := by
+          funext ⟨T, hT⟩
+          have : T = Finset.univ := by
+            rw [← Finset.card_eq_iff_eq_univ]; simpa using hT
+          subst this
+          apply monomialCoeffIntShift_determines_zero
           intro a ha
-          apply _root_.relSimplexComplex_get_primitive a.negSupport R p
-          · exact (_root_.relSimplexComplex_acyclic a.negSupport R
-              (hnonempty a) (hne_univ a (hB_ne a ha))) (p + 1)
-          · suffices ∀ k (hk : k = n),
-                _root_.relSimplexδHom a.negSupport R k
-                  (Eq.mp (congr_arg (_root_.relSimplexCochain a.negSupport R) hk.symm)
-                    (componentHom a n f)) = 0 from
-              this (p + 1) hprev_succ
-            intro k hk; subst hk; exact hcomp_cocycle a
-        -- Choose primitives
-        let ga : (a : LaurentExp n d) → _root_.relSimplexCochain a.negSupport R p :=
+          exact hallneg a (by
+            rw [← Finset.card_eq_iff_eq_univ]
+            have h1 := Finset.card_le_univ a.negSupport
+            have h2 := (hnonempty a).card_pos
+            simp only [Fintype.card_fin] at h1 ⊢; omega)
+        rw [AddMonoidHom.mem_range]
+        exact ⟨0, Subtype.ext (by simp [SA, ShortComplex.abToCycles, hf_zero])⟩
+      · -- n ≥ 1: obtain k with n = k + 1 for definitional (k+1)-1+1 = k+1
+        obtain ⟨k, rfl⟩ : ∃ k, n = k + 1 := ⟨n - 1, by omega⟩
+        have hprev : (ComplexShape.up ℕ).prev (k + 1) = k :=
+          ComplexShape.prev_eq' _ (show (ComplexShape.up ℕ).Rel k (k + 1) by
+            simp [ComplexShape.up_Rel])
+        -- Get primitives
+        have hprimitive : ∀ (a : LaurentExp (k + 1) d), a ∈ B_fin →
+            ∃ ga : _root_.relSimplexCochain a.negSupport R k,
+              _root_.relSimplexδHom a.negSupport R k ga =
+                componentHom a (k + 1) f := by
+          intro a ha_mem
+          exact _root_.relSimplexComplex_get_primitive a.negSupport R k
+            ((_root_.relSimplexComplex_acyclic a.negSupport R
+              (hnonempty a) (hne_univ_B a ha_mem)) (k + 1))
+            (componentHom a (k + 1) f)
+            (hcomp_cocycle a)
+        let ga : (a : LaurentExp (k + 1) d) →
+            _root_.relSimplexCochain a.negSupport R k :=
           fun a => if ha : a ∈ B_fin then (hprimitive a ha).choose else 0
-        have hga_spec : ∀ a ∈ B_fin,
-            _root_.relSimplexδHom a.negSupport R p (ga a) =
-              Eq.mp (congr_arg (_root_.relSimplexCochain a.negSupport R)
-                hprev_succ.symm) (componentHom a n f) := by
+        have hga_spec : ∀ (a : LaurentExp (k + 1) d) (ha : a ∈ B_fin),
+            _root_.relSimplexδHom a.negSupport R k (ga a) =
+              componentHom a (k + 1) f := by
           intro a ha
-          have hga_eq : ga a = (hprimitive a ha).choose := dif_pos ha
-          rw [hga_eq]; exact (hprimitive a ha).choose_spec
-        have hga_outside : ∀ a, a ∉ B_fin → ga a = 0 :=
-          fun a ha => dif_neg ha
-        have hcomp_zero_outside : ∀ a, a ∉ B_fin →
-            componentHom a n f = 0 := by
+          show _root_.relSimplexδHom a.negSupport R k
+            (if h : a ∈ B_fin then (hprimitive a h).choose else 0) = _
+          rw [dif_pos ha]; exact (hprimitive a ha).choose_spec
+        have hga_outside : ∀ a, a ∉ B_fin → ga a = 0 := fun a ha => dif_neg ha
+        have hcomp_zero_outside : ∀ (a : LaurentExp (k + 1) d), a ∉ B_fin →
+            componentHom a (k + 1) f = 0 := by
           intro a ha; ext ⟨T, hT, hns⟩
-          simp only [componentHom, AddMonoidHom.mk'_apply, Pi.zero_apply]
-          by_contra hne; exact ha (hB_finite.mem_toFinset.mpr
-            (Set.mem_iUnion.mpr ⟨⟨T, hT⟩, hns, hne⟩))
-        have hga_spec_all : ∀ a : LaurentExp n d,
-            _root_.relSimplexδHom a.negSupport R p (ga a) =
-              Eq.mp (congr_arg (_root_.relSimplexCochain a.negSupport R)
-                hprev_succ.symm) (componentHom a n f) := by
+          simp only [componentHom, AddMonoidHom.coe_mk, ZeroHom.coe_mk, Pi.zero_apply]
+          by_contra hne; apply ha; rw [Set.Finite.mem_toFinset]
+          exact Set.mem_iUnion.mpr ⟨⟨T, hT⟩, hns, hne⟩
+        have hga_spec_all : ∀ a : LaurentExp (k + 1) d,
+            _root_.relSimplexδHom a.negSupport R k (ga a) =
+              componentHom a (k + 1) f := by
           intro a; by_cases ha_mem : a ∈ B_fin
           · exact hga_spec a ha_mem
           · rw [hga_outside a ha_mem, map_zero, hcomp_zero_outside a ha_mem]
-            suffices ∀ k (hk : k = n),
-                (0 : _root_.relSimplexCochain a.negSupport R k) =
-                  Eq.mp (congr_arg (_root_.relSimplexCochain a.negSupport R) hk.symm)
-                    (0 : _root_.relSimplexCochain a.negSupport R n) from
-              this _ hprev_succ
-            intro k hk; subst hk; rfl
-        -- Construct the primitive G
-        have hd_decomp : SA.f =
-            (A.XIsoOfEq (show p = (ComplexShape.up ℕ).prev n from rfl).symm).hom ≫
-            A.d p (p + 1) ≫ (A.XIsoOfEq hprev_succ).hom := by
-          rw [← Category.assoc]
-          conv_lhs => rw [show SA.f = A.d ((ComplexShape.up ℕ).prev n) n from rfl]
-          rw [A.XIsoOfEq_hom_comp_d (show p = (ComplexShape.up ℕ).prev n from rfl).symm,
-            A.d_comp_XIsoOfEq_hom hprev_succ]
-        have hd_hom_eq : ∀ (G' : ↑(A.X p)),
-            SA.f.hom ((A.XIsoOfEq (rfl : p = (ComplexShape.up ℕ).prev n).symm).hom.hom
-              G') =
-            (A.XIsoOfEq hprev_succ).hom.hom (algebraicδ n R 𝓜 p G') := by
-          intro G'; show (SA.f ≫ 𝟙 _).hom _ = _
-          rw [Category.comp_id, hd_decomp]
-          simp only [CategoryTheory.comp_apply, hAd p, AddCommGrp.hom_ofHom]
-          rfl
-        have huniv' : (Finset.univ : Finset (Fin (n + 1))).card = p + 1 + 1 := by omega
-        refine ⟨(A.XIsoOfEq (rfl : p = (ComplexShape.up ℕ).prev n).symm).hom.hom
-          (fun ⟨S, hS⟩ => B_fin.sum fun a =>
+        -- Construct the primitive G at degree k
+        set G : ∀ S : {S : Finset (Fin (k + 2)) // S.card = k + 1},
+            HomogeneousLocalizedModule.Away (𝒜 (k + 1) R) 𝓜
+              (coordProd (k + 1) R S.1) :=
+          fun ⟨S, hS⟩ => B_fin.sum fun a =>
             if h : a.negSupport ⊆ S then
               smulMonomialElemIntShift (R := R) (ga a ⟨S, hS, h⟩) a S h
-            else 0),
-          Subtype.ext ?_⟩
-        show SA.f.hom _ = f
-        rw [hd_hom_eq]
-        show (A.XIsoOfEq hprev_succ).hom.hom (algebraicδ n R 𝓜 p (fun ⟨S, hS⟩ =>
-            B_fin.sum fun a =>
+            else 0
+        -- Verify algebraicδ k G = f
+        have hδG : algebraicδ (k + 1) R 𝓜 k G = f := by
+          funext ⟨T, hT⟩
+          suffices hsub : algebraicδ (k + 1) R 𝓜 k G ⟨T, hT⟩ - f ⟨T, hT⟩ = 0 from
+            sub_eq_zero.mp hsub
+          apply monomialCoeffIntShift_determines_zero
+          intro b hb
+          show (monomialCoeffHom (𝓜 := 𝓜) b T) _ = 0
+          rw [map_sub]
+          have h_lhs : (monomialCoeffHom (𝓜 := 𝓜) b T)
+              (algebraicδ (k + 1) R 𝓜 k G ⟨T, hT⟩) =
+              componentHom b (k + 1) (algebraicδ (k + 1) R 𝓜 k G)
+                ⟨T, hT, hb⟩ := rfl
+          rw [h_lhs, component_comm_δ b k]
+          have h_rhs : (monomialCoeffHom (𝓜 := 𝓜) b T) (f ⟨T, hT⟩) =
+              componentHom b (k + 1) f ⟨T, hT, hb⟩ := rfl
+          rw [h_rhs]
+          suffices hcomp_eq : componentHom (𝓜 := 𝓜) b k G = ga b by
+            rw [hcomp_eq]; simp [hga_spec_all b]
+          ext ⟨S, hS, hb'⟩
+          simp only [componentHom, AddMonoidHom.coe_mk, ZeroHom.coe_mk]
+          show (monomialCoeffHom (𝓜 := 𝓜) b S) _ = _
+          rw [map_sum]
+          simp_rw [show ∀ (a : LaurentExp (k + 1) d),
+              (monomialCoeffHom (𝓜 := 𝓜) b S)
+                (if h : a.negSupport ⊆ S then
+                  smulMonomialElemIntShift (R := R) (ga a ⟨S, hS, h⟩) a S h
+                else 0) =
               if h : a.negSupport ⊆ S then
-                smulMonomialElemIntShift (R := R) (ga a ⟨S, hS, h⟩) a S h
-              else 0)) = f
-        funext ⟨T, hT⟩
-        rw [algebraicComplex_XIsoOfEq_eval hprev_succ _ T hT (by omega)]
-        -- Goal: algebraicδ p G_raw ⟨T, huniv'⟩ - f ⟨T, hT⟩ = ... just show they're equal
-        suffices hsub : algebraicδ n R 𝓜 p (fun ⟨S, hS⟩ =>
-            B_fin.sum fun a =>
-              if h : a.negSupport ⊆ S then
-                smulMonomialElemIntShift (R := R) (ga a ⟨S, hS, h⟩) a S h
-              else 0) ⟨T, by omega⟩ - f ⟨T, hT⟩ = 0 from sub_eq_zero.mp hsub
-        apply monomialCoeffIntShift_determines_zero
-        intro b hb
-        show (monomialCoeffHom b T) _ = 0
-        rw [map_sub]
-        have h_lhs : (monomialCoeffHom b T) (algebraicδ n R 𝓜 p (fun ⟨S, hS⟩ =>
-            B_fin.sum fun a =>
-              if h : a.negSupport ⊆ S then
-                smulMonomialElemIntShift (R := R) (ga a ⟨S, hS, h⟩) a S h
-              else 0) ⟨T, by omega⟩) =
-          componentHom b (p + 1) (algebraicδ n R 𝓜 p (fun ⟨S, hS⟩ =>
-            B_fin.sum fun a =>
-              if h : a.negSupport ⊆ S then
-                smulMonomialElemIntShift (R := R) (ga a ⟨S, hS, h⟩) a S h
-              else 0)) ⟨T, by omega, hb⟩ := rfl
-        rw [h_lhs, component_comm_δ b p]
-        have h_rhs : (monomialCoeffHom b T) (f ⟨T, hT⟩) =
-            componentHom b n f ⟨T, hT, hb⟩ := rfl
-        rw [h_rhs]
-        -- Need: relSimplexδ (componentB G) at ⟨T, _, hb⟩ = componentB f at ⟨T, _, hb⟩
-        suffices hcomp_eq : componentHom b p
-            (fun ⟨S, hS⟩ => B_fin.sum fun a =>
-              if h : a.negSupport ⊆ S then
-                smulMonomialElemIntShift (R := R) (ga a ⟨S, hS, h⟩) a S h
-              else 0) = ga b by
-          rw [hcomp_eq]
-          -- relSimplexδHom ... p (ga b) evaluated at degree p+1 element
-          -- vs componentHom b n f evaluated at degree n element
-          -- These are at different types but both evaluate to R at the same finset
-          have hspec := congr_fun (hga_spec_all b) ⟨T, by omega, hb⟩
-          rw [relSimplexCochain_cast_eval _ hprev_succ _ T ⟨by omega, hb⟩
-            ⟨hT, hb⟩] at hspec
-          simp only [sub_eq_zero]; exact hspec
-        ext ⟨S, hS, hb'⟩
-        simp only [componentHom, AddMonoidHom.mk'_apply]
-        show (monomialCoeffHom b S) _ = _
-        rw [map_sum]
-        simp_rw [show ∀ (a : LaurentExp n d),
-          (monomialCoeffHom b S)
-            (if h : a.negSupport ⊆ S then
-              smulMonomialElemIntShift (R := R) (ga a ⟨S, hS, h⟩) a S h
-            else 0) =
-          if h : a.negSupport ⊆ S then
-            monomialCoeff b S
-              (smulMonomialElemIntShift (R := R) (ga a ⟨S, hS, h⟩) a S h)
-          else 0 from fun a => by split_ifs with h <;> [rfl; exact map_zero _]]
-        simp_rw [fun (a : LaurentExp n d) (h : a.negSupport ⊆ S) =>
-          monomialCoeffIntShift_smulMonomialElemIntShift a b S h hb'
-            (ga a ⟨S, hS, h⟩)]
-        by_cases hb_mem : b ∈ B_fin
-        · rw [Finset.sum_eq_single b]
-          · simp only [dif_pos hb', eq_self_iff_true, ↓reduceIte]
-          · intro a _ hab; simp [show b ≠ a from Ne.symm hab]
-          · intro habs; exact absurd hb_mem habs
-        · rw [Finset.sum_eq_zero, hga_outside b hb_mem, Pi.zero_apply]
-          intro a ha
-          by_cases hns : a.negSupport ⊆ S
-          · simp only [dif_pos hns]
-            by_cases hab : b = a
-            · subst hab; exact absurd ha hb_mem
-            · simp [hab]
-          · simp [dif_neg hns]
-      · -- ¬Rel case (n = 0): SA.f = 0, show f = 0 hence in range
-        suffices hf_zero : f = 0 by
-          subst hf_zero
-          exact ⟨0, Subtype.ext (map_zero SA.f.hom)⟩
-        funext ⟨S, hS⟩
-        apply monomialCoeffIntShift_determines_zero
-        intro a _
-        have hS_univ : S = Finset.univ :=
-          Finset.eq_univ_of_card S (hS.trans (Fintype.card_fin _).symm)
-        subst hS_univ
-        -- Every a has negSupport = univ, hence a = a₀, hence coefficient = 0
-        have hns_eq : a.negSupport = Finset.univ := by
-          apply Finset.eq_univ_of_card
-          refine le_antisymm (Finset.card_le_univ _) ?_
-          rw [Fintype.card_fin]
-          by_contra h; push_neg at h
-          have hn_ge : 2 ≤ n + 1 := by
-            have h1 := (hnonempty a).card_pos
-            have h2 : (Finset.univ \ a.negSupport).Nonempty :=
-              Finset.sdiff_nonempty_of_card_lt_card (by
-                rwa [Finset.card_univ, Fintype.card_fin])
-            have h3 := h2.card_pos
-            have h4 := Finset.card_sdiff_add_card_eq_card
-              (Finset.subset_univ a.negSupport)
-            rw [Finset.card_univ, Fintype.card_fin] at h4
-            omega
-          exact hrel (by
-            have hprev := (ComplexShape.up ℕ).prev_eq' (show (ComplexShape.up ℕ).Rel
-              (n - 1) n from by show n - 1 + 1 = n; omega)
-            rw [hprev]; show n - 1 + 1 = n; omega)
-        rw [eq_allNegOne_of_negSupport_eq_univ a hns_eq]; exact hext
-    · -- Backward: coboundary ⟹ extraction zero
-      intro ⟨g_prev, hg_eq⟩; rw [AddMonoidHom.mem_ker]
-      have hf_eq : f = SA.f.hom g_prev :=
-        (congr_arg Subtype.val hg_eq).symm
-      show monomialCoeff a₀ Finset.univ (f ⟨Finset.univ, huniv⟩) = 0
-      rw [hf_eq]
-      -- SA.f = A.d (prev n) n; either this is zero (n=0) or is algebraicδ (n ≥ 1)
-      show monomialCoeff a₀ Finset.univ (SA.f.hom g_prev ⟨Finset.univ, huniv⟩) = 0
-      -- SA.f = A.d (prev n) n. Either this is 0 or it's algebraicδ.
-      by_cases hrel : (ComplexShape.up ℕ).Rel ((ComplexShape.up ℕ).prev n) n
-      · -- prev n + 1 = n (i.e., n ≥ 1): SA.f.hom = algebraicδ (n-1),
-        -- and each face of univ has < n+1 elements, so a₀.negSupport = univ ⊄ face.
-        -- Strategy: decompose A.d (prev n) n via d_comp_XIsoOfEq_hom,
-        -- apply hAd to get algebraicδ, and handle eqToHom as a no-op on elements.
-        have hprev_succ : (ComplexShape.up ℕ).prev n + 1 = n := hrel
-        -- SA.f = A.d (prev n) n = A.d (prev n) (prev n + 1) ≫ XIsoOfEq
-        set p := (ComplexShape.up ℕ).prev n
-        have hd_decomp : SA.f =
-            A.d p (p + 1) ≫ (A.XIsoOfEq hprev_succ).hom :=
-          (A.d_comp_XIsoOfEq_hom hprev_succ p).symm
-        have hd_hom : ∀ x, SA.f.hom x =
-            (A.XIsoOfEq hprev_succ).hom.hom ((A.d p (p + 1)).hom x) := by
-          intro x; show (SA.f ≫ 𝟙 _).hom x = _
-          rw [Category.comp_id, hd_decomp]; rfl
-        rw [hd_hom, hAd p, AddCommGrp.hom_ofHom]
-        -- Goal: monomialCoeff a₀ univ
-        --   (XIsoOfEq.hom.hom (algebraicδ ... g_prev) ⟨univ, huniv⟩) = 0
-        -- XIsoOfEq.hom is eqToHom, which is a cast on the pi type.
-        -- After cast, evaluating at ⟨univ, huniv⟩ = evaluating before cast at ⟨univ, huniv'⟩.
-        have huniv' : (Finset.univ : Finset (Fin (n + 1))).card = p + 1 + 1 := by omega
-        have h_cast_eval : ∀ (x : ↑(A.X (p + 1))),
-            (A.XIsoOfEq hprev_succ).hom.hom x ⟨Finset.univ, huniv⟩ =
-            x ⟨Finset.univ, huniv'⟩ :=
-          fun x => algebraicComplex_XIsoOfEq_eval hprev_succ x Finset.univ huniv huniv'
-        rw [h_cast_eval]
-        show (monomialCoeffHom a₀ Finset.univ)
-          (∑ j : Fin (p + 2), ((-1 : ℤ) ^ j.val) •
-            coordRestrict n R 𝓜 Finset.univ huniv' j
-              (g_prev (TopCat.eraseNth Finset.univ huniv' j))) = 0
-        rw [map_sum]
-        apply Finset.sum_eq_zero; intro j _
-        rw [map_zsmul]
-        -- a₀.negSupport = univ ⊄ any face
-        have hns_univ : a₀.negSupport = Finset.univ := allNegOne_negSupport
-        have hface : ¬a₀.negSupport ⊆ (TopCat.eraseNth Finset.univ huniv' j).1 := by
-          rw [hns_univ]; intro hsub
-          exact absurd (Finset.card_le_card hsub)
-            (by rw [(TopCat.eraseNth Finset.univ huniv' j).2]; omega)
-        show (-1 : ℤ) ^ (j : Fin (p + 2)).val •
-          monomialCoeff a₀ Finset.univ
-            (coordRestrict n R 𝓜 Finset.univ huniv' j
-              (g_prev (TopCat.eraseNth Finset.univ huniv' j))) = 0
-        rw [monomialCoeff_coordRestrict_vanish a₀ huniv' j hface
-          (hns_univ ▸ Finset.Subset.refl _), smul_zero]
-      · -- A.d (prev n) n = 0 (no relation), so element is 0
-        have hSAf : SA.f = 0 := A.shape _ _ hrel
-        have : SA.f.hom g_prev ⟨Finset.univ, huniv⟩ = 0 := by
-          have h : SA.f.hom = (0 : SA.X₁ ⟶ SA.X₂).hom :=
-            congr_arg AddCommGrp.Hom.hom hSAf
-          show SA.f.hom g_prev ⟨Finset.univ, huniv⟩ = 0
-          rw [h]; rfl
-        rw [this]; exact (monomialCoeffHom a₀ Finset.univ).map_zero
+                monomialCoeff b S
+                  (smulMonomialElemIntShift (R := R) (ga a ⟨S, hS, h⟩) a S h)
+              else 0 from
+            fun a => by split_ifs with h <;> [rfl; exact map_zero _]]
+          simp_rw [fun (a : LaurentExp (k + 1) d) (h : a.negSupport ⊆ S) =>
+            monomialCoeffIntShift_smulMonomialElemIntShift a b S h hb'
+              (ga a ⟨S, hS, h⟩)]
+          by_cases hb_mem : b ∈ B_fin
+          · rw [Finset.sum_eq_single b]
+            · simp only [dif_pos hb', eq_self_iff_true, ↓reduceIte]
+            · intro a _ hab; simp [show b ≠ a from Ne.symm hab]
+            · intro habs; exact absurd hb_mem habs
+          · rw [Finset.sum_eq_zero, hga_outside b hb_mem, Pi.zero_apply]
+            intro a ha
+            by_cases hns : a.negSupport ⊆ S
+            · simp only [dif_pos hns]
+              by_cases hab : b = a
+              · subst hab; exact absurd ha hb_mem
+              · simp [hab]
+            · simp [dif_neg hns]
+        -- Transport G to SA.X₁ via XIsoOfEq and prove SA.abToCycles maps to f
+        rw [AddMonoidHom.mem_range]
+        set G_cast := (A.XIsoOfEq hprev).inv.hom G
+        refine ⟨G_cast, Subtype.ext ?_⟩
+        show SA.f.hom G_cast = f
+        have hSAf_G : SA.f.hom G_cast = (A.d k (k + 1)).hom G := by
+          have hsaf : SA.f.hom =
+              ((A.XIsoOfEq hprev).hom ≫ A.d k (k + 1)).hom := by
+            show (A.d ((ComplexShape.up ℕ).prev (k + 1)) (k + 1)).hom = _
+            exact congr_arg AddCommGrp.Hom.hom
+              (HomologicalComplex.XIsoOfEq_hom_comp_d A hprev (k + 1)).symm
+          rw [hsaf]
+          change (A.d k (k + 1)).hom
+            ((A.XIsoOfEq hprev).hom.hom ((A.XIsoOfEq hprev).inv.hom G)) = _
+          congr 1
+          exact DFunLike.congr_fun
+            (congr_arg AddCommGrp.Hom.hom
+              (Iso.inv_hom_id (A.XIsoOfEq hprev))) G
+        rw [hSAf_G, show (A.d k (k + 1)).hom = algebraicδ (k + 1) R 𝓜 k from
+          congr_arg AddCommGrp.Hom.hom (hAd k)]
+        exact hδG
+    · -- range ⊆ ker: f ∈ range(abToCycles) implies ext_map(f) = 0
+      intro hrange
+      rw [AddMonoidHom.mem_range] at hrange
+      obtain ⟨g_prev, hgp⟩ := hrange
+      rw [AddMonoidHom.mem_ker,
+        show (⟨f, hf_ker⟩ : SA.g.hom.ker) = SA.abToCycles g_prev from hgp.symm]
+      show (⟨allNegPoly d hd ((SA.abToCycles g_prev).1 ⟨_, huniv⟩),
+        allNegPoly_mem d hd _⟩ : ↥((𝒜 n R) m)) = 0
+      refine Subtype.ext ?_
+      show allNegPoly d hd (SA.f.hom g_prev ⟨_, huniv⟩) = 0
+      -- Show all terms vanish
+      simp only [allNegPoly]
+      apply Finset.sum_eq_zero; intro a _
+      split_ifs with ha
+      · suffices hmz : monomialCoeff (𝓜 := 𝓜) a Finset.univ
+            (SA.f.hom g_prev ⟨_, huniv⟩) = 0 by
+          rw [hmz, MvPolynomial.monomial_zero]
+        by_cases hn0 : n = 0
+        · subst hn0
+          have hfz : SA.f.hom g_prev ⟨_, huniv⟩ = 0 := by
+            have : SA.f = 0 :=
+              A.shape _ _ (fun h => by simp [ComplexShape.up_Rel] at h)
+            rw [show SA.f.hom = 0 from congr_arg AddCommGrp.Hom.hom this,
+              AddMonoidHom.zero_apply, Pi.zero_apply]
+          rw [hfz]; exact (monomialCoeffHom (𝓜 := 𝓜) a Finset.univ).map_zero
+        · obtain ⟨k', rfl⟩ : ∃ k', n = k' + 1 := ⟨n - 1, by omega⟩
+          have hprev : (ComplexShape.up ℕ).prev (k' + 1) = k' :=
+            ComplexShape.prev_eq' _ (show (ComplexShape.up ℕ).Rel k' (k' + 1) by
+              simp [ComplexShape.up_Rel])
+          set g_cast := (A.XIsoOfEq hprev).hom.hom g_prev
+          have hSAf_eval : SA.f.hom g_prev ⟨_, huniv⟩ =
+              algebraicδ (k' + 1) R 𝓜 k' g_cast ⟨Finset.univ, huniv⟩ := by
+            have h1 := DFunLike.congr_fun (congr_arg AddCommGrp.Hom.hom
+              (HomologicalComplex.XIsoOfEq_hom_comp_d A hprev (k' + 1)).symm)
+              g_prev
+            rw [show SA.f.hom g_prev ⟨_, huniv⟩ =
+              ((A.XIsoOfEq hprev).hom ≫ A.d k' (k' + 1)).hom g_prev
+                ⟨Finset.univ, huniv⟩ from congr_fun h1 ⟨_, huniv⟩]
+            change (A.d k' (k' + 1)).hom g_cast ⟨Finset.univ, huniv⟩ = _
+            exact congr_fun (DFunLike.congr_fun
+              (congr_arg AddCommGrp.Hom.hom (hAd k')) g_cast) ⟨_, huniv⟩
+          rw [hSAf_eval]
+          show componentHom a (k' + 1) (algebraicδ (k' + 1) R 𝓜 k' g_cast)
+            ⟨Finset.univ, huniv, by rw [ha]⟩ = 0
+          rw [component_comm_δ a k' g_cast]
+          have hempty : IsEmpty {S : Finset (Fin (k' + 2)) //
+              S.card = k' + 1 ∧ a.negSupport ⊆ S} := by
+            rw [ha]; constructor; intro ⟨S, hS, hunivS⟩
+            exact absurd (Finset.card_le_card hunivS)
+              (by rw [Finset.card_univ, Fintype.card_fin]; omega)
+          rw [show componentHom (𝓜 := 𝓜) a k' g_cast = 0 from
+            funext fun x => hempty.elim x, map_zero, Pi.zero_apply]
+      · rfl
   -- Step 6: Build quotient equivalence
   exact ((QuotientAddGroup.quotientAddEquivOfEq h_ker_eq.symm).trans
     (QuotientAddGroup.quotientKerEquivOfSurjective ext_map h_surj)).toAddCommGrpIso
+
+/-- `Hⁿ(𝒪(-(n+1))) ≅ R`: special case of the general theorem when `d = -(n+1)`,
+giving `m = 0` and `𝒜₀ ≅ R` via the constant embedding. -/
+noncomputable def algebraicComplex_intShift_Hn_iso :
+    (algebraicComplex n R (GradedModule.intShift (𝒜 n R)
+      (-(↑(n + 1) : ℤ)))).homology n ≅ AddCommGrp.of R := by
+  have hm : (-(-(↑(n + 1) : ℤ)) - ↑(n + 1)).toNat = 0 := by omega
+  exact algebraicComplex_intShift_Hn_iso_general (-(↑(n + 1) : ℤ)) le_rfl ≪≫
+    (hm ▸ ({ toFun := fun ⟨p, hp⟩ => MvPolynomial.constantCoeff p
+             invFun := fun r => ⟨MvPolynomial.C r, MvPolynomial.isHomogeneous_C _ r⟩
+             left_inv := fun ⟨p, hp⟩ => by
+               simp only [MvPolynomial.mem_homogeneousSubmodule] at hp
+               have htd : p.totalDegree = 0 := Nat.le_zero.mp hp.totalDegree_le
+               have heq : p = MvPolynomial.C (MvPolynomial.constantCoeff p) := by
+                 rw [MvPolynomial.constantCoeff_eq]
+                 exact MvPolynomial.totalDegree_eq_zero_iff_eq_C.mp htd
+               exact Subtype.ext heq.symm
+             right_inv := fun r => by simp
+             map_add' := fun _ _ => map_add _ _ _ } : ↥((𝒜 n R) 0) ≃+ R
+           ).toAddCommGrpIso)
 
 end HnNegTwist
 
