@@ -1189,6 +1189,7 @@ import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.MonomialDecomposition
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.ProjectiveSpace
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Proper
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Scheme
+import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.SerreDuality
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.StructureSheaf
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.StructureSheafAcyclicity
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.StructureSheafCohomology

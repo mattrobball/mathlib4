@@ -386,6 +386,16 @@ def awayMap : Away 𝒜 𝓜 f →+ Away 𝒜 𝓜 x where
 lemma awayMap_mk (p : NumDenSameDeg 𝒜 𝓜 (Submonoid.powers f)) :
     awayMap 𝒜 𝓜 hg hx (mk p) = mk (awayMapNumDenSameDeg 𝒜 𝓜 hg hx p) := rfl
 
+@[simp]
+lemma awayMap_mk_coe_num (p : NumDenSameDeg 𝒜 𝓜 (Submonoid.powers f)) :
+    (↑(awayMapNumDenSameDeg 𝒜 𝓜 hg hx p).num : M) =
+    (g ^ p.den_mem.choose) • (↑p.num : M) := rfl
+
+@[simp]
+lemma awayMap_mk_coe_den (p : NumDenSameDeg 𝒜 𝓜 (Submonoid.powers f)) :
+    (↑(awayMapNumDenSameDeg 𝒜 𝓜 hg hx p).den : A) =
+    (↑p.den : A) * g ^ p.den_mem.choose := rfl
+
 lemma val_awayMap_mk (p : NumDenSameDeg 𝒜 𝓜 (Submonoid.powers f)) :
     (awayMap 𝒜 𝓜 hg hx (mk p)).val =
     LocalizedModule.mk ((g ^ p.den_mem.choose : A) • (p.num : M))
