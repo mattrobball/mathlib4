@@ -3,12 +3,14 @@ Copyright (c) 2025 Matt Diamond. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matt Diamond
 -/
-import Mathlib.Topology.Sheaves.Sheaf
-import Mathlib.Algebra.Homology.HomologicalComplex
-import Mathlib.Algebra.Category.Grp.Preadditive
-import Mathlib.Data.Finset.Sort
-import Mathlib.Algebra.BigOperators.GroupWithZero.Action
-import Mathlib.Data.Fintype.BigOperators
+module
+
+public import Mathlib.Topology.Sheaves.Sheaf
+public import Mathlib.Algebra.Homology.HomologicalComplex
+public import Mathlib.Algebra.Category.Grp.Preadditive
+public import Mathlib.Data.Finset.Sort
+public import Mathlib.Algebra.BigOperators.GroupWithZero.Action
+public import Mathlib.Data.Fintype.BigOperators
 
 /-!
 # Čech Cochain Complex
@@ -28,6 +30,10 @@ Given a sheaf `F` of abelian groups on a topological space `X` and a finite inde
 * [Hartshorne, *Algebraic Geometry*, III.4]
 * [Stacks Project, Tag 01ED](https://stacks.math.columbia.edu/tag/01ED)
 -/
+
+@[expose] public section
+
+set_option backward.isDefEq.respectTransparency false
 
 open CategoryTheory TopologicalSpace Opposite Finset
 
@@ -49,12 +55,12 @@ theorem cechCoverInf_mono (U : ι → Opens X) {S T : Finset ι} (h : S ⊆ T) :
 
 /-! ### Cochain groups -/
 
-variable (F : Sheaf AddCommGrp X) (U : ι → Opens X)
+variable (F : Sheaf AddCommGrpCat X) (U : ι → Opens X)
 
 /-- The `p`-th Čech cochain group: the product of `F(U_S)` over all subsets `S ⊆ ι` with
 `|S| = p + 1`. When `p + 1 > |ι|`, the index type is empty and this is the trivial group. -/
-def cechObj (p : ℕ) : AddCommGrp :=
-  AddCommGrp.of (∀ S : {S : Finset ι // S.card = p + 1},
+def cechObj (p : ℕ) : AddCommGrpCat :=
+  AddCommGrpCat.of (∀ S : {S : Finset ι // S.card = p + 1},
     F.1.obj (op (cechCoverInf U S.1)))
 
 /-! ### Face maps and coboundary -/
@@ -80,7 +86,7 @@ For `T` with `|T| = p + 2`, the coboundary sends a cochain `f` to:
 `(d f)_T = ∑_{j=0}^{p+1} (-1)^j · res(f_{T \ {t_j}})`,
 where `t_j` is the `j`-th smallest element of `T`. -/
 def cechδ (p : ℕ) : cechObj F U p ⟶ cechObj F U (p + 1) :=
-  AddCommGrp.ofHom
+  AddCommGrpCat.ofHom
     { toFun := fun f ⟨T, hT⟩ =>
         ∑ j : Fin (p + 2), ((-1 : ℤ) ^ j.val) •
           (F.1.map (homOfLE (cechCoverInf_mono U (erase_subset _ _))).op
@@ -156,8 +162,8 @@ theorem sort_erase_nthElem {n : ℕ} (T : Finset ι) (hT : T.card = n + 1)
   have h_nth : nthElem T hT j = (T.sort (· ≤ ·))[j.val]'(by rw [length_sort]; omega) :=
     nthElem_eq_sort_getElem T hT j
   rw [h_nth, ← (T.sort_nodup (· ≤ ·)).erase_getElem j.val (by rw [length_sort]; omega)]
-  refine List.eq_of_perm_of_sorted ?_ ((T.erase _).sort_sorted _)
-    ((T.sort_sorted _).sublist List.erase_sublist)
+  refine List.Perm.eq_of_pairwise' ((T.erase _).pairwise_sort (· ≤ ·))
+    ((T.pairwise_sort (· ≤ ·)).sublist List.erase_sublist) ?_
   rw [List.perm_ext_iff_of_nodup ((T.erase _).sort_nodup _) ((T.sort_nodup _).erase _)]
   intro x
   simp only [(T.sort_nodup _).mem_erase_iff, mem_sort, mem_erase]
@@ -229,7 +235,7 @@ omit [Fintype ι] in
 /-- Two restriction-map compositions with the same target through different intermediates,
 applied to `f S₁` and `f S₂` respectively, agree when `S₁ = S₂`. This handles the
 dependent type issue where `rw` cannot directly rewrite `f S₁` to `f S₂`. -/
-private theorem restriction_comp_congr {p : ℕ} {T : Finset ι} (hT : T.card = p + 3)
+theorem restriction_comp_congr {p : ℕ} {T : Finset ι} (hT : T.card = p + 3)
     (f : cechObj F U p) {S₁ S₂ : {S : Finset ι // S.card = p + 1}} (heq : S₁ = S₂)
     (j₁ j₂ : Fin (p + 3))
     (h₁ : S₁.1 ⊆ (eraseNth T hT j₁).1) (h₂ : S₂.1 ⊆ (eraseNth T hT j₂).1) :
@@ -252,7 +258,7 @@ theorem cechδ_comp_cechδ (p : ℕ) : cechδ F U p ≫ cechδ F U (p + 1) = 0 :
   funext ⟨T, hT⟩
   change (cechδ F U (p + 1) (cechδ F U p f)) ⟨T, hT⟩ = 0
   -- Unfold cechδ to expose the double sum, leaving restriction maps as morphisms
-  show ∑ j : Fin (p + 3), ((-1 : ℤ) ^ j.val) •
+  change ∑ j : Fin (p + 3), ((-1 : ℤ) ^ j.val) •
     F.1.map (homOfLE (cechCoverInf_mono U (erase_subset _ _))).op
       (∑ k : Fin (p + 2), ((-1 : ℤ) ^ k.val) •
         F.1.map (homOfLE (cechCoverInf_mono U (erase_subset _ _))).op
@@ -286,7 +292,7 @@ theorem cechδ_comp_cechδ (p : ℕ) : cechδ F U p ≫ cechδ F U (p + 1) = 0 :
 /-- The Čech cochain complex of a sheaf `F` with respect to a finite open cover `U`.
 In degree `p`, it is the product `∏_{|S|=p+1} F(⋂_{i∈S} U_i)` with alternating-sign
 coboundary. -/
-def cechComplex : CochainComplex AddCommGrp ℕ :=
+def cechComplex : CochainComplex AddCommGrpCat ℕ :=
   CochainComplex.of (cechObj F U) (cechδ F U) (cechδ_comp_cechδ F U)
 
 end TopCat

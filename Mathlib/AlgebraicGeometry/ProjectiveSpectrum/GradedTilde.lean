@@ -3,9 +3,11 @@ Copyright (c) 2026 Mathlib contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matthew Robert Ballard
 -/
-import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.StructureSheaf
-import Mathlib.RingTheory.GradedAlgebra.HomogeneousLocalization.Module
-import Mathlib.Algebra.Category.Grp.Limits
+module
+
+public import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.StructureSheaf
+public import Mathlib.RingTheory.GradedAlgebra.HomogeneousLocalization.Module
+public import Mathlib.Algebra.Category.Grp.Limits
 
 /-!
 # The graded tilde construction `M̃` on `Proj(A)`
@@ -23,13 +25,17 @@ fractions `m/s` with `m ∈ 𝓜 i` and `s ∈ 𝒜 i` of the same degree.
   function is locally a fraction.
 * `ProjectiveSpectrum.GradedTilde.sectionsAddSubgroup`: the sections satisfying
   `isLocallyFraction` form an additive subgroup.
-* `GradedModule.tilde`: the sheaf `M̃` valued in `AddCommGrp`.
+* `GradedModule.tilde`: the sheaf `M̃` valued in `AddCommGrpCat`.
 
 ## References
 
 * [Robin Hartshorne, *Algebraic Geometry*][Har77]
 * [Jean-Pierre Serre, *Faisceaux algébriques cohérents*][Ser55]
 -/
+
+@[expose] public section
+
+set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
 
@@ -131,7 +137,7 @@ def sectionsAddSubgroup (U : (Opens (ProjectiveSpectrum.top 𝒜))ᵒᵖ) :
 
 end
 
-/-- The graded tilde sheaf (valued in `Type`, not yet `AddCommGrp`) is the subsheaf consisting of
+/-- The graded tilde sheaf (valued in `Type`, not yet `AddCommGrpCat`) is the subsheaf consisting of
 functions satisfying `isLocallyFraction`. -/
 def structureSheafInType : Sheaf (Type _) (ProjectiveSpectrum.top 𝒜) :=
   subsheafToTypes (isLocallyFraction 𝒜 𝓜)
@@ -140,20 +146,20 @@ instance addCommGroupStructureSheafInTypeObj (U : (Opens (ProjectiveSpectrum.top
     AddCommGroup ((structureSheafInType 𝒜 𝓜).1.obj U) :=
   inferInstanceAs (AddCommGroup (sectionsAddSubgroup U))
 
-/-- The graded tilde presheaf, valued in `AddCommGrp`, constructed by dressing up the `Type` valued
+/-- The graded tilde presheaf, valued in `AddCommGrpCat`, constructed by dressing up the `Type` valued
 structure presheaf. -/
-def structurePresheafInAddCommGrp :
-    Presheaf AddCommGrp (ProjectiveSpectrum.top 𝒜) where
-  obj U := AddCommGrp.of ((structureSheafInType 𝒜 𝓜).1.obj U)
-  map i := AddCommGrp.ofHom
+def structurePresheafInAddCommGrpCat :
+    Presheaf AddCommGrpCat (ProjectiveSpectrum.top 𝒜) where
+  obj U := AddCommGrpCat.of ((structureSheafInType 𝒜 𝓜).1.obj U)
+  map i := AddCommGrpCat.ofHom
     { toFun := (structureSheafInType 𝒜 𝓜).1.map i
       map_zero' := rfl
       map_add' := fun _ _ => rfl }
 
-/-- Some glue, verifying that the structure presheaf valued in `AddCommGrp` agrees with the `Type`
+/-- Some glue, verifying that the structure presheaf valued in `AddCommGrpCat` agrees with the `Type`
 valued structure presheaf. -/
 def structurePresheafCompForget :
-    structurePresheafInAddCommGrp 𝒜 𝓜 ⋙ forget AddCommGrp ≅
+    structurePresheafInAddCommGrpCat 𝒜 𝓜 ⋙ forget AddCommGrpCat ≅
       (structureSheafInType 𝒜 𝓜).1 :=
   NatIso.ofComponents (fun _ => Iso.refl _) (by aesop_cat)
 
@@ -165,10 +171,10 @@ open TopCat.Presheaf ProjectiveSpectrum.GradedTilde Opens
 
 /-- The graded tilde construction `M̃`: a sheaf of abelian groups on `Proj(A)` associated to a
 graded module `M` over a graded ring `A`. -/
-def tilde : Sheaf AddCommGrp (ProjectiveSpectrum.top 𝒜) :=
-  ⟨structurePresheafInAddCommGrp 𝒜 𝓜,
+def tilde : Sheaf AddCommGrpCat (ProjectiveSpectrum.top 𝒜) :=
+  ⟨structurePresheafInAddCommGrpCat 𝒜 𝓜,
     (isSheaf_iff_isSheaf_comp
-      (forget AddCommGrp) _).mpr
+      (forget AddCommGrpCat) _).mpr
       (isSheaf_of_iso (structurePresheafCompForget 𝒜 𝓜).symm
         (structureSheafInType 𝒜 𝓜).cond)⟩
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Mathlib contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matthew Robert Ballard
 -/
-import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.MonomialCoefficient
+module
+
+public import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.MonomialCoefficient
 
 /-!
 # Cohomology of the structure sheaf on projective space
@@ -25,6 +27,10 @@ is a quasi-isomorphism at degree 0.
 * [Stacks Project, Cohomology of projective space](https://stacks.math.columbia.edu/tag/01XS)
 -/
 
+@[expose] public section
+
+set_option backward.isDefEq.respectTransparency false
+
 noncomputable section
 
 open MvPolynomial CategoryTheory CategoryTheory.Limits Finset
@@ -37,8 +43,6 @@ variable {n : ℕ} {R : Type u} [CommRing R]
 
 attribute [local instance] mvPolynomialGrading
 
-private abbrev 𝒜 (n : ℕ) (R : Type u) [CommRing R] :=
-  MvPolynomial.homogeneousSubmodule (Fin (n + 1)) R
 
 local instance : SetLike.GradedSMul (𝒜 n R) (𝒜 n R) :=
   SetLike.GradedMul.toGradedSMul _
@@ -118,18 +122,18 @@ noncomputable def embeddingChainMap :
     _root_.relSimplexComplex (∅ : Finset (Fin (n + 1))) R ⟶
     algebraicComplex n R (𝒜 n R) :=
   CochainComplex.ofHom
-    (fun p => AddCommGrp.of
+    (fun p => AddCommGrpCat.of
       (_root_.relSimplexCochain (∅ : Finset (Fin (n + 1))) R p))
-    (fun p => AddCommGrp.ofHom
+    (fun p => AddCommGrpCat.ofHom
       (_root_.relSimplexδHom (∅ : Finset (Fin (n + 1))) R p))
-    (fun p => AddCommGrp.ext
+    (fun p => AddCommGrpCat.ext
       (_root_.relSimplexδ_comp_eq_zero (∅ : Finset (Fin (n + 1))) R p))
-    (fun p => AddCommGrp.of (∀ S : {S : Finset (Fin (n + 1)) // S.card = p + 1},
+    (fun p => AddCommGrpCat.of (∀ S : {S : Finset (Fin (n + 1)) // S.card = p + 1},
       HomogeneousLocalizedModule.Away (𝒜 n R) (𝒜 n R) (coordProd n R S.1)))
-    (fun p => AddCommGrp.ofHom (algebraicδ n R (𝒜 n R) p))
+    (fun p => AddCommGrpCat.ofHom (algebraicδ n R (𝒜 n R) p))
     (fun p => algebraicδ_comp_algebraicδ n R (𝒜 n R) p)
-    (fun p => AddCommGrp.ofHom (embeddingHom p))
-    (fun p => AddCommGrp.ext (fun f => embedding_comm_δ p f))
+    (fun p => AddCommGrpCat.ofHom (embeddingHom p))
+    (fun p => AddCommGrpCat.ext (fun f => embedding_comm_δ p f))
 
 /-- Zero-exponent extraction of a constant element gives back the original value:
 `zeroExpCoeffMod S (C(r)/1) = r`. -/
@@ -210,14 +214,14 @@ theorem algebraicCocycle_zero_of_extraction_zero
       K.shape _ _ (fun h => by simp [ComplexShape.up_Rel] at h)
     -- So range(f) = ⊥
     have hrange_bot : (K.sc 0).f.hom.range = ⊥ := by
-      have : (K.sc 0).f.hom = 0 := congr_arg AddCommGrp.Hom.hom hf_zero
+      have : (K.sc 0).f.hom = 0 := congr_arg AddCommGrpCat.Hom.hom hf_zero
       rw [this]; exact AddMonoidHom.range_zero
     -- Our element is in ker(g): the differential kills it
     have hg_mem : componentHom a 0 f ∈ (K.sc 0).g.hom.ker := by
       rw [AddMonoidHom.mem_ker]
       show K.d 0 ((ComplexShape.up ℕ).next 0) (componentHom a 0 f) = 0
       rw [(ComplexShape.up ℕ).next_eq' (show (0 : ℕ) + 1 = 1 from rfl),
-        show K.d 0 1 = AddCommGrp.ofHom
+        show K.d 0 1 = AddCommGrpCat.ofHom
           (_root_.relSimplexδHom a.negSupport R 0) from
           CochainComplex.of_d _ _ _ 0]
       exact hcomp_cocycle
@@ -228,7 +232,7 @@ theorem algebraicCocycle_zero_of_extraction_zero
 /-- A 0-cocycle equals the embedding of its extraction (composed with
 the constant cochain map). This is the key identity for left-invertibility
 of the `kerEquiv` used in the `H⁰` computation. -/
-private theorem embedding_extraction_cocycle_eq
+theorem embedding_extraction_cocycle_eq
     (f : ∀ S : {S : Finset (Fin (n + 1)) // S.card = 0 + 1},
       HomogeneousLocalizedModule.Away (𝒜 n R) (𝒜 n R) (coordProd n R S.1))
     (hcocycle : algebraicδ n R (𝒜 n R) 0 f = 0) :
@@ -256,7 +260,7 @@ The proof unwraps the categorical homology via `abHomologyIso`, then builds a co
 The section property (`extraction ∘ embedding = id`) gives right inverse, and the
 cocycle vanishing theorem gives left inverse. -/
 noncomputable def algebraicComplex_H0_iso :
-    (algebraicComplex n R (𝒜 n R)).homology 0 ≅ AddCommGrp.of R := by
+    (algebraicComplex n R (𝒜 n R)).homology 0 ≅ AddCommGrpCat.of R := by
   set A := algebraicComplex n R (𝒜 n R)
   -- Step 1: Unwrap homology via short complex
   refine A.homologyIsoSc' _ 0 1 rfl ((ComplexShape.up ℕ).next_eq' rfl) ≪≫ ?_
@@ -271,7 +275,7 @@ noncomputable def algebraicComplex_H0_iso :
   -- SA.g.hom = algebraicδ 0 (by CochainComplex.of_d)
   have hg_hom : SA.g.hom = algebraicδ n R (𝒜 n R) 0 := by
     show (A.d 0 1).hom = _
-    have h : A.d 0 1 = AddCommGrp.ofHom (algebraicδ n R (𝒜 n R) 0) :=
+    have h : A.d 0 1 = AddCommGrpCat.ofHom (algebraicδ n R (𝒜 n R) 0) :=
       CochainComplex.of_d _ _ _ 0
     rw [h]; rfl
   -- Step 3: Build (ker g / range abToCycles) ≃+ R

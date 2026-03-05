@@ -3,7 +3,9 @@ Copyright (c) 2026 Mathlib contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matthew Robert Ballard
 -/
-import Mathlib.Topology.Sheaves.RelativeSimplexComplex
+module
+
+public import Mathlib.Topology.Sheaves.RelativeSimplexComplex
 
 /-!
 # Čech cohomology computations for the relative simplex complex
@@ -29,6 +31,10 @@ this gives a complete description of the homology of all `K_T` complexes.
 
 * [Stacks Project, Cohomology of projective space](https://stacks.math.columbia.edu/tag/01XS)
 -/
+
+@[expose] public section
+
+set_option backward.isDefEq.respectTransparency false
 
 open CategoryTheory Finset
 
@@ -65,7 +71,7 @@ def relSimplexEvalSingleton (R : Type*) [AddCommGroup R] (i : Fin (n + 1)) :
 
 /-- Two elements of a 2-element finset that are mapped from distinct `Fin 2` indices
 by `nthElem` are distinct. -/
-private theorem nthElem_pair_ne {S : Finset (Fin (n + 1))} (hS : S.card = 2) :
+theorem nthElem_pair_ne {S : Finset (Fin (n + 1))} (hS : S.card = 2) :
     nthElem S hS (0 : Fin 2) ≠ nthElem S hS (1 : Fin 2) := by
   intro h
   exact absurd ((S.orderIsoOfFin hS).injective (Subtype.ext h))
@@ -76,7 +82,7 @@ private theorem nthElem_pair_ne {S : Finset (Fin (n + 1))} (hS : S.card = 2) :
 We evaluate `d⁰ f` at the pair `{a, b}`: since `T = ∅`, all `dif` conditions hold, and
 the alternating sum gives `f(face₀) - f(face₁) = 0`. A case split on which face is `{a}`
 and which is `{b}` shows `f({a}) = f({b})`. -/
-private theorem relSimplexδ_ker_values_eq (R : Type*) [AddCommGroup R]
+theorem relSimplexδ_ker_values_eq (R : Type*) [AddCommGroup R]
     (f : relSimplexCochain (∅ : Finset (Fin (n + 1))) R 0)
     (hf : relSimplexδHom (∅ : Finset (Fin (n + 1))) R 0 f = 0)
     (a b : Fin (n + 1)) (hab : a ≠ b) :
@@ -105,11 +111,11 @@ private theorem relSimplexδ_ker_values_eq (R : Type*) [AddCommGroup R]
       · exact h
     have he0 :
         (eraseNth ({a, b} : Finset (Fin (n + 1))) hcard (0 : Fin 2)).1 = {b} := by
-      show ({a, b} : Finset (Fin (n + 1))).erase (nthElem _ hcard 0) = {b}
+      change ({a, b} : Finset (Fin (n + 1))).erase (nthElem _ hcard 0) = {b}
       rw [h0, Finset.erase_insert (Finset.notMem_singleton.mpr hab)]
     have he1 :
         (eraseNth ({a, b} : Finset (Fin (n + 1))) hcard (1 : Fin 2)).1 = {a} := by
-      show ({a, b} : Finset (Fin (n + 1))).erase (nthElem _ hcard 1) = {a}
+      change ({a, b} : Finset (Fin (n + 1))).erase (nthElem _ hcard 1) = {a}
       rw [h1, Finset.erase_insert_of_ne hab, Finset.erase_singleton,
         Finset.insert_empty]
     -- f({a}) = f(eraseNth 1) = f(eraseNth 0) = f({b})
@@ -121,12 +127,12 @@ private theorem relSimplexδ_ker_values_eq (R : Type*) [AddCommGroup R]
       · exact absurd (h0.trans h.symm) hne
     have he0 :
         (eraseNth ({a, b} : Finset (Fin (n + 1))) hcard (0 : Fin 2)).1 = {a} := by
-      show ({a, b} : Finset (Fin (n + 1))).erase (nthElem _ hcard 0) = {a}
+      change ({a, b} : Finset (Fin (n + 1))).erase (nthElem _ hcard 0) = {a}
       rw [h0, Finset.erase_insert_of_ne hab, Finset.erase_singleton,
         Finset.insert_empty]
     have he1 :
         (eraseNth ({a, b} : Finset (Fin (n + 1))) hcard (1 : Fin 2)).1 = {b} := by
-      show ({a, b} : Finset (Fin (n + 1))).erase (nthElem _ hcard 1) = {b}
+      change ({a, b} : Finset (Fin (n + 1))).erase (nthElem _ hcard 1) = {b}
       rw [h1, Finset.erase_insert (Finset.notMem_singleton.mpr hab)]
     -- f({a}) = f(eraseNth 0) = f(eraseNth 1) = f({b})
     convert heval using 1 <;> (congr 1; ext1) <;> [exact he0.symm; exact he1.symm]
@@ -143,7 +149,7 @@ theorem relSimplexCochain_empty_ker_const (R : Type*) [AddCommGroup R]
   rw [Finset.card_eq_one] at hcard
   obtain ⟨i, rfl⟩ := hcard
   -- Show f({i}) = f({0})
-  show f ⟨{i}, Finset.card_singleton _, Finset.empty_subset _⟩ =
+  change f ⟨{i}, Finset.card_singleton _, Finset.empty_subset _⟩ =
     f ⟨{(0 : Fin (n + 1))}, Finset.card_singleton _, Finset.empty_subset _⟩
   by_cases hi : i = (0 : Fin (n + 1))
   · subst hi; rfl
@@ -169,7 +175,7 @@ def relSimplexKerδ_equiv (R : Type*) [AddCommGroup R] :
 `T = ∅` is isomorphic to `R`. -/
 noncomputable def relSimplexComplex_empty_homologyIso (R : Type*) [AddCommGroup R] :
     (relSimplexComplex (∅ : Finset (Fin (n + 1))) R).homology 0 ≅
-      AddCommGrp.of R := by
+      AddCommGrpCat.of R := by
   set K := relSimplexComplex (∅ : Finset (Fin (n + 1))) R
   -- Step 1: Use homologyIsoSc' to work with concrete indices, avoiding Classical.choose
   -- in ComplexShape.next/prev
@@ -189,8 +195,8 @@ noncomputable def relSimplexComplex_empty_homologyIso (R : Type*) [AddCommGroup 
   have hrange_bot : AddMonoidHom.range S.abToCycles = ⊥ := by
     rw [habToCycles_zero]; exact AddMonoidHom.range_zero
   -- Step 5: S.g = K.d 0 1 which is the concrete differential by CochainComplex.of_d
-  have hg : S.g = AddCommGrp.ofHom (relSimplexδHom (∅ : Finset (Fin (n + 1))) R 0) := by
-    show K.d 0 1 = _
+  have hg : S.g = AddCommGrpCat.ofHom (relSimplexδHom (∅ : Finset (Fin (n + 1))) R 0) := by
+    change K.d 0 1 = _
     exact CochainComplex.of_d _ _ _ 0
   have hg_hom : S.g.hom = relSimplexδHom (∅ : Finset (Fin (n + 1))) R 0 := by
     rw [hg]; rfl

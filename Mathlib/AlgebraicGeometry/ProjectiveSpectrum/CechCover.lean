@@ -3,9 +3,11 @@ Copyright (c) 2026 Mathlib contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matthew Robert Ballard
 -/
-import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.ProjectiveSpace
-import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.GradedTilde
-import Mathlib.Topology.Sheaves.CechCochainComplex
+module
+
+public import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.ProjectiveSpace
+public import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.GradedTilde
+public import Mathlib.Topology.Sheaves.CechCochainComplex
 
 /-!
 # Čech complex of `M̃` on projective space with the standard cover
@@ -40,6 +42,10 @@ standard coordinate cover `D₊(x₀), ..., D₊(xₙ)`.
 * [Stacks Project, Cohomology of projective space](https://stacks.math.columbia.edu/tag/01XS)
 -/
 
+@[expose] public section
+
+set_option backward.isDefEq.respectTransparency false
+
 noncomputable section
 
 open MvPolynomial CategoryTheory TopologicalSpace Opposite Finset
@@ -52,7 +58,7 @@ variable (n : ℕ) (R : Type u) [CommRing R]
 
 attribute [local instance] mvPolynomialGrading
 
-private abbrev 𝒜' (n : ℕ) (R : Type u) [CommRing R] :=
+abbrev 𝒜' (n : ℕ) (R : Type u) [CommRing R] :=
   MvPolynomial.homogeneousSubmodule (Fin (n + 1)) R
 
 section StandardCoverOpens
@@ -79,7 +85,7 @@ variable {M : Type u} [AddCommGroup M] [Module R M]
 /-- The Čech cochain complex of `M̃` on `Proj(R[x₀,...,xₙ])` with the
 standard coordinate cover `D₊(x₀), ..., D₊(xₙ)`. -/
 def cechComplexTilde :
-    CochainComplex AddCommGrp ℕ :=
+    CochainComplex AddCommGrpCat ℕ :=
   TopCat.cechComplex (GradedModule.tilde (𝒜' n R) 𝓜) (standardCoverOpens n R)
 
 /-- The comparison map from `Away 𝒜 𝓜 (coordProd S)` to sections of `M̃` on the
@@ -174,7 +180,7 @@ theorem algebraicToCech_comm (p : ℕ)
 set_option maxHeartbeats 400000 in
 /-- Two `coordRestrict` compositions to the same target agree when the double-erased
 source subtypes agree. This is the algebraic analogue of `restriction_comp_congr`. -/
-private theorem coordRestrict_comp_congr {p : ℕ} {T : Finset (Fin (n + 1))}
+theorem coordRestrict_comp_congr {p : ℕ} {T : Finset (Fin (n + 1))}
     (hT : T.card = p + 3)
     {j₁ j₂ : Fin (p + 3)} {k₁ k₂ : Fin (p + 2)}
     {S : {S : Finset (Fin (n + 1)) // S.card = p + 1}}
@@ -229,12 +235,12 @@ private theorem coordRestrict_comp_congr {p : ℕ} {T : Finset (Fin (n + 1))}
 
 /-- The algebraic coboundary squares to zero: `algebraicδ (p+1) ∘ algebraicδ p = 0`. -/
 theorem algebraicδ_comp_algebraicδ (p : ℕ) :
-    AddCommGrp.ofHom (algebraicδ n R 𝓜 p) ≫
-      AddCommGrp.ofHom (algebraicδ n R 𝓜 (p + 1)) = 0 :=
-  AddCommGrp.ext fun f => by
+    AddCommGrpCat.ofHom (algebraicδ n R 𝓜 p) ≫
+      AddCommGrpCat.ofHom (algebraicδ n R 𝓜 (p + 1)) = 0 :=
+  AddCommGrpCat.ext fun f => by
   funext ⟨T, hT⟩
   change (algebraicδ n R 𝓜 (p + 1) (algebraicδ n R 𝓜 p f)) ⟨T, hT⟩ = 0
-  show ∑ j : Fin (p + 3), ((-1 : ℤ) ^ j.val) •
+  change ∑ j : Fin (p + 3), ((-1 : ℤ) ^ j.val) •
     coordRestrict n R 𝓜 T hT j
       (∑ k : Fin (p + 2), ((-1 : ℤ) ^ k.val) •
         coordRestrict n R 𝓜 (TopCat.eraseNth T hT j).1 (TopCat.eraseNth T hT j).2 k
@@ -279,11 +285,11 @@ theorem algebraicδ_comp_algebraicδ (p : ℕ) :
 
 /-- The algebraic Čech cochain complex: in degree `p`, the product of `M⁰_{∏ xᵢ}`
 over all `(p+1)`-element subsets, with the algebraic coboundary `algebraicδ`. -/
-def algebraicComplex : CochainComplex AddCommGrp ℕ :=
+def algebraicComplex : CochainComplex AddCommGrpCat ℕ :=
   CochainComplex.of
-    (fun p => AddCommGrp.of (∀ S : {S : Finset (Fin (n + 1)) // S.card = p + 1},
+    (fun p => AddCommGrpCat.of (∀ S : {S : Finset (Fin (n + 1)) // S.card = p + 1},
       HomogeneousLocalizedModule.Away (𝒜' n R) 𝓜 (coordProd n R S.1)))
-    (fun p => AddCommGrp.ofHom (algebraicδ n R 𝓜 p))
+    (fun p => AddCommGrpCat.ofHom (algebraicδ n R 𝓜 p))
     (fun p => algebraicδ_comp_algebraicδ n R 𝓜 p)
 
 /-- The chain map from the algebraic Čech complex to the topological Čech complex of `M̃`,
@@ -291,15 +297,15 @@ built from the comparison maps `algebraicToCech` at each degree. -/
 def algebraicToCechHom :
     algebraicComplex n R 𝓜 ⟶ cechComplexTilde n R 𝓜 :=
   CochainComplex.ofHom
-    (fun p => AddCommGrp.of (∀ S : {S : Finset (Fin (n + 1)) // S.card = p + 1},
+    (fun p => AddCommGrpCat.of (∀ S : {S : Finset (Fin (n + 1)) // S.card = p + 1},
       HomogeneousLocalizedModule.Away (𝒜' n R) 𝓜 (coordProd n R S.1)))
-    (fun p => AddCommGrp.ofHom (algebraicδ n R 𝓜 p))
+    (fun p => AddCommGrpCat.ofHom (algebraicδ n R 𝓜 p))
     (fun p => algebraicδ_comp_algebraicδ n R 𝓜 p)
     (TopCat.cechObj (GradedModule.tilde (𝒜' n R) 𝓜) (standardCoverOpens n R))
     (TopCat.cechδ (GradedModule.tilde (𝒜' n R) 𝓜) (standardCoverOpens n R))
     (TopCat.cechδ_comp_cechδ (GradedModule.tilde (𝒜' n R) 𝓜) (standardCoverOpens n R))
-    (fun p => AddCommGrp.ofHom (algebraicToCech n R 𝓜 p))
-    (fun p => AddCommGrp.ext (fun f =>
+    (fun p => AddCommGrpCat.ofHom (algebraicToCech n R 𝓜 p))
+    (fun p => AddCommGrpCat.ext (fun f =>
       (algebraicToCech_comm n R 𝓜 p f).symm))
 
 end CechTilde

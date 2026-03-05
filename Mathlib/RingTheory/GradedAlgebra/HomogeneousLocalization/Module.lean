@@ -3,9 +3,11 @@ Copyright (c) 2026 Mathlib contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matthew Robert Ballard
 -/
-import Mathlib.RingTheory.GradedAlgebra.HomogeneousLocalization
-import Mathlib.Algebra.Module.LocalizedModule.Basic
-import Mathlib.Algebra.GradedMulAction
+module
+
+public import Mathlib.RingTheory.GradedAlgebra.HomogeneousLocalization
+public import Mathlib.Algebra.Module.LocalizedModule.Basic
+public import Mathlib.Algebra.GradedMulAction
 
 /-!
 # Homogeneous Localization for Graded Modules
@@ -34,6 +36,10 @@ the ring case `M = A`) and is the building block for the graded tilde constructi
 
 graded module, homogeneous localization, tilde construction
 -/
+
+@[expose] public section
+
+set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
 
@@ -151,7 +157,7 @@ variable {𝒜 𝓜}
 
 variable [SetLike.GradedSMul 𝒜 𝓜]
 
-private theorem embedding_add (c1 c2 : NumDenSameDeg 𝒜 𝓜 x) :
+theorem embedding_add (c1 c2 : NumDenSameDeg 𝒜 𝓜 x) :
     embedding 𝒜 𝓜 x (c1 + c2) = embedding 𝒜 𝓜 x c1 + embedding 𝒜 𝓜 x c2 := by
   simp only [embedding, num_add, den_add, LocalizedModule.mk_add_mk,
     Submonoid.smul_def, Submonoid.coe_mul]
@@ -212,7 +218,8 @@ instance : Neg (HomogeneousLocalizedModule 𝒜 𝓜 x) where
   neg := Quotient.map' Neg.neg
     fun c1 c2 (h : embedding 𝒜 𝓜 x c1 = embedding 𝒜 𝓜 x c2) => by
       change embedding 𝒜 𝓜 x (-c1) = embedding 𝒜 𝓜 x (-c2)
-      simp only [embedding, num_neg, den_neg, ← LocalizedModule.mk_neg]
+      simp only [embedding, num_neg, den_neg]
+      rw [LocalizedModule.mk_neg, LocalizedModule.mk_neg]
       exact congr_arg Neg.neg h
 
 omit [AddCommMonoid ι] [DecidableEq ι] [GradedAlgebra 𝒜] [SetLike.GradedSMul 𝒜 𝓜] in
@@ -232,7 +239,7 @@ instance : Sub (HomogeneousLocalizedModule 𝒜 𝓜 x) where sub z1 z2 := z1 + 
 omit [SetLike.GradedSMul 𝒜 𝓜] in
 @[simp]
 lemma val_zero : (0 : HomogeneousLocalizedModule 𝒜 𝓜 x).val = 0 := by
-  show embedding 𝒜 𝓜 x (0 : NumDenSameDeg 𝒜 𝓜 x) = 0
+  change embedding 𝒜 𝓜 x (0 : NumDenSameDeg 𝒜 𝓜 x) = 0
   simp [embedding, LocalizedModule.zero_mk]
 
 @[simp]
@@ -240,7 +247,7 @@ lemma val_add (a b : HomogeneousLocalizedModule 𝒜 𝓜 x) :
     (a + b).val = a.val + b.val := by
   induction a, b using Quotient.inductionOn₂' with
   | _ a b =>
-    show embedding 𝒜 𝓜 x (a + b) = embedding 𝒜 𝓜 x a + embedding 𝒜 𝓜 x b
+    change embedding 𝒜 𝓜 x (a + b) = embedding 𝒜 𝓜 x a + embedding 𝒜 𝓜 x b
     simp only [embedding, num_add, den_add, LocalizedModule.mk_add_mk,
       Submonoid.smul_def, Submonoid.coe_mul]
     exact congrArg (LocalizedModule.mk _) (Subtype.ext rfl)
@@ -250,8 +257,9 @@ omit [AddCommMonoid ι] [DecidableEq ι] [GradedAlgebra 𝒜] [SetLike.GradedSMu
 lemma val_neg (a : HomogeneousLocalizedModule 𝒜 𝓜 x) : (-a).val = -a.val := by
   induction a using Quotient.inductionOn' with
   | _ a =>
-    show embedding 𝒜 𝓜 x (-a) = -(embedding 𝒜 𝓜 x a)
-    simp [embedding, LocalizedModule.mk_neg]
+    change embedding 𝒜 𝓜 x (-a) = -(embedding 𝒜 𝓜 x a)
+    simp only [embedding, num_neg, den_neg]
+    rw [LocalizedModule.mk_neg]
 
 instance : AddCommGroup (HomogeneousLocalizedModule 𝒜 𝓜 x) where
   add_assoc a b c := ext x (by simp [add_assoc])
@@ -321,7 +329,7 @@ variable (𝒜 𝓜)
 
 /-- Maps a representative `⟨d, m, s, hs⟩` of `M⁰_f` (where `f^n = s`) to
 `⟨d + n • e, g^n • m, s * g^n, _⟩`, a representative of `M⁰_x` (where `x = f * g`). -/
-private def awayMapNumDenSameDeg
+def awayMapNumDenSameDeg
     (p : NumDenSameDeg 𝒜 𝓜 (Submonoid.powers f)) :
     NumDenSameDeg 𝒜 𝓜 (Submonoid.powers x) :=
   let n := p.den_mem.choose
@@ -336,7 +344,7 @@ private def awayMapNumDenSameDeg
       change x ^ n = (p.den : A) * g ^ n
       rw [hx, mul_pow, h]⟩⟩
 
-private theorem awayMapNumDenSameDeg_respects
+theorem awayMapNumDenSameDeg_respects
     (p q : NumDenSameDeg 𝒜 𝓜 (Submonoid.powers f))
     (h : NumDenSameDeg.embedding 𝒜 𝓜 _ p = NumDenSameDeg.embedding 𝒜 𝓜 _ q) :
     NumDenSameDeg.embedding 𝒜 𝓜 _ (awayMapNumDenSameDeg 𝒜 𝓜 hg hx p) =

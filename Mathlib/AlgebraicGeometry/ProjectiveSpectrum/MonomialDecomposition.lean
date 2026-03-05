@@ -3,8 +3,10 @@ Copyright (c) 2026 Mathlib contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matthew Robert Ballard
 -/
-import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.CechCover
-import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.CechCohomology
+module
+
+public import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.CechCover
+public import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.CechCohomology
 
 /-!
 # Monomial decomposition of the structure sheaf algebraic complex
@@ -33,6 +35,10 @@ Combined with the acyclicity results from `RelativeSimplexComplex.lean`, this yi
 * [Stacks Project, Cohomology of projective space](https://stacks.math.columbia.edu/tag/01XS)
 -/
 
+@[expose] public section
+
+set_option backward.isDefEq.respectTransparency false
+
 noncomputable section
 
 open MvPolynomial CategoryTheory Finset
@@ -45,7 +51,7 @@ variable (n : ℕ) (R : Type u) [CommRing R]
 
 attribute [local instance] mvPolynomialGrading
 
-private abbrev 𝒜 (n : ℕ) (R : Type u) [CommRing R] :=
+abbrev 𝒜 (n : ℕ) (R : Type u) [CommRing R] :=
   MvPolynomial.homogeneousSubmodule (Fin (n + 1)) R
 
 /-! ### Laurent exponents and negative support -/
@@ -163,20 +169,20 @@ variable {ι' : Type*} [AddCommMonoid ι'] [DecidableEq ι']
 
 /-- Convert a ring `NumDenSameDeg` to a module `NumDenSameDeg` when the module
 grading equals the ring grading (`𝓜 = 𝒜`). The data is identical. -/
-private def ringToModuleND
+def ringToModuleND
     (p : HomogeneousLocalization.NumDenSameDeg 𝒜' (Submonoid.powers f)) :
     HomogeneousLocalizedModule.NumDenSameDeg 𝒜' 𝒜' (Submonoid.powers f) :=
   ⟨p.deg, p.num, p.den, p.den_mem⟩
 
 /-- Convert a module `NumDenSameDeg` back to a ring `NumDenSameDeg`. -/
-private def moduleToRingND
+def moduleToRingND
     (p : HomogeneousLocalizedModule.NumDenSameDeg 𝒜' 𝒜' (Submonoid.powers f)) :
     HomogeneousLocalization.NumDenSameDeg 𝒜' (Submonoid.powers f) :=
   ⟨p.deg, p.num, p.den, p.den_mem⟩
 
 /-- The localization equivalence relations agree: `Localization.mk a s = Localization.mk b t`
 iff `LocalizedModule.mk a s = LocalizedModule.mk b t`, when the module is the ring itself. -/
-private theorem localization_mk_eq_iff_localizedModule_mk_eq
+theorem localization_mk_eq_iff_localizedModule_mk_eq
     {a b : A} {s t : Submonoid.powers f} :
     Localization.mk a s = Localization.mk b t ↔
     LocalizedModule.mk (R := A) a s = LocalizedModule.mk b t := by
@@ -237,7 +243,7 @@ def numExp (a : LaurentExp n d) (S : Finset (Fin (n + 1)))
     (i : Fin (n + 1)) : ℕ :=
   if i ∈ S then (a.1 i + ↑(a.clearingPow S)).toNat else (a.1 i).toNat
 
-private theorem numExp_cast (a : LaurentExp n d) (S : Finset (Fin (n + 1)))
+theorem numExp_cast (a : LaurentExp n d) (S : Finset (Fin (n + 1)))
     (hS : a.negSupport ⊆ S) (i : Fin (n + 1)) :
     (a.numExp S i : ℤ) = a.1 i + if i ∈ S then ↑(a.clearingPow S) else 0 := by
   simp only [numExp]
@@ -782,7 +788,7 @@ theorem zeroExpCoeff_monomialElem_zero (S : Finset (Fin (n + 1))) :
     MvPolynomial.coeff_zero_one]
 
 /-- If `coordProdFinsupp S (clearingPow a S) = numFinsupp a S`, then `a = 0`. -/
-private theorem numFinsupp_eq_coordProdFinsupp_imp_zero {a : LaurentExp n}
+theorem numFinsupp_eq_coordProdFinsupp_imp_zero {a : LaurentExp n}
     {S : Finset (Fin (n + 1))} (hS : a.negSupport ⊆ S)
     (h : a.numFinsupp S = coordProdFinsupp S (a.clearingPow S)) : a = 0 := by
   refine Subtype.ext (funext fun i => show a.1 i = 0 from ?_)
@@ -817,7 +823,7 @@ attribute [local instance] mvPolynomialGrading
 
 /-- `zeroExpCoeff` commutes with addition. The proof reduces to the Localization
 addition formula `mk a s + mk b t = mk (t*a + s*b) (s*t)` and the shifting lemma. -/
-private theorem zeroExpCoeff_add (S : Finset (Fin (n + 1)))
+theorem zeroExpCoeff_add (S : Finset (Fin (n + 1)))
     (x y : HomogeneousLocalization.Away (𝒜 n R) (coordProd n R S)) :
     zeroExpCoeff S (x + y) = zeroExpCoeff S x + zeroExpCoeff S y := by
   -- Reduce to representatives via HomogeneousLocalization val
@@ -863,7 +869,7 @@ def zeroExpCoeffHom (S : Finset (Fin (n + 1))) :
     HomogeneousLocalization.Away (𝒜 n R) (coordProd n R S) →+ R where
   toFun := zeroExpCoeff S
   map_zero' := by
-    show zeroExpCoeff S 0 = 0
+    change zeroExpCoeff (R := R) S 0 = 0
     unfold zeroExpCoeff
     rw [HomogeneousLocalization.val_zero]
     -- 0 in Localization is mk 0 1
@@ -881,7 +887,7 @@ def zeroExpCoeffMod (S : Finset (Fin (n + 1))) :
 
 /-- `zeroExpCoeffMod S` on a representative `mk q` computes as a polynomial coefficient:
 it extracts `coeff (coordProdFinsupp S N) (q.num)` where `N = q.den_mem.choose`. -/
-private theorem zeroExpCoeffMod_mk (S : Finset (Fin (n + 1)))
+theorem zeroExpCoeffMod_mk (S : Finset (Fin (n + 1)))
     (q : HomogeneousLocalizedModule.NumDenSameDeg (𝒜 n R) (𝒜 n R)
       (Submonoid.powers (coordProd n R S))) :
     zeroExpCoeffMod S (HomogeneousLocalizedModule.mk q) =
@@ -1023,17 +1029,15 @@ theorem extraction_comm_δ (p : ℕ)
       HomogeneousLocalizedModule.Away (𝒜 n R) (𝒜 n R) (coordProd n R S.1)) :
     extractionHom (p + 1) (algebraicδ n R (𝒜 n R) p f) =
     _root_.relSimplexδHom (∅ : Finset (Fin (n + 1))) R p (extractionHom p f) := by
-  ext ⟨T, hT, _⟩
-  -- LHS: zeroExpCoeffMod T (∑_j (-1)^j • coordRestrict(f(face_j)))
-  -- RHS: ∑_j (-1)^j • zeroExpCoeffMod (face_j) (f(face_j))
+  funext ⟨T, hT, hT'⟩
   simp only [extractionHom, AddMonoidHom.coe_mk, ZeroHom.coe_mk,
-    algebraicδ, _root_.relSimplexδHom, _root_.relSimplexδ_apply,
-    dif_pos (Finset.empty_subset _)]
+    algebraicδ, _root_.relSimplexδHom]
+  rw [_root_.relSimplexδ_apply]
+  simp only [dif_pos (Finset.empty_subset _)]
   rw [map_sum]
-  congr 1; ext j
-  rw [map_zsmul]
-  congr 1
-  exact zeroExpCoeffMod_coordRestrict hT j (f (TopCat.eraseNth T hT j))
+  apply Finset.sum_congr rfl
+  intro j _
+  rw [map_zsmul, zeroExpCoeffMod_coordRestrict hT j (f (TopCat.eraseNth T hT j))]
 
 /-- The extraction chain map from the structure-sheaf algebraic complex to the
 relative simplex complex `K_∅`. -/
@@ -1041,16 +1045,16 @@ noncomputable def extractionChainMap :
     algebraicComplex n R (𝒜 n R) ⟶
     _root_.relSimplexComplex (∅ : Finset (Fin (n + 1))) R :=
   CochainComplex.ofHom
-    (fun p => AddCommGrp.of (∀ S : {S : Finset (Fin (n + 1)) // S.card = p + 1},
+    (fun p => AddCommGrpCat.of (∀ S : {S : Finset (Fin (n + 1)) // S.card = p + 1},
       HomogeneousLocalizedModule.Away (𝒜 n R) (𝒜 n R) (coordProd n R S.1)))
-    (fun p => AddCommGrp.ofHom (algebraicδ n R (𝒜 n R) p))
+    (fun p => AddCommGrpCat.ofHom (algebraicδ n R (𝒜 n R) p))
     (fun p => algebraicδ_comp_algebraicδ n R (𝒜 n R) p)
-    (fun p => AddCommGrp.of (_root_.relSimplexCochain (∅ : Finset (Fin (n + 1))) R p))
-    (fun p => AddCommGrp.ofHom (_root_.relSimplexδHom (∅ : Finset (Fin (n + 1))) R p))
-    (fun p => AddCommGrp.ext (_root_.relSimplexδ_comp_eq_zero
+    (fun p => AddCommGrpCat.of (_root_.relSimplexCochain (∅ : Finset (Fin (n + 1))) R p))
+    (fun p => AddCommGrpCat.ofHom (_root_.relSimplexδHom (∅ : Finset (Fin (n + 1))) R p))
+    (fun p => AddCommGrpCat.ext (_root_.relSimplexδ_comp_eq_zero
       (∅ : Finset (Fin (n + 1))) R p))
-    (fun p => AddCommGrp.ofHom (extractionHom p))
-    (fun p => AddCommGrp.ext (fun f => (extraction_comm_δ p f).symm))
+    (fun p => AddCommGrpCat.ofHom (extractionHom p))
+    (fun p => AddCommGrpCat.ext (fun f => (extraction_comm_δ p f).symm))
 
 end CohomologyConsequences
 

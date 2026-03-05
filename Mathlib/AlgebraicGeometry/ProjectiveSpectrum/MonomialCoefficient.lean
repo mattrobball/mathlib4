@@ -3,8 +3,10 @@ Copyright (c) 2026 Mathlib contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matthew Robert Ballard
 -/
-import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.MonomialDecomposition
-import Mathlib.Algebra.Module.GradedModule.Shift
+module
+
+public import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.MonomialDecomposition
+public import Mathlib.Algebra.Module.GradedModule.Shift
 
 /-!
 # Monomial coefficient extraction for graded module localizations
@@ -37,6 +39,10 @@ When `d = 0`, `GradedModule.shift 𝒜 0 = 𝒜` definitionally (since `shift` i
 * [Stacks Project, Cohomology of projective space](https://stacks.math.columbia.edu/tag/01XS)
 -/
 
+@[expose] public section
+
+set_option backward.isDefEq.respectTransparency false
+
 noncomputable section
 
 open MvPolynomial CategoryTheory CategoryTheory.Limits Finset
@@ -49,8 +55,6 @@ variable {n : ℕ} {R : Type u} [CommRing R]
 
 attribute [local instance] mvPolynomialGrading
 
-private abbrev 𝒜 (n : ℕ) (R : Type u) [CommRing R] :=
-  MvPolynomial.homogeneousSubmodule (Fin (n + 1)) R
 
 local instance : SetLike.GradedSMul (𝒜 n R) (𝒜 n R) :=
   SetLike.GradedMul.toGradedSMul _
@@ -137,7 +141,7 @@ variable {d : ℤ} {𝓜 : ℕ → Submodule R (MvPolynomial (Fin (n + 1)) R)}
 /-- The raw coefficient extraction function on `M × S` pairs, where
 `M = MvPolynomial` and `S = powers(coordProd)`. Used to define
 `monomialCoeff` via `LocalizedModule.liftOn`. -/
-private def monomialCoeffShiftFun (a : LaurentExp n d) (S : Finset (Fin (n + 1)))
+def monomialCoeffShiftFun (a : LaurentExp n d) (S : Finset (Fin (n + 1)))
     (ms : MvPolynomial (Fin (n + 1)) R ×
       ↥(Submonoid.powers (coordProd n R S))) :
     R :=
@@ -145,7 +149,7 @@ private def monomialCoeffShiftFun (a : LaurentExp n d) (S : Finset (Fin (n + 1))
     ((coordProd n R S) ^ (a.clearingPow S) * ms.1)
 
 /-- Well-definedness of coefficient extraction for the `LocalizedModule` relation. -/
-private theorem monomialCoeffShiftFun_wd (a : LaurentExp n d)
+theorem monomialCoeffShiftFun_wd (a : LaurentExp n d)
     (S : Finset (Fin (n + 1)))
     (p q : MvPolynomial (Fin (n + 1)) R ×
       ↥(Submonoid.powers (coordProd n R S)))
@@ -451,13 +455,13 @@ theorem monomialCoeff_coordRestrict (a : LaurentExp n d)
           coordProdFinsupp_apply_mem (hi_face_iff.mpr hiT)]
         have := a.numExp_erase_of_ne (TopCat.nthElem_mem T hT j) hj_nn hij
         change a.numExp face i = a.numExp T i at this
-        linarith
+        grind
       · rw [coordProdFinsupp_apply_notMem hiT,
           coordProdFinsupp_apply_notMem (fun h => hiT (hi_face_iff.mp h))]
         have : a.numExp face i = a.numExp T i := by
           simp only [LaurentExp.numExp, if_neg (fun h => hiT (hi_face_iff.mp h)),
             if_neg hiT]
-        linarith
+        grind
   -- Step 3: Polynomial identity
   have hpoly :
       (coordProd n R T) ^ cp * (coord n R j_elem) ^ N =
@@ -785,10 +789,12 @@ theorem component_comm_δ (a : LaurentExp n d) (p : ℕ)
     _root_.relSimplexδHom a.negSupport R p (componentHom a p f) := by
   ext ⟨T, hT, hfull⟩
   simp only [componentHom, AddMonoidHom.coe_mk, ZeroHom.coe_mk,
-    algebraicδ, _root_.relSimplexδHom, _root_.relSimplexδ_apply]
-  show (monomialCoeffHom a T) _ = _
+    algebraicδ, _root_.relSimplexδHom]
+  rw [_root_.relSimplexδ_apply]
+  change (monomialCoeffHom a T) _ = _
   rw [map_sum]
-  congr 1; ext j
+  apply Finset.sum_congr rfl
+  intro j _
   rw [map_zsmul]
   simp only [monomialCoeffHom, AddMonoidHom.coe_mk, ZeroHom.coe_mk]
   split_ifs with hface

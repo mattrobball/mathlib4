@@ -3,7 +3,9 @@ Copyright (c) 2026 Mathlib contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matthew Robert Ballard
 -/
-import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.MonomialCoefficient
+module
+
+public import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.MonomialCoefficient
 
 /-!
 # Cohomology of the twisted structure sheaf on projective space
@@ -33,6 +35,10 @@ vanish via `K_T` acyclicity.
 * [Stacks Project, Cohomology of projective space](https://stacks.math.columbia.edu/tag/01XS)
 -/
 
+@[expose] public section
+
+set_option backward.isDefEq.respectTransparency false
+
 noncomputable section
 
 open MvPolynomial CategoryTheory CategoryTheory.Limits Finset
@@ -45,8 +51,6 @@ variable {n : ℕ} {R : Type u} [CommRing R]
 
 attribute [local instance] mvPolynomialGrading
 
-private abbrev 𝒜 (n : ℕ) (R : Type u) [CommRing R] :=
-  MvPolynomial.homogeneousSubmodule (Fin (n + 1)) R
 
 local instance : SetLike.GradedSMul (𝒜 n R) (𝒜 n R) :=
   SetLike.GradedMul.toGradedSMul _
@@ -62,7 +66,7 @@ set_option maxHeartbeats 400000 in
 - `orthog` gives orthogonality: `monomialCoeff a' (smulME r a S hS) = if a'=a then r else 0`
 - `det_zero` gives injectivity: all coefficients zero implies element is zero
 - `hne_univ` ensures negSupport is always a proper subset of `univ`. -/
-private theorem algebraicComplex_acyclic_pos_aux
+theorem algebraicComplex_acyclic_pos_aux
     {𝓜 : ℕ → Submodule R (MvPolynomial (Fin (n + 1)) R)}
     [SetLike.GradedSMul (𝒜 n R) 𝓜] {d : ℤ} (p : ℕ)
     (smulME : R → (a : LaurentExp n d) → (S : Finset (Fin (n + 1))) →
@@ -79,7 +83,7 @@ private theorem algebraicComplex_acyclic_pos_aux
     IsZero ((algebraicComplex n R 𝓜).homology (p + 1)) := by
   set A := algebraicComplex n R 𝓜
   rw [← HomologicalComplex.exactAt_iff_isZero_homology]
-  have hAd : ∀ j, A.d j (j + 1) = AddCommGrp.ofHom (algebraicδ n R 𝓜 j) :=
+  have hAd : ∀ j, A.d j (j + 1) = AddCommGrpCat.ofHom (algebraicδ n R 𝓜 j) :=
     fun j => by simp [A, algebraicComplex]
   rw [HomologicalComplex.exactAt_iff' A p (p + 1) (p + 2) (by simp) (by simp),
     ShortComplex.ab_exact_iff]
@@ -244,7 +248,7 @@ theorem algebraicComplex_intShift_H0_zero (d : ℤ) (hd : d < 0) (hn : 0 < n) :
   rw [HomologicalComplex.exactAt_iff' A ((ComplexShape.up ℕ).prev 0) 0 1
     rfl ((ComplexShape.up ℕ).next_eq' rfl), ShortComplex.ab_exact_iff]
   intro f hf
-  have hAd : ∀ j, A.d j (j + 1) = AddCommGrp.ofHom (algebraicδ n R 𝓜 j) :=
+  have hAd : ∀ j, A.d j (j + 1) = AddCommGrpCat.ofHom (algebraicδ n R 𝓜 j) :=
     fun j => by simp [A, algebraicComplex]
   have hfδ : algebraicδ n R 𝓜 0 f = 0 := by
     have hg : (A.sc' ((ComplexShape.up ℕ).prev 0) 0 1).g = A.d 0 1 := rfl
@@ -279,13 +283,13 @@ theorem algebraicComplex_intShift_H0_zero (d : ℤ) (hd : d < 0) (hn : 0 < n) :
   have hf_zero : (K.sc 0).f = 0 :=
     K.shape _ _ (fun h => by simp [ComplexShape.up_Rel] at h)
   have hrange_bot : (K.sc 0).f.hom.range = ⊥ := by
-    have : (K.sc 0).f.hom = 0 := congr_arg AddCommGrp.Hom.hom hf_zero
+    have : (K.sc 0).f.hom = 0 := congr_arg AddCommGrpCat.Hom.hom hf_zero
     rw [this]; exact AddMonoidHom.range_zero
   have hg_mem : componentHom a 0 f ∈ (K.sc 0).g.hom.ker := by
     rw [AddMonoidHom.mem_ker]
     show K.d 0 ((ComplexShape.up ℕ).next 0) (componentHom a 0 f) = 0
     rw [(ComplexShape.up ℕ).next_eq' (show (0 : ℕ) + 1 = 1 from rfl),
-      show K.d 0 1 = AddCommGrp.ofHom
+      show K.d 0 1 = AddCommGrpCat.ofHom
         (_root_.relSimplexδHom a.negSupport R 0) from
         CochainComplex.of_d _ _ _ 0]
     exact hcomp_cocycle a
@@ -390,7 +394,7 @@ theorem polyEmbedding_injective (f : ↥((𝒜 n R) d_nat))
 /-! #### Helper lemmas for coefficient extraction from embedded polynomials -/
 
 /-- For a Laurent exponent with empty negSupport, the clearing power is zero. -/
-private theorem clearingPow_eq_zero_of_negSupport_empty (a : LaurentExp n (↑d_nat))
+theorem clearingPow_eq_zero_of_negSupport_empty (a : LaurentExp n (↑d_nat))
     (h : a.negSupport = ∅) (S : Finset (Fin (n + 1))) :
     a.clearingPow S = 0 := by
   simp only [LaurentExp.clearingPow]
@@ -400,7 +404,7 @@ private theorem clearingPow_eq_zero_of_negSupport_empty (a : LaurentExp n (↑d_
   simp [Int.toNat_eq_zero.mpr (neg_nonpos_of_nonneg hi)]
 
 /-- For a Laurent exponent with empty negSupport, `numFinsupp` is independent of `S`. -/
-private theorem numFinsupp_eq_of_negSupport_empty (a : LaurentExp n (↑d_nat))
+theorem numFinsupp_eq_of_negSupport_empty (a : LaurentExp n (↑d_nat))
     (h : a.negSupport = ∅) (S : Finset (Fin (n + 1))) :
     a.numFinsupp S = a.numFinsupp ∅ := by
   ext i
@@ -410,13 +414,11 @@ private theorem numFinsupp_eq_of_negSupport_empty (a : LaurentExp n (↑d_nat))
 
 
 /-- `numFinsupp` for a Laurent exponent with empty negSupport has degree `d_nat`. -/
-private theorem numFinsupp_degree_of_negSupport_empty (a : LaurentExp n (↑d_nat))
+theorem numFinsupp_degree_of_negSupport_empty (a : LaurentExp n (↑d_nat))
     (h : a.negSupport = ∅) :
     (a.numFinsupp ∅).degree = d_nat := by
   have hnn := a.negSupport_empty_iff_nonneg.mp h
-  simp only [Finsupp.degree]
-  rw [Finset.sum_subset (Finset.subset_univ _)
-    (fun i _ hi => Finsupp.notMem_support_iff.mp hi)]
+  rw [Finsupp.degree_eq_sum]
   simp only [LaurentExp.numFinsupp_apply, LaurentExp.numExp, Finset.notMem_empty,
     ↓reduceIte]
   exact_mod_cast show (↑(∑ i : Fin (n + 1), (a.1 i).toNat) : ℤ) = (↑d_nat : ℤ) from by
@@ -425,7 +427,7 @@ private theorem numFinsupp_degree_of_negSupport_empty (a : LaurentExp n (↑d_na
 
 /-- The coefficient extraction of an embedded polynomial at a Laurent exponent with
 empty negSupport returns the corresponding polynomial coefficient. -/
-private theorem monomialCoeffShift_polyElemMod_of_empty
+theorem monomialCoeffShift_polyElemMod_of_empty
     (a : LaurentExp n (↑d_nat)) (h : a.negSupport = ∅)
     (S : Finset (Fin (n + 1))) (g : ↥((𝒜 n R) d_nat)) :
     monomialCoeff a S (polyElemModHom d_nat S g) =
@@ -439,7 +441,7 @@ private theorem monomialCoeffShift_polyElemMod_of_empty
 /-- The coefficient extraction of an embedded polynomial at a Laurent exponent with
 nonempty negSupport returns zero: polynomial elements have no negative-exponent
 components. -/
-private theorem monomialCoeffShift_polyElemMod_of_nonempty
+theorem monomialCoeffShift_polyElemMod_of_nonempty
     (a : LaurentExp n (↑d_nat)) (h : a.negSupport.Nonempty)
     (S : Finset (Fin (n + 1))) (hS : a.negSupport ⊆ S)
     (g : ↥((𝒜 n R) d_nat)) :
@@ -559,7 +561,8 @@ theorem polyEmbedding_surj_cocycle (hd : 0 ≤ (d_nat : ℤ))
         exact hS'.trans hS₀'.symm
       ext ⟨T, ⟨hT, _⟩⟩
       simp only [Pi.zero_apply, _root_.relSimplexδHom, AddMonoidHom.coe_mk,
-        ZeroHom.coe_mk, _root_.relSimplexδ_apply, f₀]
+        ZeroHom.coe_mk, f₀]
+      rw [_root_.relSimplexδ_apply]
       -- Apply monomialCoeffHom a T to the cocycle condition algebraicδ f = 0
       have hfT := congr_fun hf ⟨T, hT⟩
       simp only [algebraicδ, AddMonoidHom.coe_mk, ZeroHom.coe_mk, Pi.zero_apply] at hfT
@@ -595,13 +598,13 @@ theorem polyEmbedding_surj_cocycle (hd : 0 ≤ (d_nat : ℤ))
     have hf_zero : (K.sc 0).f = 0 :=
       K.shape _ _ (fun h => by simp [ComplexShape.up_Rel] at h)
     have hrange_bot : (K.sc 0).f.hom.range = ⊥ := by
-      have : (K.sc 0).f.hom = 0 := congr_arg AddCommGrp.Hom.hom hf_zero
+      have : (K.sc 0).f.hom = 0 := congr_arg AddCommGrpCat.Hom.hom hf_zero
       rw [this]; exact AddMonoidHom.range_zero
     have hg_mem' : componentHom a 0 f ∈ (K.sc 0).g.hom.ker := by
       rw [AddMonoidHom.mem_ker]
       show K.d 0 ((ComplexShape.up ℕ).next 0) (componentHom a 0 f) = 0
       rw [(ComplexShape.up ℕ).next_eq' (show (0 : ℕ) + 1 = 1 from rfl),
-        show K.d 0 1 = AddCommGrp.ofHom
+        show K.d 0 1 = AddCommGrpCat.ofHom
           (_root_.relSimplexδHom a.negSupport R 0) from
           CochainComplex.of_d _ _ _ 0]
       exact hcomp_cocycle
@@ -613,7 +616,7 @@ the degree-zero cohomology of the algebraic Čech complex for the `d`-th twist
 on projective space is isomorphic to the degree-`d` homogeneous polynomials. -/
 noncomputable def algebraicComplex_shift_H0_iso (hd : 0 ≤ (d_nat : ℤ)) :
     (algebraicComplex n R (GradedModule.shift (𝒜 n R) d_nat)).homology 0 ≅
-    AddCommGrp.of ↥((𝒜 n R) d_nat) := by
+    AddCommGrpCat.of ↥((𝒜 n R) d_nat) := by
   set 𝓜 := GradedModule.shift (𝒜 n R) d_nat
   set A := algebraicComplex n R 𝓜
   -- Step 1: Unwrap homology via short complex
@@ -629,7 +632,7 @@ noncomputable def algebraicComplex_shift_H0_iso (hd : 0 ≤ (d_nat : ℤ)) :
   -- SA.g.hom = algebraicδ 0
   have hg_hom : SA.g.hom = algebraicδ n R 𝓜 0 := by
     show (A.d 0 1).hom = _
-    have h : A.d 0 1 = AddCommGrp.ofHom (algebraicδ n R 𝓜 0) :=
+    have h : A.d 0 1 = AddCommGrpCat.ofHom (algebraicδ n R 𝓜 0) :=
       CochainComplex.of_d _ _ _ 0
     rw [h]; rfl
   -- Step 3: Build (ker g / range abToCycles) ≃+ 𝒜_d
@@ -676,28 +679,26 @@ For `d ≤ -(n+1)`, set `m = (-d - (n+1)).toNat`. The all-negative Laurent expon
 -/
 
 /-- Map an all-negative Laurent exponent to a polynomial `Finsupp`: `aᵢ ↦ (-aᵢ - 1)`. -/
-private def dualFinsupp (d : ℤ) (a : LaurentExp n d) (_h : a.negSupport = Finset.univ) :
+def dualFinsupp (d : ℤ) (a : LaurentExp n d) (_h : a.negSupport = Finset.univ) :
     Fin (n + 1) →₀ ℕ :=
   Finsupp.equivFunOnFinite.invFun (fun i => (-a.1 i - 1).toNat)
 
-private theorem dualFinsupp_apply (d : ℤ) (a : LaurentExp n d)
+theorem dualFinsupp_apply (d : ℤ) (a : LaurentExp n d)
     (h : a.negSupport = Finset.univ) (i : Fin (n + 1)) :
     dualFinsupp d a h i = (-a.1 i - 1).toNat := by
   simp [dualFinsupp]
 
-private theorem dualFinsupp_apply_int (d : ℤ) (a : LaurentExp n d)
+theorem dualFinsupp_apply_int (d : ℤ) (a : LaurentExp n d)
     (h : a.negSupport = Finset.univ) (i : Fin (n + 1)) :
     (dualFinsupp d a h i : ℤ) = -a.1 i - 1 := by
   rw [dualFinsupp_apply]
   exact Int.toNat_of_nonneg (by
     have := (a.mem_negSupport_iff i).mp (h ▸ Finset.mem_univ i); omega)
 
-private theorem dualFinsupp_degree (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
+theorem dualFinsupp_degree (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
     (a : LaurentExp n d) (h : a.negSupport = Finset.univ) :
     (dualFinsupp d a h).degree = (-d - ↑(n + 1)).toNat := by
-  simp only [Finsupp.degree]
-  rw [Finset.sum_subset (Finset.subset_univ _)
-    (fun i _ hi => Finsupp.notMem_support_iff.mp hi)]
+  rw [Finsupp.degree_eq_sum]
   suffices h_int : (∑ i, (dualFinsupp d a h i : ℤ)) =
       ((-d - ↑(n + 1)).toNat : ℤ) by exact_mod_cast h_int
   simp_rw [dualFinsupp_apply_int d a h]
@@ -708,14 +709,12 @@ private theorem dualFinsupp_degree (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
 
 /-- Map a polynomial `Finsupp` of degree `m` to an all-negative Laurent exponent:
 `bᵢ ↦ -(bᵢ : ℤ) - 1`. -/
-private def inverseDualExp (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
+def inverseDualExp (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
     (b : Fin (n + 1) →₀ ℕ) (hb : b.degree = (-d - ↑(n + 1)).toNat) :
     LaurentExp n d :=
   ⟨fun i => -(b i : ℤ) - 1, by
-    simp only [Finsupp.degree] at hb
-    have hb' : ∑ i : Fin (n + 1), b i = (-d - ↑(n + 1)).toNat := by
-      rwa [Finset.sum_subset (Finset.subset_univ _)
-        (fun i _ hi => Finsupp.notMem_support_iff.mp hi)] at hb
+    rw [Finsupp.degree_eq_sum] at hb
+    have hb' : ∑ i : Fin (n + 1), b i = (-d - ↑(n + 1)).toNat := hb
     have hb_int : (∑ i, (b i : ℤ)) = -d - ↑(n + 1) := by
       zify at hb'; rwa [Int.toNat_of_nonneg (by omega)] at hb'
     simp_rw [show ∀ i : Fin (n + 1), -(b i : ℤ) - 1 = -(b i : ℤ) + (-1) from
@@ -723,29 +722,29 @@ private def inverseDualExp (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
     rw [Finset.sum_add_distrib, Finset.sum_neg_distrib]
     simp [hb_int, Fintype.card_fin]; ring⟩
 
-private theorem inverseDualExp_apply (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
+theorem inverseDualExp_apply (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
     (b : Fin (n + 1) →₀ ℕ) (hb : b.degree = (-d - ↑(n + 1)).toNat)
     (i : Fin (n + 1)) :
     (inverseDualExp d hd b hb).1 i = -(b i : ℤ) - 1 := rfl
 
-private theorem inverseDualExp_negSupport (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
+theorem inverseDualExp_negSupport (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
     (b : Fin (n + 1) →₀ ℕ) (hb : b.degree = (-d - ↑(n + 1)).toNat) :
     (inverseDualExp d hd b hb).negSupport = Finset.univ := by
   ext i; simp [LaurentExp.mem_negSupport_iff, inverseDualExp_apply]; omega
 
-private theorem dualFinsupp_inverseDualExp (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
+theorem dualFinsupp_inverseDualExp (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
     (b : Fin (n + 1) →₀ ℕ) (hb : b.degree = (-d - ↑(n + 1)).toNat) :
     dualFinsupp d (inverseDualExp d hd b hb)
       (inverseDualExp_negSupport d hd b hb) = b := by
   ext i; rw [dualFinsupp_apply, inverseDualExp_apply]; omega
 
-private theorem inverseDualExp_dualFinsupp (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
+theorem inverseDualExp_dualFinsupp (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
     (a : LaurentExp n d) (h : a.negSupport = Finset.univ) :
     inverseDualExp d hd (dualFinsupp d a h) (dualFinsupp_degree d hd a h) = a := by
   refine Subtype.ext (funext fun i => ?_)
   rw [inverseDualExp_apply, dualFinsupp_apply_int]; ring
 
-private theorem dualFinsupp_injective (d : ℤ) (_hd : d ≤ -(↑(n + 1) : ℤ))
+theorem dualFinsupp_injective (d : ℤ) (_hd : d ≤ -(↑(n + 1) : ℤ))
     (a a' : LaurentExp n d)
     (h : a.negSupport = Finset.univ) (h' : a'.negSupport = Finset.univ)
     (heq : dualFinsupp d a h = dualFinsupp d a' h') : a = a' := by
@@ -758,7 +757,7 @@ private theorem dualFinsupp_injective (d : ℤ) (_hd : d ≤ -(↑(n + 1) : ℤ)
 
 /-! #### Helper lemmas for cast -/
 
-private lemma algebraicComplex_XIsoOfEq_eval
+lemma algebraicComplex_XIsoOfEq_eval
     {𝓜 : ℕ → Submodule R (MvPolynomial (Fin (n + 1)) R)} [SetLike.GradedSMul (𝒜 n R) 𝓜]
     {p k : ℕ} (hk : p + 1 = k)
     (x : ∀ S : {S : Finset (Fin (n + 1)) // S.card = p + 1 + 1},
@@ -767,7 +766,7 @@ private lemma algebraicComplex_XIsoOfEq_eval
     ((algebraicComplex n R 𝓜).XIsoOfEq hk).hom.hom x ⟨S, hS⟩ = x ⟨S, hS'⟩ := by
   subst hk; rfl
 
-private lemma relSimplexCochain_cast_eval (T : Finset (Fin (n + 1)))
+lemma relSimplexCochain_cast_eval (T : Finset (Fin (n + 1)))
     {p k : ℕ} (hk : p + 1 = k)
     (f : _root_.relSimplexCochain T R k)
     (S : Finset (Fin (n + 1))) (hS : S.card = p + 1 + 1 ∧ T ⊆ S)
@@ -782,7 +781,7 @@ private lemma relSimplexCochain_cast_eval (T : Finset (Fin (n + 1)))
 for each all-negative Laurent exponent `a` (with `negSupport = univ`), collect its
 monomial coefficient as a term `monomial(dualFinsupp(a), coeff_a(x))`.
 The result is a homogeneous polynomial of degree `m = (-d-(n+1)).toNat`. -/
-private noncomputable def allNegPoly (d : ℤ) (_hd : d ≤ -(↑(n + 1) : ℤ))
+noncomputable def allNegPoly (d : ℤ) (_hd : d ≤ -(↑(n + 1) : ℤ))
     (x : HomogeneousLocalizedModule.Away (𝒜 n R)
       (GradedModule.intShift (𝒜 n R) d) (coordProd n R Finset.univ)) :
     MvPolynomial (Fin (n + 1)) R :=
@@ -792,7 +791,7 @@ private noncomputable def allNegPoly (d : ℤ) (_hd : d ≤ -(↑(n + 1) : ℤ))
         (monomialCoeff a Finset.univ x)
     else 0
 
-private theorem allNegPoly_mem (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
+theorem allNegPoly_mem (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ))
     (x : HomogeneousLocalizedModule.Away (𝒜 n R)
       (GradedModule.intShift (𝒜 n R) d) (coordProd n R Finset.univ)) :
     allNegPoly d hd x ∈ (𝒜 n R) ((-d - ↑(n + 1)).toNat) := by
@@ -810,7 +809,7 @@ twisted structure sheaf on projective `n`-space is the graded component of degre
 noncomputable def algebraicComplex_intShift_Hn_iso_general
     (d : ℤ) (hd : d ≤ -(↑(n + 1) : ℤ)) :
     (algebraicComplex n R (GradedModule.intShift (𝒜 n R) d)).homology n ≅
-    AddCommGrp.of ↥((𝒜 n R) ((-d - ↑(n + 1)).toNat)) := by
+    AddCommGrpCat.of ↥((𝒜 n R) ((-d - ↑(n + 1)).toNat)) := by
   set m := (-d - ↑(n + 1)).toNat with hm_def
   set 𝓜 := GradedModule.intShift (𝒜 n R) d
   set A := algebraicComplex n R 𝓜
@@ -826,12 +825,12 @@ noncomputable def algebraicComplex_intShift_Hn_iso_general
     show IsZero (A.X (n + 1))
     have hempty : IsEmpty {S : Finset (Fin (n + 1)) // S.card = n + 1 + 1} :=
       ⟨fun ⟨S, hS⟩ => absurd (Finset.card_le_univ S) (by rw [Fintype.card_fin]; omega)⟩
-    exact @AddCommGrp.isZero_of_subsingleton _
+    exact @AddCommGrpCat.isZero_of_subsingleton _
       ⟨fun f g => funext fun x => hempty.elim x⟩
-  have hg_hom : SA.g.hom = 0 := congr_arg AddCommGrp.Hom.hom hg
+  have hg_hom : SA.g.hom = 0 := congr_arg AddCommGrpCat.Hom.hom hg
   have hker_mem : ∀ f, f ∈ SA.g.hom.ker :=
     fun f => by rw [AddMonoidHom.mem_ker, hg_hom, AddMonoidHom.zero_apply]
-  have hAd : ∀ j, A.d j (j + 1) = AddCommGrp.ofHom (algebraicδ n R 𝓜 j) :=
+  have hAd : ∀ j, A.d j (j + 1) = AddCommGrpCat.ofHom (algebraicδ n R 𝓜 j) :=
     fun j => by simp [A, algebraicComplex]
   -- All Laurent exponents have nonempty negSupport (d < 0)
   have hnonempty : ∀ a : LaurentExp n d, a.negSupport.Nonempty :=
@@ -891,8 +890,10 @@ noncomputable def algebraicComplex_intShift_Hn_iso_general
   -- Helper: convert weight-1 homogeneity to Finsupp.degree
   have hdeg_of_coeff : ∀ (q : MvPolynomial (Fin (n + 1)) R),
       q.IsHomogeneous m → ∀ (b : Fin (n + 1) →₀ ℕ),
-      MvPolynomial.coeff b q ≠ 0 → b.degree = m := fun q hq b hne =>
-    (congr_fun Finsupp.degree_eq_weight_one b).trans (hq hne)
+      MvPolynomial.coeff b q ≠ 0 → b.degree = m := fun q hq b hne => by
+    rw [show b.degree = Finsupp.weight (fun _ => (1 : ℕ)) b from
+      DFunLike.congr_fun Finsupp.degree_eq_weight_one b]
+    exact hq hne
   -- Step 4: Extraction is surjective
   have h_surj : Function.Surjective ext_map := by
     intro ⟨p, hp⟩
@@ -1187,17 +1188,17 @@ noncomputable def algebraicComplex_intShift_Hn_iso_general
           have hsaf : SA.f.hom =
               ((A.XIsoOfEq hprev).hom ≫ A.d k (k + 1)).hom := by
             show (A.d ((ComplexShape.up ℕ).prev (k + 1)) (k + 1)).hom = _
-            exact congr_arg AddCommGrp.Hom.hom
+            exact congr_arg AddCommGrpCat.Hom.hom
               (HomologicalComplex.XIsoOfEq_hom_comp_d A hprev (k + 1)).symm
           rw [hsaf]
           change (A.d k (k + 1)).hom
             ((A.XIsoOfEq hprev).hom.hom ((A.XIsoOfEq hprev).inv.hom G)) = _
           congr 1
           exact DFunLike.congr_fun
-            (congr_arg AddCommGrp.Hom.hom
+            (congr_arg AddCommGrpCat.Hom.hom
               (Iso.inv_hom_id (A.XIsoOfEq hprev))) G
         rw [hSAf_G, show (A.d k (k + 1)).hom = algebraicδ (k + 1) R 𝓜 k from
-          congr_arg AddCommGrp.Hom.hom (hAd k)]
+          congr_arg AddCommGrpCat.Hom.hom (hAd k)]
         exact hδG
     · -- range ⊆ ker: f ∈ range(abToCycles) implies ext_map(f) = 0
       intro hrange
@@ -1221,7 +1222,7 @@ noncomputable def algebraicComplex_intShift_Hn_iso_general
           have hfz : SA.f.hom g_prev ⟨_, huniv⟩ = 0 := by
             have : SA.f = 0 :=
               A.shape _ _ (fun h => by simp [ComplexShape.up_Rel] at h)
-            rw [show SA.f.hom = 0 from congr_arg AddCommGrp.Hom.hom this,
+            rw [show SA.f.hom = 0 from congr_arg AddCommGrpCat.Hom.hom this,
               AddMonoidHom.zero_apply, Pi.zero_apply]
           rw [hfz]; exact (monomialCoeffHom (𝓜 := 𝓜) a Finset.univ).map_zero
         · obtain ⟨k', rfl⟩ : ∃ k', n = k' + 1 := ⟨n - 1, by omega⟩
@@ -1231,7 +1232,7 @@ noncomputable def algebraicComplex_intShift_Hn_iso_general
           set g_cast := (A.XIsoOfEq hprev).hom.hom g_prev
           have hSAf_eval : SA.f.hom g_prev ⟨_, huniv⟩ =
               algebraicδ (k' + 1) R 𝓜 k' g_cast ⟨Finset.univ, huniv⟩ := by
-            have h1 := DFunLike.congr_fun (congr_arg AddCommGrp.Hom.hom
+            have h1 := DFunLike.congr_fun (congr_arg AddCommGrpCat.Hom.hom
               (HomologicalComplex.XIsoOfEq_hom_comp_d A hprev (k' + 1)).symm)
               g_prev
             rw [show SA.f.hom g_prev ⟨_, huniv⟩ =
@@ -1239,7 +1240,7 @@ noncomputable def algebraicComplex_intShift_Hn_iso_general
                 ⟨Finset.univ, huniv⟩ from congr_fun h1 ⟨_, huniv⟩]
             change (A.d k' (k' + 1)).hom g_cast ⟨Finset.univ, huniv⟩ = _
             exact congr_fun (DFunLike.congr_fun
-              (congr_arg AddCommGrp.Hom.hom (hAd k')) g_cast) ⟨_, huniv⟩
+              (congr_arg AddCommGrpCat.Hom.hom (hAd k')) g_cast) ⟨_, huniv⟩
           rw [hSAf_eval]
           show componentHom a (k' + 1) (algebraicδ (k' + 1) R 𝓜 k' g_cast)
             ⟨Finset.univ, huniv, by rw [ha]⟩ = 0
@@ -1260,7 +1261,7 @@ noncomputable def algebraicComplex_intShift_Hn_iso_general
 giving `m = 0` and `𝒜₀ ≅ R` via the constant embedding. -/
 noncomputable def algebraicComplex_intShift_Hn_iso :
     (algebraicComplex n R (GradedModule.intShift (𝒜 n R)
-      (-(↑(n + 1) : ℤ)))).homology n ≅ AddCommGrp.of R := by
+      (-(↑(n + 1) : ℤ)))).homology n ≅ AddCommGrpCat.of R := by
   have hm : (-(-(↑(n + 1) : ℤ)) - ↑(n + 1)).toNat = 0 := by omega
   exact algebraicComplex_intShift_Hn_iso_general (-(↑(n + 1) : ℤ)) le_rfl ≪≫
     (hm ▸ ({ toFun := fun ⟨p, hp⟩ => MvPolynomial.constantCoeff p

@@ -3,8 +3,10 @@ Copyright (c) 2026 Mathlib contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matthew Robert Ballard
 -/
-import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.GradedTilde
-import Mathlib.Algebra.Module.GradedModule.Shift
+module
+
+public import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.GradedTilde
+public import Mathlib.Algebra.Module.GradedModule.Shift
 
 /-!
 # The twisting sheaf `M̃(d)` on `Proj(A)`
@@ -27,6 +29,10 @@ of the localization `A_f`.
 * [Jean-Pierre Serre, *Faisceaux algébriques cohérents*][Ser55]
 -/
 
+@[expose] public section
+
+set_option backward.isDefEq.respectTransparency false
+
 noncomputable section
 
 namespace AlgebraicGeometry
@@ -44,7 +50,7 @@ namespace GradedModule
 
 /-- The twisted tilde sheaf `M̃(d)` on `Proj(A)`: the graded tilde of the `d`-shifted
 module `M(d)`, where `M(d)ₙ = Mₙ₊ₐ`. -/
-def twistingSheaf (d : ℕ) : Sheaf AddCommGrp (ProjectiveSpectrum.top 𝒜) :=
+def twistingSheaf (d : ℕ) : Sheaf AddCommGrpCat (ProjectiveSpectrum.top 𝒜) :=
   tilde 𝒜 (GradedModule.shift 𝓜 d)
 
 end GradedModule

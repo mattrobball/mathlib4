@@ -3,15 +3,17 @@ Copyright (c) 2025 Matt Diamond. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matt Diamond
 -/
-import Mathlib.Topology.Sheaves.CechCochainComplex
-import Mathlib.Algebra.Homology.Homotopy
-import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
-import Mathlib.Algebra.Homology.ShortComplex.Ab
-import Mathlib.Order.Interval.Finset.Fin
-import Mathlib.Algebra.Category.Grp.Abelian
-import Mathlib.Algebra.Category.Grp.Zero
-import Mathlib.Algebra.Homology.HomologicalComplexAbelian
-import Mathlib.Algebra.Homology.HomologySequence
+module
+
+public import Mathlib.Topology.Sheaves.CechCochainComplex
+public import Mathlib.Algebra.Homology.Homotopy
+public import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
+public import Mathlib.Algebra.Homology.ShortComplex.Ab
+public import Mathlib.Order.Interval.Finset.Fin
+public import Mathlib.Algebra.Category.Grp.Abelian
+public import Mathlib.Algebra.Category.Grp.Zero
+public import Mathlib.Algebra.Homology.HomologicalComplexAbelian
+public import Mathlib.Algebra.Homology.HomologySequence
 
 /-!
 # Relative Simplex Cochain Complex
@@ -44,6 +46,10 @@ computation of Čech cohomology for O(d) on projective space (Stacks 01XS).
 
 * [Stacks Project, Tag 01XS](https://stacks.math.columbia.edu/tag/01XS)
 -/
+
+@[expose] public section
+
+set_option backward.isDefEq.respectTransparency false
 
 open Finset TopCat CategoryTheory CategoryTheory.Limits
 
@@ -105,7 +111,7 @@ def relSimplexδHom (T : Finset (Fin (n + 1))) (R : Type*) [AddCommGroup R] (p :
 /-! ### d² = 0 -/
 
 /-- The double-erased set is a subset of the single-erased set. -/
-private theorem eraseNth_eraseNth_subset {W : Finset (Fin (n + 1))} {p : ℕ}
+theorem eraseNth_eraseNth_subset {W : Finset (Fin (n + 1))} {p : ℕ}
     (hW : W.card = p + 3) (j : Fin (p + 3)) (k : Fin (p + 2)) :
     (eraseNth (eraseNth W hW j).1 (eraseNth W hW j).2 k).1 ⊆ (eraseNth W hW j).1 := by
   simp only [eraseNth]; exact erase_subset _ _
@@ -117,7 +123,7 @@ theorem relSimplexδ_comp_eq_zero (T : Finset (Fin (n + 1))) (R : Type*) [AddCom
   funext ⟨W, hW, hT_W⟩
   simp only [Pi.zero_apply]
   -- Unfold relSimplexδ and simplify; no match issues since def avoids pattern matching
-  show ∑ j : Fin (p + 3),
+  change ∑ j : Fin (p + 3),
     (if h : T ⊆ (eraseNth W hW j).1
     then (-1 : ℤ) ^ j.val •
       ∑ k : Fin (p + 2),
@@ -187,11 +193,11 @@ theorem relSimplexδ_comp_eq_zero (T : Finset (Fin (n + 1))) (R : Type*) [AddCom
 /-- The relative simplex cochain complex. In degree `p`, the cochains are functions from
 `(p + 1)`-element subsets of `Fin (n + 1)` containing `T` to `R`. -/
 def relSimplexComplex (T : Finset (Fin (n + 1))) (R : Type*) [AddCommGroup R] :
-    CochainComplex AddCommGrp ℕ :=
+    CochainComplex AddCommGrpCat ℕ :=
   CochainComplex.of
-    (fun p => AddCommGrp.of (relSimplexCochain T R p))
-    (fun p => AddCommGrp.ofHom (relSimplexδHom T R p))
-    (fun p => AddCommGrp.ext (relSimplexδ_comp_eq_zero T R p))
+    (fun p => AddCommGrpCat.of (relSimplexCochain T R p))
+    (fun p => AddCommGrpCat.ofHom (relSimplexδHom T R p))
+    (fun p => AddCommGrpCat.ext (relSimplexδ_comp_eq_zero T R p))
 
 /-! ### Insertion infrastructure -/
 
@@ -340,18 +346,18 @@ def relSimplexHomotopyHom (T : Finset (Fin (n + 1))) (v : Fin (n + 1)) (hv : v �
 /-! ### Helper lemmas for the homotopy equation -/
 
 /-- `v` is not in `eraseNth S j` when `v ∉ S`. -/
-private theorem v_not_mem_eraseNth_of_not_mem (S : Finset (Fin (n + 1)))
+theorem v_not_mem_eraseNth_of_not_mem (S : Finset (Fin (n + 1)))
     (hS : S.card = p + 2) (v : Fin (n + 1)) (hv : v ∉ S) (j : Fin (p + 2)) :
     v ∉ (eraseNth S hS j).1 :=
   fun h => hv (erase_subset _ _ h)
 
 /-- `nthElem` depends only on the finset, not on the card proof. -/
-private theorem nthElem_congr {S₁ S₂ : Finset (Fin (n + 1))} {m : ℕ}
+theorem nthElem_congr {S₁ S₂ : Finset (Fin (n + 1))} {m : ℕ}
     {h₁ : S₁.card = m} {h₂ : S₂.card = m} (heq : S₁ = S₂) (k : Fin m) :
     nthElem S₁ h₁ k = nthElem S₂ h₂ k := by subst heq; rfl
 
 /-- `nthElem` of `insert v S` at a `succAbove`-shifted position equals `nthElem` of `S`. -/
-private theorem nthElem_insert_succAbove (S : Finset (Fin (n + 1)))
+theorem nthElem_insert_succAbove (S : Finset (Fin (n + 1)))
     (hS : S.card = p + 2) (v : Fin (n + 1)) (hv : v ∉ S)
     (hS' : (insert v S).card = p + 3)
     (l : Fin (p + 3)) (hl : nthElem (insert v S) hS' l = v)
@@ -378,7 +384,7 @@ private theorem nthElem_insert_succAbove (S : Finset (Fin (n + 1)))
 
 /-- `eraseNth` of `insert v S` at a `succAbove`-shifted position gives
 `insert v (eraseNth S j)`. -/
-private theorem eraseNth_insert_succAbove (S : Finset (Fin (n + 1)))
+theorem eraseNth_insert_succAbove (S : Finset (Fin (n + 1)))
     (hS : S.card = p + 2) (v : Fin (n + 1)) (hv : v ∉ S)
     (hS' : (insert v S).card = p + 3)
     (l : Fin (p + 3)) (hl : nthElem (insert v S) hS' l = v)
@@ -390,7 +396,7 @@ private theorem eraseNth_insert_succAbove (S : Finset (Fin (n + 1)))
 
 
 /-- `insertPos` of `eraseNth S j` when `nthElem S j < v`. -/
-private theorem insertPos_eraseNth_lt (S : Finset (Fin (n + 1)))
+theorem insertPos_eraseNth_lt (S : Finset (Fin (n + 1)))
     (hS : S.card = p + 2) (v : Fin (n + 1)) (_hv : v ∉ S)
     (j : Fin (p + 2)) (hjv : nthElem S hS j < v) :
     insertPos (eraseNth S hS j).1 v = insertPos S v - 1 := by
@@ -399,7 +405,7 @@ private theorem insertPos_eraseNth_lt (S : Finset (Fin (n + 1)))
   exact mem_filter.mpr ⟨nthElem_mem S hS j, hjv⟩
 
 /-- `insertPos` of `eraseNth S j` when `v < nthElem S j`. -/
-private theorem insertPos_eraseNth_ge (S : Finset (Fin (n + 1)))
+theorem insertPos_eraseNth_ge (S : Finset (Fin (n + 1)))
     (hS : S.card = p + 2) (v : Fin (n + 1)) (_hv : v ∉ S)
     (j : Fin (p + 2)) (hjv : v < nthElem S hS j) :
     insertPos (eraseNth S hS j).1 v = insertPos S v := by
@@ -410,7 +416,7 @@ private theorem insertPos_eraseNth_ge (S : Finset (Fin (n + 1)))
   rw [Finset.erase_eq_of_notMem hmem]
 
 /-- `nthElem S j < v` when `j.val < insertPos S v` and `v ∉ S`. -/
-private theorem nthElem_lt_of_lt_insertPos (S : Finset (Fin (n + 1)))
+theorem nthElem_lt_of_lt_insertPos (S : Finset (Fin (n + 1)))
     (hS : S.card = p + 2) (v : Fin (n + 1)) (hv : v ∉ S)
     (j : Fin (p + 2)) (hj : j.val < insertPos S v) :
     nthElem S hS j < v := by
@@ -421,7 +427,7 @@ private theorem nthElem_lt_of_lt_insertPos (S : Finset (Fin (n + 1)))
   -- Thus S.filter (· < v) ⊆ image of {k | k < j} under nthElem, giving ≤ j elements
   suffices insertPos S v ≤ j.val by omega
   set φ := S.orderIsoOfFin hS
-  show (S.filter (· < v)).card ≤ j.val
+  change (S.filter (· < v)).card ≤ j.val
   calc (S.filter (· < v)).card
       ≤ ((Finset.Iio j).image (fun k => (φ k).val)).card := by
         apply Finset.card_le_card; intro x hx
@@ -437,7 +443,7 @@ private theorem nthElem_lt_of_lt_insertPos (S : Finset (Fin (n + 1)))
     _ = j.val := Fin.card_Iio j
 
 /-- `v < nthElem S j` when `insertPos S v ≤ j.val` and `v ∉ S`. -/
-private theorem nthElem_gt_of_ge_insertPos (S : Finset (Fin (n + 1)))
+theorem nthElem_gt_of_ge_insertPos (S : Finset (Fin (n + 1)))
     (hS : S.card = p + 2) (v : Fin (n + 1)) (hv : v ∉ S)
     (j : Fin (p + 2)) (hj : insertPos S v ≤ j.val) :
     v < nthElem S hS j := by
@@ -447,7 +453,7 @@ private theorem nthElem_gt_of_ge_insertPos (S : Finset (Fin (n + 1)))
   -- Elements at positions ≤ j are ≤ nthElem S j < v, giving j+1 elements in S.filter (· < v)
   suffices j.val < insertPos S v by omega
   set φ := S.orderIsoOfFin hS
-  show j.val + 1 ≤ (S.filter (· < v)).card
+  change j.val + 1 ≤ (S.filter (· < v)).card
   calc j.val + 1 = (Finset.Iic j).card := (Fin.card_Iic j).symm
     _ = ((Finset.Iic j).image (fun k => (φ k).val)).card := by
         rw [Finset.card_image_of_injOn]; intro k₁ _ k₂ _ heq
@@ -481,7 +487,7 @@ theorem relSimplexHomotopy_eq (T : Finset (Fin (n + 1))) (v : Fin (n + 1)) (hv :
     rw [hd_zero, add_zero]
     -- (δh)(f)_S: unfold δ to a sum, then pick out the unique nonzero term
     set j₀ := findPos S hS v hv_S
-    show relSimplexδ T R p (relSimplexHomotopy T v hv R p f) ⟨S, hS, hT_S⟩ = f ⟨S, hS, hT_S⟩
+    change relSimplexδ T R p (relSimplexHomotopy T v hv R p f) ⟨S, hS, hT_S⟩ = f ⟨S, hS, hT_S⟩
     rw [show (⟨S, hS, hT_S⟩ : { S : Finset (Fin (n + 1)) // S.card = p + 2 ∧ T ⊆ S }) =
       ⟨S, ⟨hS, hT_S⟩⟩ from rfl]
     rw [relSimplexδ_apply]
@@ -496,7 +502,7 @@ theorem relSimplexHomotopy_eq (T : Finset (Fin (n + 1))) (v : Fin (n + 1)) (hv :
       have hv_ej : v ∈ (eraseNth S hS j).1 :=
         v_mem_eraseNth_of_ne_findPos S hS v hv_S j hj
       split_ifs with hT_ej
-      · show (-1 : ℤ) ^ j.val •
+      · change (-1 : ℤ) ^ j.val •
           relSimplexHomotopy T v hv R p f
             ⟨(eraseNth S hS j).1, (eraseNth S hS j).2, hT_ej⟩ = 0
         simp only [relSimplexHomotopy, dif_pos hv_ej, smul_zero]
@@ -507,7 +513,7 @@ theorem relSimplexHomotopy_eq (T : Finset (Fin (n + 1))) (v : Fin (n + 1)) (hv :
     have hT_ej₀ : T ⊆ (eraseNth S hS j₀).1 := by
       rw [eraseNth_findPos_val]; exact subset_erase_of_not_mem hT_S hv
     rw [dif_pos hT_ej₀]
-    show (-1 : ℤ) ^ j₀.val •
+    change (-1 : ℤ) ^ j₀.val •
       relSimplexHomotopy T v hv R p f
         ⟨(eraseNth S hS j₀).1, (eraseNth S hS j₀).2, hT_ej₀⟩ = f ⟨S, hS, hT_S⟩
     simp only [relSimplexHomotopy, dif_neg hv_ej₀]
@@ -667,7 +673,7 @@ theorem relSimplexHomotopy_eq (T : Finset (Fin (n + 1))) (v : Fin (n + 1)) (hv :
 /-- The degree-0 homotopy equation: `h₁ ∘ δ₀ = id` on degree-0 cochains.
 At degree 0, every 1-element subset containing `T` equals `T` itself (since `T` is nonempty),
 and `v ∉ T` means the homotopy has a single surviving term. -/
-private theorem relSimplexHomotopy_eq_zero (T : Finset (Fin (n + 1))) (v : Fin (n + 1))
+theorem relSimplexHomotopy_eq_zero (T : Finset (Fin (n + 1))) (v : Fin (n + 1))
     (hv : v ∉ T) (R : Type*) [AddCommGroup R] (hT_ne : T.Nonempty)
     (f : relSimplexCochain T R 0)
     (S : { S : Finset (Fin (n + 1)) // S.card = 1 ∧ T ⊆ S }) :
@@ -693,7 +699,7 @@ private theorem relSimplexHomotopy_eq_zero (T : Finset (Fin (n + 1))) (v : Fin (
     congr 1; exact (Finset.erase_insert hv_S).symm
   have hl_v := nthElem_findPos (insert v S) hIns v (mem_insert_self v S)
   -- Expand δ: sum over Fin 2, only the term erasing v survives
-  show (-1 : ℤ) ^ insertPos S v •
+  change (-1 : ℤ) ^ insertPos S v •
     (∑ j : Fin 2, if h : T ⊆ (eraseNth (insert v S) hIns j).1
       then (-1 : ℤ) ^ j.val •
         f ⟨(eraseNth (insert v S) hIns j).1, (eraseNth (insert v S) hIns j).2, h⟩
@@ -728,7 +734,7 @@ private theorem relSimplexHomotopy_eq_zero (T : Finset (Fin (n + 1))) (v : Fin (
 /-! ### Acyclicity -/
 
 /-- An object `X` in a preadditive category is zero iff `𝟙 X = 0`. -/
-private theorem isZero_of_id_eq_zero {C : Type*} [Category C] [Preadditive C] {X : C}
+theorem isZero_of_id_eq_zero {C : Type*} [Category C] [Preadditive C] {X : C}
     (h : 𝟙 X = 0) : CategoryTheory.Limits.IsZero X where
   unique_to Y :=
     ⟨{ default := 0
@@ -752,7 +758,7 @@ theorem relSimplexComplex_acyclic (T : Finset (Fin (n + 1))) (R : Type*) [AddCom
   let homData : ∀ i j, (ComplexShape.up ℕ).Rel j i → (K.X i ⟶ K.X j) :=
     fun i j hij =>
       eqToHom (show K.X i = K.X (j + 1) from congr_arg K.X hij.symm) ≫
-      AddCommGrp.ofHom (relSimplexHomotopyHom T v hv R j)
+      AddCommGrpCat.ofHom (relSimplexHomotopyHom T v hv R j)
   -- Show 𝟙 K = nullHomotopicMap' homData
   suffices hEq : 𝟙 K = Homotopy.nullHomotopicMap' homData by
     -- Transport the null-homotopy to get Homotopy (𝟙 K) 0
@@ -765,7 +771,7 @@ theorem relSimplexComplex_acyclic (T : Finset (Fin (n + 1))) (R : Type*) [AddCom
     rwa [HomologicalComplex.homologyMap_id, HomologicalComplex.homologyMap_zero] at this
   -- Prove 𝟙 K = nullHomotopicMap' homData degree by degree
   -- Helper: K.d unfolds via CochainComplex.of_d
-  have hKd : ∀ j, K.d j (j + 1) = AddCommGrp.ofHom (relSimplexδHom T R j) :=
+  have hKd : ∀ j, K.d j (j + 1) = AddCommGrpCat.ofHom (relSimplexδHom T R j) :=
     fun j => by simp [K, relSimplexComplex]
   ext i : 1
   induction i with
@@ -777,7 +783,7 @@ theorem relSimplexComplex_acyclic (T : Finset (Fin (n + 1))) (R : Type*) [AddCom
     -- Goal: 𝟙 (K.X 0) = K.d 0 1 ≫ homData 1 0 _
     -- Unfold homData; eqToHom is 𝟙 since K.X 1 = K.X (0+1) definitionally
     simp only [homData, eqToHom_refl, Category.id_comp]
-    rw [hKd, ← AddCommGrp.ofHom_comp, ← AddCommGrp.ofHom_id]
+    rw [hKd, ← AddCommGrpCat.ofHom_comp, ← AddCommGrpCat.ofHom_id]
     congr 1; ext f; funext S
     simp only [AddMonoidHom.comp_apply, AddMonoidHom.id_apply, relSimplexδHom,
       relSimplexHomotopyHom, AddMonoidHom.mk'_apply]
@@ -789,8 +795,8 @@ theorem relSimplexComplex_acyclic (T : Finset (Fin (n + 1))) (R : Type*) [AddCom
       (show (ComplexShape.up ℕ).Rel (p + 1) (p + 2) from rfl)]
     -- Unfold homData; eqToHom is 𝟙 definitionally
     simp only [homData, eqToHom_refl, Category.id_comp]
-    rw [hKd, hKd, ← AddCommGrp.ofHom_comp, ← AddCommGrp.ofHom_comp,
-      ← AddCommGrp.ofHom_id]
+    rw [hKd, hKd, ← AddCommGrpCat.ofHom_comp, ← AddCommGrpCat.ofHom_comp,
+      ← AddCommGrpCat.ofHom_id]
     congr 1; ext f; funext S
     simp only [AddMonoidHom.comp_apply, AddMonoidHom.add_apply, AddMonoidHom.id_apply,
       relSimplexδHom, relSimplexHomotopyHom, AddMonoidHom.mk'_apply]
@@ -805,7 +811,7 @@ theorem relSimplexComplex_empty_exactAt (R : Type*) [AddCommGroup R] (p : ℕ) :
     (relSimplexComplex (∅ : Finset (Fin (n + 1))) R).ExactAt (p + 1) := by
   set K := relSimplexComplex (∅ : Finset (Fin (n + 1))) R
   have hv : (0 : Fin (n + 1)) ∉ (∅ : Finset (Fin (n + 1))) := Finset.notMem_empty _
-  have hKd : ∀ j, K.d j (j + 1) = AddCommGrp.ofHom (relSimplexδHom ∅ R j) :=
+  have hKd : ∀ j, K.d j (j + 1) = AddCommGrpCat.ofHom (relSimplexδHom ∅ R j) :=
     fun j => by simp [K, relSimplexComplex]
   rw [HomologicalComplex.exactAt_iff' K p (p + 1) (p + 2) (by simp) (by simp),
     ShortComplex.ab_exact_iff]
@@ -835,7 +841,7 @@ theorem relSimplexComplex_univ_isZero_X (R : Type*) [AddCommGroup R] (hp : p ≠
   have hempty := relSimplexCochain_univ_isEmpty (show p + 1 ≠ n + 1 by omega)
   have hsub : Subsingleton (relSimplexCochain (Finset.univ : Finset (Fin (n + 1))) R p) :=
     ⟨fun f g => funext fun x => hempty.elim x⟩
-  exact @AddCommGrp.isZero_of_subsingleton _ hsub
+  exact @AddCommGrpCat.isZero_of_subsingleton _ hsub
 
 /-- When `T = Finset.univ` and `p ≠ n`, the complex is exact at degree `p`. -/
 theorem relSimplexComplex_univ_exactAt (R : Type*) [AddCommGroup R] (hp : p ≠ n) :
@@ -862,22 +868,22 @@ def relSimplexCochain_univ_addEquiv (R : Type*) [AddCommGroup R] :
     map_add' := fun _ _ => rfl }
 
 /-- The categorical isomorphism between the degree-`n` object of `K_univ` and
-`AddCommGrp.of R`. -/
+`AddCommGrpCat.of R`. -/
 noncomputable def relSimplexComplex_univ_X_iso (R : Type*) [AddCommGroup R] :
     (relSimplexComplex (Finset.univ : Finset (Fin (n + 1))) R).X n ≅
-      AddCommGrp.of R :=
+      AddCommGrpCat.of R :=
   (relSimplexCochain_univ_addEquiv R).toAddCommGrpIso
 
 /-- `H^n(K_univ) ≅ R`: the `n`-th homology of the relative simplex complex for
 `T = Finset.univ` is isomorphic to `R`. -/
 noncomputable def relSimplexComplex_univ_homologyIso (R : Type*) [AddCommGroup R] :
     (relSimplexComplex (Finset.univ : Finset (Fin (n + 1))) R).homology n ≅
-      AddCommGrp.of R := by
+      AddCommGrpCat.of R := by
   set K := relSimplexComplex (Finset.univ : Finset (Fin (n + 1))) R
   -- The outgoing map is zero because its target K.X(n+1) is zero
   have hg : (K.sc n).g = 0 := by
     apply IsZero.eq_of_tgt
-    show IsZero (K.X ((ComplexShape.up ℕ).next n))
+    change IsZero (K.X ((ComplexShape.up ℕ).next n))
     rw [show (ComplexShape.up ℕ).next n = n + 1 from (ComplexShape.up ℕ).next_eq' rfl]
     exact relSimplexComplex_univ_isZero_X R (by omega)
   -- The incoming map is zero: either no predecessor (n=0) or source is zero
@@ -916,12 +922,12 @@ theorem relSimplexComplex_get_primitive (T : Finset (Fin (n + 1)))
     (hf : relSimplexδHom T R (p + 1) f = 0) :
     ∃ g : relSimplexCochain T R p, relSimplexδHom T R p g = f := by
   set K := relSimplexComplex T R
-  have hKd : ∀ j, K.d j (j + 1) = AddCommGrp.ofHom (relSimplexδHom T R j) :=
+  have hKd : ∀ j, K.d j (j + 1) = AddCommGrpCat.ofHom (relSimplexδHom T R j) :=
     fun j => by simp [K, relSimplexComplex]
   rw [HomologicalComplex.exactAt_iff' K p (p + 1) (p + 2)
       (by simp) (by simp), ShortComplex.ab_exact_iff] at hexact
   have hker : (K.sc' p (p + 1) (p + 2)).g.hom f = 0 := by
-    show K.d (p + 1) (p + 2) f = 0; rw [hKd]; exact hf
+    change K.d (p + 1) (p + 2) f = 0; rw [hKd]; exact hf
   obtain ⟨g, hg⟩ := hexact f hker
   exact ⟨g, by rwa [show (K.sc' p (p + 1) (p + 2)).f = K.d p (p + 1) from rfl, hKd] at hg⟩
 
@@ -986,14 +992,14 @@ def relSimplexExtend (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
     (R : Type*) [AddCommGroup R] :
     relSimplexComplex T R ⟶ relSimplexComplex T' R :=
   CochainComplex.ofHom
-    (fun p => AddCommGrp.of (relSimplexCochain T R p))
-    (fun p => AddCommGrp.ofHom (relSimplexδHom T R p))
-    (fun p => AddCommGrp.ext (relSimplexδ_comp_eq_zero T R p))
-    (fun p => AddCommGrp.of (relSimplexCochain T' R p))
-    (fun p => AddCommGrp.ofHom (relSimplexδHom T' R p))
-    (fun p => AddCommGrp.ext (relSimplexδ_comp_eq_zero T' R p))
-    (fun p => AddCommGrp.ofHom (relSimplexExtendByZeroHom T T' hT'T R p))
-    (fun p => AddCommGrp.ext (fun f =>
+    (fun p => AddCommGrpCat.of (relSimplexCochain T R p))
+    (fun p => AddCommGrpCat.ofHom (relSimplexδHom T R p))
+    (fun p => AddCommGrpCat.ext (relSimplexδ_comp_eq_zero T R p))
+    (fun p => AddCommGrpCat.of (relSimplexCochain T' R p))
+    (fun p => AddCommGrpCat.ofHom (relSimplexδHom T' R p))
+    (fun p => AddCommGrpCat.ext (relSimplexδ_comp_eq_zero T' R p))
+    (fun p => AddCommGrpCat.ofHom (relSimplexExtendByZeroHom T T' hT'T R p))
+    (fun p => AddCommGrpCat.ext (fun f =>
       relSimplexExtendByZero_comm T T' hT'T R p f))
 
 /-- Extension by zero is injective: if `extend(f) = 0` then `f = 0`. -/
@@ -1031,7 +1037,7 @@ is the same alternating face formula, restricted to this domain. The short exact
 -/
 
 /-- Face closure: `T ⊄ S` implies `T ⊄ eraseNth(S, j)`, since `eraseNth(S, j) ⊆ S`. -/
-private theorem not_subset_eraseNth_of_not_subset {T S : Finset (Fin (n + 1))}
+theorem not_subset_eraseNth_of_not_subset {T S : Finset (Fin (n + 1))}
     {p : ℕ} (hTS : ¬(T ⊆ S)) (hS : S.card = p + 2) (j : Fin (p + 2)) :
     ¬(T ⊆ (eraseNth S hS j).1) :=
   fun h => hTS (h.trans (by simp only [eraseNth]; exact erase_subset _ _))
@@ -1109,11 +1115,11 @@ theorem relSimplexQuotδ_comp_eq_zero (T T' : Finset (Fin (n + 1))) (hT'T : T' �
 
 /-- The quotient cochain complex `Q = K_{T'}/K_T`. -/
 def relSimplexQuotComplex (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
-    (R : Type*) [AddCommGroup R] : CochainComplex AddCommGrp ℕ :=
+    (R : Type*) [AddCommGroup R] : CochainComplex AddCommGrpCat ℕ :=
   CochainComplex.of
-    (fun p => AddCommGrp.of (relSimplexQuotCochain T T' R p))
-    (fun p => AddCommGrp.ofHom (relSimplexQuotδHom T T' hT'T R p))
-    (fun p => AddCommGrp.ext (relSimplexQuotδ_comp_eq_zero T T' hT'T R p))
+    (fun p => AddCommGrpCat.of (relSimplexQuotCochain T T' R p))
+    (fun p => AddCommGrpCat.ofHom (relSimplexQuotδHom T T' hT'T R p))
+    (fun p => AddCommGrpCat.ext (relSimplexQuotδ_comp_eq_zero T T' hT'T R p))
 
 /-- Restriction from `K_{T'}` to the quotient `Q`: evaluate a cochain at subsets in
 the quotient domain (forgetting `¬(T ⊆ S)`). -/
@@ -1145,14 +1151,14 @@ def relSimplexRestrictMap (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
     (R : Type*) [AddCommGroup R] :
     relSimplexComplex T' R ⟶ relSimplexQuotComplex T T' hT'T R :=
   CochainComplex.ofHom
-    (fun p => AddCommGrp.of (relSimplexCochain T' R p))
-    (fun p => AddCommGrp.ofHom (relSimplexδHom T' R p))
-    (fun p => AddCommGrp.ext (relSimplexδ_comp_eq_zero T' R p))
-    (fun p => AddCommGrp.of (relSimplexQuotCochain T T' R p))
-    (fun p => AddCommGrp.ofHom (relSimplexQuotδHom T T' hT'T R p))
-    (fun p => AddCommGrp.ext (relSimplexQuotδ_comp_eq_zero T T' hT'T R p))
-    (fun p => AddCommGrp.ofHom (relSimplexRestrictHom T T' hT'T R p))
-    (fun p => AddCommGrp.ext (fun f =>
+    (fun p => AddCommGrpCat.of (relSimplexCochain T' R p))
+    (fun p => AddCommGrpCat.ofHom (relSimplexδHom T' R p))
+    (fun p => AddCommGrpCat.ext (relSimplexδ_comp_eq_zero T' R p))
+    (fun p => AddCommGrpCat.of (relSimplexQuotCochain T T' R p))
+    (fun p => AddCommGrpCat.ofHom (relSimplexQuotδHom T T' hT'T R p))
+    (fun p => AddCommGrpCat.ext (relSimplexQuotδ_comp_eq_zero T T' hT'T R p))
+    (fun p => AddCommGrpCat.ofHom (relSimplexRestrictHom T T' hT'T R p))
+    (fun p => AddCommGrpCat.ext (fun f =>
       relSimplexRestrict_comm T T' hT'T R p f))
 
 /-- The composition `extend ≫ restrict` is zero: extending by zero then restricting
@@ -1205,13 +1211,13 @@ theorem relSimplexExtend_restrict_comp (T T' : Finset (Fin (n + 1))) (hT'T : T' 
   ext p : 1
   simp only [HomologicalComplex.comp_f, HomologicalComplex.zero_f_apply,
     relSimplexExtend, relSimplexRestrictMap, CochainComplex.ofHom_f]
-  exact AddCommGrp.ext (fun f =>
+  exact AddCommGrpCat.ext (fun f =>
     relSimplexExtend_restrict_comp_zero T T' hT'T R p f)
 
 /-- The short complex `K_T ⟶ K_{T'} ⟶ Q` of cochain complexes. -/
 def relSimplexSES (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
     (R : Type*) [AddCommGroup R] :
-    ShortComplex (CochainComplex AddCommGrp ℕ) :=
+    ShortComplex (CochainComplex AddCommGrpCat ℕ) :=
   ShortComplex.mk
     (relSimplexExtend T T' hT'T R)
     (relSimplexRestrictMap T T' hT'T R)
@@ -1221,37 +1227,37 @@ def relSimplexSES (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
 theorem relSimplexSES_degreewise_shortExact (T T' : Finset (Fin (n + 1))) (hT'T : T' ⊆ T)
     (R : Type*) [AddCommGroup R] (p : ℕ) :
     ((relSimplexSES T T' hT'T R).map
-      (HomologicalComplex.eval AddCommGrp (ComplexShape.up ℕ) p)).ShortExact := by
+      (HomologicalComplex.eval AddCommGrpCat (ComplexShape.up ℕ) p)).ShortExact := by
   refine ShortComplex.ShortExact.mk' ?exact ?mono ?epi
   case exact =>
     rw [ShortComplex.ab_exact_iff]
     intro x₂ hx₂
     have hx₂' : relSimplexRestrict T T' hT'T R p x₂ = 0 := by
       have : ((relSimplexSES T T' hT'T R).map
-          (HomologicalComplex.eval AddCommGrp (ComplexShape.up ℕ) p)).g x₂ = 0 := hx₂
+          (HomologicalComplex.eval AddCommGrpCat (ComplexShape.up ℕ) p)).g x₂ = 0 := hx₂
       simp only [relSimplexSES, ShortComplex.map_g, HomologicalComplex.eval_map,
-        relSimplexRestrictMap, CochainComplex.ofHom_f, AddCommGrp.ofHom_apply] at this
+        relSimplexRestrictMap, CochainComplex.ofHom_f, AddCommGrpCat.ofHom_apply] at this
       exact this
     obtain ⟨f, hf⟩ := relSimplexSES_exact T T' hT'T R p x₂ hx₂'
     refine ⟨f, ?_⟩
-    show ((relSimplexSES T T' hT'T R).map
-        (HomologicalComplex.eval AddCommGrp (ComplexShape.up ℕ) p)).f f = x₂
+    change ((relSimplexSES T T' hT'T R).map
+        (HomologicalComplex.eval AddCommGrpCat (ComplexShape.up ℕ) p)).f f = x₂
     simp only [relSimplexSES, ShortComplex.map_f, HomologicalComplex.eval_map,
-      relSimplexExtend, CochainComplex.ofHom_f, AddCommGrp.ofHom_apply]
+      relSimplexExtend, CochainComplex.ofHom_f, AddCommGrpCat.ofHom_apply]
     exact hf
   case mono =>
-    rw [AddCommGrp.mono_iff_injective]
+    rw [AddCommGrpCat.mono_iff_injective]
     show Function.Injective
       ((relSimplexSES T T' hT'T R).map
-        (HomologicalComplex.eval AddCommGrp (ComplexShape.up ℕ) p)).f
+        (HomologicalComplex.eval AddCommGrpCat (ComplexShape.up ℕ) p)).f
     simp only [relSimplexSES, ShortComplex.map_f, HomologicalComplex.eval_map,
       relSimplexExtend, CochainComplex.ofHom_f]
     exact relSimplexExtendByZero_injective T T' hT'T R p
   case epi =>
-    rw [AddCommGrp.epi_iff_surjective]
+    rw [AddCommGrpCat.epi_iff_surjective]
     show Function.Surjective
       ((relSimplexSES T T' hT'T R).map
-        (HomologicalComplex.eval AddCommGrp (ComplexShape.up ℕ) p)).g
+        (HomologicalComplex.eval AddCommGrpCat (ComplexShape.up ℕ) p)).g
     simp only [relSimplexSES, ShortComplex.map_g, HomologicalComplex.eval_map,
       relSimplexRestrictMap, CochainComplex.ofHom_f]
     exact relSimplexRestrict_surjective T T' hT'T R p

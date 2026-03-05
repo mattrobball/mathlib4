@@ -3,9 +3,11 @@ Copyright (c) 2026 Mathlib contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matthew Robert Ballard
 -/
-import Mathlib.Algebra.Order.Antidiag.Finsupp
-import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.TwistedCohomology
-import Mathlib.LinearAlgebra.PerfectPairing.Basic
+module
+
+public import Mathlib.Algebra.Order.Antidiag.Finsupp
+public import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.TwistedCohomology
+public import Mathlib.LinearAlgebra.PerfectPairing.Basic
 
 /-!
 # Serre duality perfect pairing on projective space
@@ -25,12 +27,16 @@ monomial basis is self-dual.
 ## Main results
 
 * `serrePairingPoly` — the bilinear coefficient inner product on `𝒜_d`
-* `serrePerfectPairing` — this pairing is a `PerfectPairing R (𝒜_d) (𝒜_d)`
+* `serrePerfectPairing` — `serrePairingPoly` satisfies `IsPerfPair`
 
 ## References
 
 * [Stacks Project, Cohomology of projective space](https://stacks.math.columbia.edu/tag/01XS)
 -/
+
+@[expose] public section
+
+set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
 
@@ -44,8 +50,6 @@ variable {n : ℕ} {R : Type u} [CommRing R]
 
 attribute [local instance] mvPolynomialGrading
 
-private abbrev 𝒜 (n : ℕ) (R : Type u) [CommRing R] :=
-  MvPolynomial.homogeneousSubmodule (Fin (n + 1)) R
 
 local instance : SetLike.GradedSMul (𝒜 n R) (𝒜 n R) :=
   SetLike.GradedMul.toGradedSMul _
@@ -54,32 +58,33 @@ local instance : SetLike.GradedSMul (𝒜 n R) (𝒜 n R) :=
 
 /-- The finset of `Finsupp`s with total degree `d` over `Fin (n + 1)`.
 These index the monomial basis of `𝒜_d`. -/
-private def degreeFinset (n : ℕ) (d : ℕ) : Finset (Fin (n + 1) →₀ ℕ) :=
+def degreeFinset (n : ℕ) (d : ℕ) : Finset (Fin (n + 1) →₀ ℕ) :=
   Finset.finsuppAntidiag Finset.univ d
 
-private theorem univ_sum_eq_degree (α : Fin (n + 1) →₀ ℕ) :
+theorem univ_sum_eq_degree (α : Fin (n + 1) →₀ ℕ) :
     Finset.univ.sum (⇑α) = α.degree :=
   (Finset.sum_subset (Finset.subset_univ α.support)
     (fun _ _ hi => Finsupp.notMem_support_iff.mp hi)).symm
 
-private theorem mem_degreeFinset {d : ℕ} {α : Fin (n + 1) →₀ ℕ} :
+theorem mem_degreeFinset {d : ℕ} {α : Fin (n + 1) →₀ ℕ} :
     α ∈ degreeFinset n d ↔ α.degree = d := by
   simp only [degreeFinset, Finset.mem_finsuppAntidiag, Finset.subset_univ, and_true]
   exact (univ_sum_eq_degree α) ▸ Iff.rfl
 
-private theorem monomial_mem_homogeneous {d : ℕ} {α : Fin (n + 1) →₀ ℕ}
+theorem monomial_mem_homogeneous {d : ℕ} {α : Fin (n + 1) →₀ ℕ}
     (hα : α ∈ degreeFinset n d) (r : R) :
     MvPolynomial.monomial α r ∈ (𝒜 n R) d :=
   (MvPolynomial.mem_homogeneousSubmodule d _).mpr
     (MvPolynomial.isHomogeneous_monomial r (mem_degreeFinset.mp hα))
 
-private theorem support_subset_degreeFinset {d : ℕ}
+theorem support_subset_degreeFinset {d : ℕ}
     (p : ↥((𝒜 n R) d)) : p.val.support ⊆ degreeFinset n d := by
   intro α hα
   rw [mem_degreeFinset]
   have hp := (MvPolynomial.mem_homogeneousSubmodule d _).mp p.2
-  exact (congr_fun Finsupp.degree_eq_weight_one α).trans
-    (hp (Finsupp.mem_support_iff.mp hα))
+  rw [show α.degree = Finsupp.weight (fun _ => (1 : ℕ)) α from
+    DFunLike.congr_fun Finsupp.degree_eq_weight_one α]
+  exact hp (Finsupp.mem_support_iff.mp hα)
 
 /-! ### Coefficient pairing -/
 
@@ -133,7 +138,7 @@ theorem serrePairingPoly_monomial (d : ℕ) (f : ↥((𝒜 n R) d))
 
 /-! ### Injectivity -/
 
-private theorem serrePairingPoly_injective (d : ℕ) :
+theorem serrePairingPoly_injective (d : ℕ) :
     Function.Injective (serrePairingPoly n R d) := by
   intro f g hfg
   have h : ∀ α ∈ degreeFinset n d,
@@ -158,7 +163,7 @@ private theorem serrePairingPoly_injective (d : ℕ) :
 
 /-- A homogeneous polynomial of degree `d` is the sum of its monomial terms
 over the degree-`d` finset. -/
-private theorem poly_eq_sum_degreeFinset (d : ℕ) (p : ↥((𝒜 n R) d)) :
+theorem poly_eq_sum_degreeFinset (d : ℕ) (p : ↥((𝒜 n R) d)) :
     p.val = (degreeFinset n d).sum
       fun α => MvPolynomial.monomial α (MvPolynomial.coeff α p.val) := by
   conv_lhs => rw [← MvPolynomial.support_sum_monomial_coeff p.val]
@@ -168,7 +173,7 @@ private theorem poly_eq_sum_degreeFinset (d : ℕ) (p : ↥((𝒜 n R) d)) :
 
 /-- The coefficient of `fval = Σ_α monomial(α, c_α)` at β equals `c_β`,
 when summing over a set of distinct multi-indices. -/
-private theorem coeff_sum_monomial_degreeFinset (d : ℕ) (c : (Fin (n + 1) →₀ ℕ) → R)
+theorem coeff_sum_monomial_degreeFinset (d : ℕ) (c : (Fin (n + 1) →₀ ℕ) → R)
     (β : Fin (n + 1) →₀ ℕ) (hβ : β ∈ degreeFinset n d) :
     MvPolynomial.coeff β ((degreeFinset n d).sum
       fun α => MvPolynomial.monomial α (c α)) = c β := by
@@ -178,7 +183,7 @@ private theorem coeff_sum_monomial_degreeFinset (d : ℕ) (c : (Fin (n + 1) →�
   · intro α _ hαβ; rw [MvPolynomial.coeff_monomial, if_neg hαβ]
   · intro habs; exact absurd hβ habs
 
-private theorem serrePairingPoly_surjective (d : ℕ) :
+theorem serrePairingPoly_surjective (d : ℕ) :
     Function.Surjective (serrePairingPoly n R d) := by
   intro φ
   -- c(α) = φ(monomial α 1) for α ∈ degreeFinset, 0 otherwise
@@ -248,9 +253,8 @@ private theorem serrePairingPoly_surjective (d : ℕ) :
 /-- The coefficient inner product on `𝒜_d` is a **perfect pairing**: the induced maps
 `𝒜_d → Dual(𝒜_d)` and `𝒜_d → Dual(𝒜_d)` are both bijective. This is the polynomial-level
 manifestation of Serre duality on projective `n`-space. -/
-noncomputable def serrePerfectPairing (n : ℕ) (R : Type u) [CommRing R] (d : ℕ) :
-    PerfectPairing R ↥((𝒜 n R) d) ↥((𝒜 n R) d) where
-  toLinearMap := serrePairingPoly n R d
+noncomputable instance serrePerfectPairing (n : ℕ) (R : Type u) [CommRing R] (d : ℕ) :
+    (serrePairingPoly n R d).IsPerfPair where
   bijective_left := ⟨serrePairingPoly_injective d, serrePairingPoly_surjective d⟩
   bijective_right := by
     rw [show (serrePairingPoly n R d).flip = serrePairingPoly n R d from
@@ -265,7 +269,7 @@ variable {d_nat : ℕ} {e : ℤ} {S : Finset (Fin (n + 1))}
 
 /-- Membership proof for the numerator of `mulByHomogeneous`: if `g ∈ 𝒜_{d_nat}` and
 `m ∈ (intShift 𝒜 e)_k`, then `g * m ∈ (intShift 𝒜 (e + d_nat))_k`. -/
-private theorem mul_mem_intShift (g : ↥((𝒜 n R) d_nat))
+theorem mul_mem_intShift (g : ↥((𝒜 n R) d_nat))
     {k : ℕ} {m : MvPolynomial (Fin (n + 1)) R}
     (hm : m ∈ GradedModule.intShift (𝒜 n R) e k) :
     g.val * m ∈ GradedModule.intShift (𝒜 n R) (e + ↑d_nat) k := by
@@ -340,7 +344,7 @@ noncomputable def cupCochain (g : ↥((𝒜 n R) d_nat)) (p : ℕ)
 
 /-- `mulByHomogeneous g` commutes with `coordRestrict j` (= `awayMap`):
 ring multiplication by a global polynomial commutes with localization restriction. -/
-private theorem mulByHomogeneous_comp_coordRestrict (g : ↥((𝒜 n R) d_nat))
+theorem mulByHomogeneous_comp_coordRestrict (g : ↥((𝒜 n R) d_nat))
     {p : ℕ} {T : Finset (Fin (n + 1))} (hT : T.card = p + 2)
     (j : Fin (p + 2))
     (x : HomogeneousLocalizedModule.Away (𝒜 n R)

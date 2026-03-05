@@ -3,8 +3,10 @@ Copyright (c) 2026 Mathlib contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matthew Robert Ballard
 -/
-import Mathlib.Algebra.Module.GradedModule
-import Mathlib.Algebra.Group.Units.Equiv
+module
+
+public import Mathlib.Algebra.Module.GradedModule
+public import Mathlib.Algebra.Group.Units.Equiv
 
 /-!
 # Graded Module Shift
@@ -34,6 +36,10 @@ since `𝓐(i + d) * 𝓐(j + d) ⊆ 𝓐((i + j) + 2d)`, not `𝓐((i + j) + d)
 
 graded module, shift, twist
 -/
+
+@[expose] public section
+
+set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
 
@@ -121,7 +127,7 @@ instance shift.gradedSMul (𝓐 : ι → σ') (𝓜 : ι → σ) (d : ι)
     [h : SetLike.GradedSMul 𝓐 𝓜] :
     SetLike.GradedSMul 𝓐 (shift 𝓜 d) where
   smul_mem {i j} {_a _b} hai hbj := by
-    show _a • _b ∈ 𝓜 ((i +ᵥ j) + d)
+    change _a • _b ∈ 𝓜 ((i +ᵥ j) + d)
     rw [show (i +ᵥ j) + d = i +ᵥ (j + d) from by simp [vadd_eq_add, add_assoc]]
     exact h.smul_mem hai hbj
 
@@ -139,7 +145,7 @@ variable [AddCommMonoid M] [SetLike σ M] [AddSubmonoidClass σ M]
 
 This is the key lemma: reindexing `⨁ᵢ 𝓜 i` along `n ↦ n + d` and then summing
 the components (via `coeAddMonoidHom`) gives the same result as summing directly. -/
-private lemma coe_comapDomain'_eq_coe (𝓜 : ι → σ) (d : ι) (g : ⨁ i, 𝓜 i) :
+lemma coe_comapDomain'_eq_coe (𝓜 : ι → σ) (d : ι) (g : ⨁ i, 𝓜 i) :
     DirectSum.coeAddMonoidHom (shift 𝓜 d)
       (DFinsupp.comapDomain' (· + d) (h' := (· + (-d)))
         (fun k => add_neg_cancel_right k d) g) =
@@ -213,7 +219,7 @@ theorem intShift_apply_of_neg (𝓜 : ℕ → σ) (d : ℤ) (n : ℕ)
 theorem intShift_eq_shift (𝓜 : ℕ → σ) (d : ℤ) (hd : 0 ≤ d) :
     intShift 𝓜 d = shift 𝓜 d.toNat := by
   ext n
-  show (if 0 ≤ (n : ℤ) + d then 𝓜 ((n : ℤ) + d).toNat else ⊥) = 𝓜 (n + d.toNat)
+  change (if 0 ≤ (n : ℤ) + d then 𝓜 ((n : ℤ) + d).toNat else ⊥) = 𝓜 (n + d.toNat)
   rw [if_pos (add_nonneg (Nat.cast_nonneg n) hd)]
   congr 1; omega
 

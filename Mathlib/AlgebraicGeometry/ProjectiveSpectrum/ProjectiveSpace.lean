@@ -3,9 +3,11 @@ Copyright (c) 2026 Mathlib contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Matthew Robert Ballard
 -/
-import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Basic
-import Mathlib.RingTheory.MvPolynomial.Homogeneous
-import Mathlib.RingTheory.MvPolynomial.Ideal
+module
+
+public import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Basic
+public import Mathlib.RingTheory.MvPolynomial.Homogeneous
+public import Mathlib.RingTheory.MvPolynomial.Ideal
 
 /-!
 # Projective Space as Proj of the Polynomial Ring
@@ -33,6 +35,10 @@ on cohomology of line bundles.
 
 * [Stacks Project, Cohomology of projective space](https://stacks.math.columbia.edu/tag/01XS)
 -/
+
+@[expose] public section
+
+set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
 
