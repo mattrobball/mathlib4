@@ -3,16 +3,18 @@ Copyright (c) 2018 Chris Hughes. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Chris Hughes
 -/
-import Mathlib.Algebra.Group.Equiv.Basic
-import Mathlib.Data.ENat.Lattice
-import Mathlib.Data.Part
-import Mathlib.Tactic.NormNum
+module
+
+public import Mathlib.Algebra.Group.Equiv.Basic
+public import Mathlib.Data.ENat.Lattice
+public import Mathlib.Data.Part
+public import Mathlib.Tactic.NormNum
 
 /-!
 # Natural numbers with infinity
 
 The natural numbers and an extra `top` element `⊤`. This implementation uses `Part ℕ` as an
-implementation. Use `ℕ∞` instead unless you care about computability.
+implementation. This version is deprecated, use `ℕ∞` instead.
 
 ## Main definitions
 
@@ -43,18 +45,27 @@ Before the `open scoped Classical` line, various proofs are made with decidabili
 This can cause issues -- see for example the non-simp lemma `toWithTopZero` proved by `rfl`,
 followed by `@[simp] lemma toWithTopZero'` whose proof uses `convert`.
 
+## Deprecation
+
+As it appears this has been unused since 2018, we are now deprecating it.
+If `ENat` does not serve your purposes, please raise this on the community Zulip.
 
 ## Tags
 
 PartENat, ℕ∞
 -/
 
+@[expose] public section
+
 
 open Part hiding some
 
 /-- Type of natural numbers with infinity (`⊤`) -/
+@[deprecated ENat (since := "2025-09-01")]
 def PartENat : Type :=
   Part ℕ
+
+set_option linter.deprecated false
 
 namespace PartENat
 
@@ -85,8 +96,6 @@ theorem dom_some (x : ℕ) : (some x).Dom :=
   trivial
 
 instance addCommMonoid : AddCommMonoid PartENat where
-  add := (· + ·)
-  zero := 0
   add_comm _ _ := Part.ext' and_comm fun _ _ => add_comm _ _
   zero_add _ := Part.ext' (iff_of_eq (true_and _)) fun _ _ => zero_add _
   add_zero _ := Part.ext' (iff_of_eq (and_true _)) fun _ _ => add_zero _
@@ -95,7 +104,6 @@ instance addCommMonoid : AddCommMonoid PartENat where
 
 instance : AddCommMonoidWithOne PartENat :=
   { PartENat.addCommMonoid with
-    one := 1
     natCast := some
     natCast_zero := rfl
     natCast_succ := fun _ => Part.ext' (iff_of_eq (true_and _)).symm fun _ _ => rfl }
@@ -216,7 +224,6 @@ instance decidableLe (x y : PartENat) [Decidable x.Dom] [Decidable y.Dom] : Deci
     else isTrue ⟨fun h => (hy h).elim, fun h => (hy h).elim⟩
 
 instance partialOrder : PartialOrder PartENat where
-  le := (· ≤ ·)
   le_refl _ := ⟨id, fun _ => le_rfl⟩
   le_trans := fun _ _ _ ⟨hxy₁, hxy₂⟩ ⟨hyz₁, hyz₂⟩ =>
     ⟨hxy₁ ∘ hyz₁, fun _ => le_trans (hxy₂ _) (hyz₂ _)⟩
@@ -234,9 +241,7 @@ theorem lt_def (x y : PartENat) : x < y ↔ ∃ hx : x.Dom, ∀ hy : y.Dom, x.ge
       specialize H hy
       specialize h fun _ => hy
       rw [not_forall] at h
-      obtain ⟨hx', h⟩ := h
-      rw [not_le] at h
-      exact h
+      lia
     · specialize h fun hx' => (hx hx').elim
       rw [not_forall] at h
       obtain ⟨hx', h⟩ := h
@@ -244,11 +249,11 @@ theorem lt_def (x y : PartENat) : x < y ↔ ∃ hx : x.Dom, ∀ hy : y.Dom, x.ge
   · rintro ⟨hx, H⟩
     exact ⟨⟨fun _ => hx, fun hy => (H hy).le⟩, fun hxy h => not_lt_of_ge (h _) (H _)⟩
 
-noncomputable instance isOrderedAddMonoid : IsOrderedAddMonoid PartENat :=
-  { add_le_add_left := fun a b ⟨h₁, h₂⟩ c =>
-      PartENat.casesOn c (by simp [top_add]) fun c =>
-        ⟨fun h => And.intro (dom_natCast _) (h₁ h.2), fun h => by
-          simpa only [coe_add_get] using add_le_add_left (h₂ _) c⟩ }
+noncomputable instance isOrderedAddMonoid : IsOrderedAddMonoid PartENat where
+  add_le_add_left := fun a b ⟨h₁, h₂⟩ c =>
+      PartENat.casesOn c (by simp [add_top]) fun c =>
+        ⟨fun h => And.intro (h₁ h.1) (dom_natCast _), fun h => by
+          simpa only [coe_add_get] using add_le_add_left (h₂ _) c⟩
 
 instance semilatticeSup : SemilatticeSup PartENat :=
   { PartENat.partialOrder with
@@ -259,11 +264,9 @@ instance semilatticeSup : SemilatticeSup PartENat :=
       ⟨fun hz => ⟨hx₁ hz, hy₁ hz⟩, fun _ => sup_le (hx₂ _) (hy₂ _)⟩ }
 
 instance orderBot : OrderBot PartENat where
-  bot := ⊥
   bot_le _ := ⟨fun _ => trivial, fun _ => Nat.zero_le _⟩
 
 instance orderTop : OrderTop PartENat where
-  top := ⊤
   le_top _ := ⟨fun h => False.elim h, fun hy => False.elim hy⟩
 
 instance : ZeroLEOneClass PartENat where
@@ -282,7 +285,7 @@ theorem get_le_get {x y : PartENat} {hx : x.Dom} {hy : y.Dom} : x.get hx ≤ y.g
     rw [← coe_le_coe, natCast_get, natCast_get]
 
 theorem le_coe_iff (x : PartENat) (n : ℕ) : x ≤ n ↔ ∃ h : x.Dom, x.get h ≤ n := by
-  show (∃ h : True → x.Dom, _) ↔ ∃ h : x.Dom, x.get h ≤ n
+  change (∃ h : True → x.Dom, _) ↔ ∃ h : x.Dom, x.get h ≤ n
   simp only [forall_prop_of_true, dom_natCast, get_natCast']
 
 theorem lt_coe_iff (x : PartENat) (n : ℕ) : x < n ↔ ∃ h : x.Dom, x.get h < n := by
@@ -295,7 +298,7 @@ theorem coe_le_iff (n : ℕ) (x : PartENat) : (n : PartENat) ≤ x ↔ ∀ h : x
 
 theorem coe_lt_iff (n : ℕ) (x : PartENat) : (n : PartENat) < x ↔ ∀ h : x.Dom, n < x.get h := by
   rw [← some_eq_natCast]
-  simp only [lt_def, exists_prop_of_true, dom_some, forall_true_iff]
+  simp only [lt_def, exists_prop_of_true, dom_some]
   rfl
 
 nonrec theorem eq_zero_iff {x : PartENat} : x = 0 ↔ x ≤ 0 :=
@@ -385,7 +388,7 @@ instance isTotal : IsTotal PartENat (· ≤ ·) where
 
 noncomputable instance linearOrder : LinearOrder PartENat :=
   { PartENat.partialOrder with
-    le_total := IsTotal.total
+    le_total := isTotal.total
     toDecidableLE := Classical.decRel _
     max := (· ⊔ ·)
     max_def a b := congr_fun₂ (@sup_eq_maxDefault PartENat _ (_) _) _ _ }
@@ -400,16 +403,20 @@ noncomputable instance lattice : Lattice PartENat :=
     inf_le_right := min_le_right
     le_inf := fun _ _ _ => le_min }
 
-instance : CanonicallyOrderedAdd PartENat :=
-  { le_self_add := fun a b =>
-      PartENat.casesOn b (le_top.trans_eq (add_top _).symm) fun _ =>
-        PartENat.casesOn a (top_add _).ge fun _ =>
-          (coe_le_coe.2 le_self_add).trans_eq (Nat.cast_add _ _)
-    exists_add_of_le := fun {a b} =>
-      PartENat.casesOn b (fun _ => ⟨⊤, (add_top _).symm⟩) fun b =>
-        PartENat.casesOn a (fun h => ((natCast_lt_top _).not_ge h).elim) fun a h =>
-          ⟨(b - a : ℕ), by
-            rw [← Nat.cast_add, natCast_inj, add_comm, tsub_add_cancel_of_le (coe_le_coe.1 h)]⟩ }
+instance : CanonicallyOrderedAdd PartENat where
+  le_self_add a b :=
+    PartENat.casesOn b (le_top.trans_eq (add_top _).symm) fun _ =>
+      PartENat.casesOn a (top_add _).ge fun _ =>
+        (coe_le_coe.2 le_self_add).trans_eq (Nat.cast_add _ _)
+  le_add_self a b :=
+    PartENat.casesOn b (le_top.trans_eq (top_add _).symm) fun _ =>
+      PartENat.casesOn a (add_top _).ge fun _ =>
+        (coe_le_coe.2 le_add_self).trans_eq (Nat.cast_add _ _)
+  exists_add_of_le {a b} :=
+    PartENat.casesOn b (fun _ => ⟨⊤, (add_top _).symm⟩) fun b =>
+      PartENat.casesOn a (fun h => ((natCast_lt_top _).not_ge h).elim) fun a h =>
+        ⟨(b - a : ℕ), by
+          rw [← Nat.cast_add, natCast_inj, add_comm, tsub_add_cancel_of_le (coe_le_coe.1 h)]⟩
 
 theorem eq_natCast_sub_of_add_eq_natCast {x y : PartENat} {n : ℕ} (h : x + y = n) :
     x = ↑(n - y.get (dom_of_le_natCast ((le_add_left le_rfl).trans_eq h))) := by
@@ -424,8 +431,9 @@ protected theorem add_lt_add_right {x y z : PartENat} (h : x < y) (hz : z ≠ �
   induction y using PartENat.casesOn
   · rw [top_add]
     exact_mod_cast natCast_lt_top _
+  intro h
   norm_cast at h
-  exact_mod_cast add_lt_add_right h _
+  exact mod_cast add_lt_add_left h _
 
 protected theorem add_lt_add_iff_right {x y z : PartENat} (hz : z ≠ ⊤) : x + z < y + z ↔ x < y :=
   ⟨lt_of_add_lt_add_right, fun h => PartENat.add_lt_add_right h hz⟩
@@ -444,12 +452,14 @@ theorem lt_add_one {x : PartENat} (hx : x ≠ ⊤) : x < x + 1 := by
 theorem le_of_lt_add_one {x y : PartENat} (h : x < y + 1) : x ≤ y := by
   induction y using PartENat.casesOn
   · apply le_top
+  intro h
   rcases ne_top_iff.mp (ne_top_of_lt h) with ⟨m, rfl⟩
   exact_mod_cast Nat.le_of_lt_succ (by norm_cast at h)
 
 theorem add_one_le_of_lt {x y : PartENat} (h : x < y) : x + 1 ≤ y := by
   induction y using PartENat.casesOn
   · apply le_top
+  intro h
   rcases ne_top_iff.mp (ne_top_of_lt h) with ⟨m, rfl⟩
   exact_mod_cast Nat.succ_le_of_lt (by norm_cast at h)
 
@@ -458,6 +468,7 @@ theorem add_one_le_iff_lt {x y : PartENat} (hx : x ≠ ⊤) : x + 1 ≤ y ↔ x 
   rcases ne_top_iff.mp hx with ⟨m, rfl⟩
   induction y using PartENat.casesOn
   · apply natCast_lt_top
+  intro h
   exact_mod_cast Nat.lt_of_succ_le (by norm_cast at h)
 
 theorem coe_succ_le_iff {n : ℕ} {e : PartENat} : ↑n.succ ≤ e ↔ ↑n < e := by
@@ -469,6 +480,7 @@ theorem lt_add_one_iff_lt {x y : PartENat} (hx : x ≠ ⊤) : x < y + 1 ↔ x �
   induction y using PartENat.casesOn
   · rw [top_add]
     apply natCast_lt_top
+  intro h
   exact_mod_cast Nat.lt_succ_of_le (by norm_cast at h)
 
 lemma lt_coe_succ_iff_le {x : PartENat} {n : ℕ} (hx : x ≠ ⊤) : x < n.succ ↔ x ≤ n := by
@@ -539,6 +551,7 @@ theorem toWithTop_natCast' (n : ℕ) {_ : Decidable (n : PartENat).Dom} :
 theorem toWithTop_ofNat (n : ℕ) [n.AtLeastTwo] {_ : Decidable (OfNat.ofNat n : PartENat).Dom} :
     toWithTop (ofNat(n) : PartENat) = OfNat.ofNat n := toWithTop_natCast' n
 
+set_option backward.isDefEq.respectTransparency false in
 @[simp]
 theorem toWithTop_le {x y : PartENat} [hx : Decidable x.Dom] [hy : Decidable y.Dom] :
     toWithTop x ≤ toWithTop y ↔ x ≤ y := by
@@ -608,7 +621,7 @@ open scoped Classical in
 @[simp]
 theorem toWithTop_add {x y : PartENat} : toWithTop (x + y) = toWithTop x + toWithTop y := by
   refine PartENat.casesOn y ?_ ?_ <;> refine PartENat.casesOn x ?_ ?_ <;>
-    simp [add_top, top_add, ← Nat.cast_add, ← ENat.coe_add]
+    simp [add_top, top_add, ← Nat.cast_add]
 
 open scoped Classical in
 /-- `Equiv` between `PartENat` and `ℕ∞` (for the order isomorphism see
@@ -733,12 +746,14 @@ theorem find_eq_top_iff : find P = ⊤ ↔ ∀ n, ¬P n :=
 
 end Find
 
-noncomputable instance : LinearOrderedAddCommMonoidWithTop PartENat :=
-  { PartENat.linearOrder, PartENat.isOrderedAddMonoid, PartENat.orderTop with
-    top_add' := top_add }
+noncomputable instance : LinearOrderedAddCommMonoidWithTop PartENat where
+  top_add' := top_add
+  isAddLeftRegular_of_ne_top a ha b c hbc := by
+    contrapose! hbc
+    simpa only [ne_iff_lt_or_gt, PartENat.add_lt_add_iff_left ha] using hbc.lt_or_gt
 
 noncomputable instance : CompleteLinearOrder PartENat :=
   { lattice, withTopOrderIso.symm.toGaloisInsertion.liftCompleteLattice,
-    linearOrder, LinearOrder.toBiheytingAlgebra with }
+    linearOrder, linearOrder.toBiheytingAlgebra with }
 
 end PartENat
