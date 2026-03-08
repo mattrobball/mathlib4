@@ -1687,6 +1687,19 @@ theorem Semistable_interval_indep
     {a₂ b₂ : ℝ} (hab₂ : a₂ < b₂) (hthin₂ : b₂ - a₂ + 2 * ε₀ < 1)
     (hI₂ : σ.slicing.intervalProp C a₂ b₂ E) :
     (σ.skewedStabilityFunction_of_near C W hW hab₂).Semistable C E ψ := by
+  -- Proof strategy (Bridgeland Lemma 7.5):
+  -- Conditions 1-3 (intervalProp, nonzero, W≠0) transfer directly.
+  -- Condition 4 (wPhaseOf = ψ): use wPhaseOf_indep since ψ ∈ (α₂-1, α₂+1]
+  --   (follows from ψ ∈ (φ-ε₀, φ+ε₀) where φ ∈ (a₂,b₂), and thin interval width).
+  -- Condition 5 (subobject phase bound): for K,Q ∈ P((a₂,b₂)):
+  --   Case (a₂,b₂) ⊆ (a₁,b₁): K,Q also in P((a₁,b₁)), use hSS + wPhaseOf_indep.
+  --   General case: K is a subobject of E in heart P((a₂, a₂+1]).
+  --     phiPlus(K) ≤ phiPlus(E) (by hom-vanishing: top HN factor of K maps
+  --     mono to E, so phase ≤ phiPlus(E)). Similarly phiMinus(Q) ≥ phiMinus(E).
+  --     This confines K's σ-phases to the intersection of intervals, allowing
+  --     transfer of the W-semistability bound.
+  -- Blockers: heart-subobject phase bounds (phiPlus(K) ≤ phiPlus(E)),
+  --   heart-SES-to-triangle correspondence.
   sorry
 
 variable [IsTriangulated C] in
@@ -1840,10 +1853,17 @@ theorem StabilityCondition.hom_eq_zero_of_deformedPred
     have hdisjoint : ψ₂ + ε₀ + δ' ≤ ψ₁ - ε₀ - δ' := by
       simp only [hδ'_def]; linarith
     exact σ.slicing.intervalHom_eq_zero C hEI hFI hdisjoint f
-  · -- Small gap: 0 < ψ₁ - ψ₂ ≤ 2ε₀. Both E, F lie in a common abelian heart
-    -- P((c, c+1]) where c = ψ₂ - ε₀ - δ. Factor f in the heart and use
-    -- semistability on subobjects/quotients. Requires heart SES ↔ triangle
-    -- correspondence.
+  · -- Small gap: 0 < ψ₁ - ψ₂ ≤ 2ε₀.
+    -- Proof strategy (Bridgeland Lemma 7.6):
+    -- 1. Both E, F lie in a common abelian heart P((c, c+1]) (needs ε₀ < 1/4)
+    -- 2. Factor f as E ↠ im(f) ↪ F in the heart
+    -- 3. SES 0 → im(f) → F → coker(f) → 0 gives:
+    --    F's W-semistability implies wPhaseOf(W(im(f))) ≤ ψ₂
+    -- 4. SES 0 → ker(f) → E → im(f) → 0 and W(E) = W(ker) + W(im):
+    --    See-saw gives wPhaseOf(W(im(f))) ≥ ψ₁ (from E's W-semistability)
+    -- 5. ψ₁ ≤ wPhaseOf(W(im)) ≤ ψ₂ contradicts ψ₁ > ψ₂
+    -- Blockers: heart-SES-to-triangle correspondence, P(φ) closure under
+    -- subobjects/quotients in hearts, wPhaseOf see-saw lemma
     push_neg at hlargeGap
     sorry
 
@@ -2070,7 +2090,20 @@ def StabilityCondition.deformedSlicing (σ : StabilityCondition C)
             linarith
   hom_vanishing ψ₁ ψ₂ A B hlt hA hB f :=
     σ.hom_eq_zero_of_deformedPred C W hW hε₀ hε₀2 hsin hA hB hlt f
-  hn_exists := sorry
+  hn_exists := by
+    -- Bridgeland Nodes 7.7-7.9: HN filtrations for the deformed slicing Q.
+    -- Proof strategy:
+    -- For each nonzero E, decompose via σ's t-structure Q(>t)/Q(≤t):
+    -- 1. Use σ-HN filtration of E to get σ-semistable factors
+    -- 2. Each factor gets a Q-HN filtration via W-HN in P(φ) (sorry 4)
+    -- 3. Refine the σ-tower by inserting Q-HN subtowers for each factor
+    -- 4. The resulting tower is a Q-HN filtration of E
+    -- Alternatively (Bridgeland §7.7): quasi-abelian HN in thin categories
+    -- using well-founded recursion on subobject lattice, with Lemma 7.6
+    -- providing hom-vanishing. This is the main blocker (~350-600 lines).
+    -- Requires: sigma_semistable_intervalProp (sorry 4), hom-vanishing
+    -- (sorry 2), interval independence (sorry 1).
+    sorry
 
 variable [IsTriangulated C] in
 /-- **W-compatibility of the deformed slicing.** For every nonzero Q-semistable object `E`
