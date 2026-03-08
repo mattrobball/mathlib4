@@ -1718,17 +1718,26 @@ theorem deformedPred_common_interval
   have hδ_pos : 0 < δ := by linarith
   set a := min (ψ₁ - ε₀) (ψ₂ - ε₀) - δ
   set b := max (ψ₁ + ε₀) (ψ₂ + ε₀) + δ
-  have hab : a < b := by simp only [a, b]; nlinarith [le_max_left (ψ₁ + ε₀) (ψ₂ + ε₀),
-    le_min_iff.mp (le_refl (min (ψ₁ - ε₀) (ψ₂ - ε₀)))]
+  have hab : a < b := by
+    simp only [a, b]
+    nlinarith [min_le_left (ψ₁ - ε₀) (ψ₂ - ε₀), min_le_right (ψ₁ - ε₀) (ψ₂ - ε₀),
+      le_max_left (ψ₁ + ε₀) (ψ₂ + ε₀), le_max_right (ψ₁ + ε₀) (ψ₂ + ε₀)]
   have hthin : b - a + 2 * ε₀ < 1 := by
+    -- b - a = max(ψ₁+ε₀, ψ₂+ε₀) - min(ψ₁-ε₀, ψ₂-ε₀) + 2δ
+    -- max(x+c, y+c) - min(x-c, y-c) = |x-y| + 2c, so b - a = |ψ₁-ψ₂| + 2ε₀ + 2δ
+    -- Thus b - a + 2ε₀ = |ψ₁-ψ₂| + 4ε₀ + 2δ = |ψ₁-ψ₂| + 4ε₀ + (1-|ψ₁-ψ₂|-4ε₀)/2
+    -- = (|ψ₁-ψ₂| + 4ε₀ + 1) / 2 < 1 iff |ψ₁-ψ₂| + 4ε₀ < 1, which is hgap
     simp only [a, b, hδ_def]
-    rcases le_or_lt ψ₁ ψ₂ with h | h
-    · simp [min_eq_left (by linarith : ψ₁ - ε₀ ≤ ψ₂ - ε₀),
-            max_eq_right (by linarith : ψ₁ + ε₀ ≤ ψ₂ + ε₀)]
-      rw [abs_of_nonpos (by linarith)] at hgap; linarith
-    · simp [min_eq_right (by linarith : ψ₂ - ε₀ ≤ ψ₁ - ε₀),
-            max_eq_left (by linarith : ψ₂ + ε₀ ≤ ψ₁ + ε₀)]
-      rw [abs_of_pos (by linarith)] at hgap; linarith
+    have h1 : max (ψ₁ + ε₀) (ψ₂ + ε₀) - min (ψ₁ - ε₀) (ψ₂ - ε₀) =
+        |ψ₁ - ψ₂| + 2 * ε₀ := by
+      rcases le_total ψ₁ ψ₂ with h | h
+      · rw [max_eq_right (by linarith), min_eq_left (by linarith),
+            abs_of_nonpos (by linarith)]
+        ring
+      · rw [max_eq_left (by linarith), min_eq_right (by linarith),
+            abs_of_nonneg (by linarith)]
+        ring
+    linarith
   have hEI : σ.slicing.intervalProp C a b E :=
     σ.slicing.intervalProp_of_intrinsic_phases C hSS₁.2.1
       (by simp only [a]; nlinarith [min_le_left (ψ₁ - ε₀) (ψ₂ - ε₀)])
@@ -2083,29 +2092,33 @@ theorem StabilityCondition.deformedSlicing_compat
   · exact absurd hEZ hE
   · exact ⟨‖W (K₀.of C E)‖, norm_pos_iff.mpr hSS.2.2.1, hSS.polar⟩
 
-/-! ### Proposition 5.3: σ-semistable implies Q-semistable -/
+/-! ### Reverse phase confinement: σ-semistable → Q-interval -/
 
 variable [IsTriangulated C] in
-/-- **Proposition 5.3 consequence** (reverse phase confinement). If `E` is σ-semistable
-of phase `φ` and `‖W - Z‖_σ < sin(πε₀)`, then `E` is Q-semistable of some
-Q-phase `ψ` with `|ψ - φ| ≤ ε₀`.
+/-- **Reverse phase confinement**. If `E` is σ-semistable of phase `φ` and
+`‖W - Z‖_σ < sin(πε₀)`, then `E` lies in the Q-interval `(φ - ε₀ - δ, φ + ε₀ + δ)`
+for any `δ > 0`.
 
-This is the converse of `phase_confinement_from_stabSeminorm`: that lemma shows
-Q-semistable → σ-phases near Q-phase; this lemma shows σ-semistable → Q-phases
-near σ-phase.
+This replaces the incorrect statement `sigma_semistable_is_deformedPred` which claimed
+σ-semistable implies Q-semistable. That is **false**: a σ-semistable object `E` can
+decompose into W-semistable factors with different W-phases (e.g., `E = S₁ ⊕ S₂` with
+`S₁, S₂` σ-stable of the same phase but different W-phases), so `E` need not be
+Q-semistable. The correct statement is that `E` lies in a Q-interval of half-width
+`ε₀ + δ` centered at `φ`.
 
-The proof constructs a stability function on the heart `P((φ-1, φ])` from `W`,
-shows the heart is abelian (by `heartAbelian`), and uses `hasHN_of_finiteLength` to
-get W-HN filtrations. Since `E` is σ-semistable of phase `φ`, it lies in the heart,
-and its W-HN filtration gives W-semistability in the heart, hence Q-semistability. -/
-theorem sigma_semistable_is_deformedPred
+The proof constructs a Q-HN filtration for `E` by decomposing it in the abelian
+category `P(φ)` using the W-stability function restricted to `P(φ)`. Each W-HN
+factor in `P(φ)` has W-phase within `ε₀` of `φ`, giving the desired interval bound.
+-/
+theorem sigma_semistable_intervalProp
     (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ ≤ 1 / 2)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
-    {E : C} {φ : ℝ} (hP : σ.slicing.P φ E) (hE : ¬IsZero E) :
-    ∃ ψ : ℝ, |ψ - φ| ≤ ε₀ ∧
-      σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin ψ E := by
+    {E : C} {φ : ℝ} (hP : σ.slicing.P φ E) (hE : ¬IsZero E)
+    {δ : ℝ} (hδ : 0 < δ) :
+    (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hsin).intervalProp C
+      (φ - ε₀ - δ) (φ + ε₀ + δ) E := by
   sorry
 
 /-! ### Deformation theorem (Theorem 7.1) -/
@@ -2186,7 +2199,7 @@ theorem bridgeland_7_1 (σ : StabilityCondition C)
             exact G.hφ.antitone (Fin.mk_le_mk.mpr (by omega))
           exact σ.slicing.intervalProp_of_intrinsic_phases C hSS_i.2.1
             (by linarith) (by linarith)
-    -- Reverse: σ-HN factors → Prop 5.3 → Q-semistable → Q-intervalProp
+    -- Reverse: σ-HN factors → reverse phase confinement → Q-intervalProp
     have reverse : ∀ (E : C) (hE : ¬IsZero E) (δ : ℝ), 0 < δ →
         Q.intervalProp C
           (σ.slicing.phiMinus C E hE - ε₀ - δ)
@@ -2198,19 +2211,18 @@ theorem bridgeland_7_1 (σ : StabilityCondition C)
       intro i
       by_cases hFi : IsZero (F.toPostnikovTower.factor i)
       · exact Or.inl hFi
-      · obtain ⟨ψ, hψ, hQψ⟩ := sigma_semistable_is_deformedPred C σ W hW
-          hε₀ hε₀2 hsin (F.semistable i) hFi
-        have hQψ' : Q.P ψ (F.toPostnikovTower.factor i) := hQψ
-        have ⟨hpp, hpm⟩ := Q.phiPlus_eq_phiMinus_of_semistable C hQψ' hFi
-        have hFi_le : F.φ i ≤ σ.slicing.phiPlus C E hE := by
+      · have hFi_le : F.φ i ≤ σ.slicing.phiPlus C E hE := by
           rw [σ.slicing.phiPlus_eq C E hE F hnF hfirstF]
           exact F.hφ.antitone (Fin.mk_le_mk.mpr (Nat.zero_le i.val))
         have hFi_ge : σ.slicing.phiMinus C E hE ≤ F.φ i := by
           rw [σ.slicing.phiMinus_eq C E hE F hnF hlastF]
           exact F.hφ.antitone (Fin.mk_le_mk.mpr (by omega))
-        rw [abs_le] at hψ
-        exact Q.intervalProp_of_intrinsic_phases C hFi
-          (by rw [hpm]; linarith) (by rw [hpp]; linarith)
+        -- Factor i is σ-semistable of phase F.φ i. By reverse phase confinement,
+        -- it lies in Q-interval (F.φ i - ε₀ - δ, F.φ i + ε₀ + δ).
+        have hQint := sigma_semistable_intervalProp C σ W hW
+          hε₀ hε₀2 hsin (F.semistable i) hFi hδ
+        -- Widen to (phiMinus - ε₀ - δ, phiPlus + ε₀ + δ) using monotonicity
+        exact Q.intervalProp_mono C (by linarith) (by linarith) hQint
     -- Combine: |σ.phiPlus - Q.phiPlus| ≤ ε₀ and |σ.phiMinus - Q.phiMinus| ≤ ε₀
     apply slicingDist_le_of_phase_bounds
     · -- |σ.phiPlus(E) - Q.phiPlus(E)| ≤ ε₀
