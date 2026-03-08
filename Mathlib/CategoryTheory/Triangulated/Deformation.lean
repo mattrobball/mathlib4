@@ -1664,6 +1664,224 @@ private lemma intervalProp_of_postnikovTower (s : Slicing C) {E : C} {a b : ℝ}
     · exact Or.inl ((Iso.isZero_iff e₂).mp hZ)
     · exact Or.inr ⟨F.ofIso C e₂, hF⟩
 
+/-! ### P(φ) closure under K₀ decomposition in the heart
+
+**Bridgeland Lemma 5.2** (each P(φ) is abelian). The key step is that P(φ) is closed
+under subobjects and quotients in the heart P((φ-1, φ]). The proof uses the imaginary
+part of the central charge: if Z(E) = Z(K) + Z(Q) with E ∈ P(φ), and K, Q have all
+σ-phases in (φ-1, φ], then Im(Z(K) · exp(-iπφ)) ≤ 0 (each factor contributes
+non-positive imaginary part after rotation), and the sum being zero forces all factors
+to have phase exactly φ. -/
+
+/-- **Im non-positivity for heart objects rotated by φ.** If each nonzero σ-semistable
+factor of phase `ψ ∈ (a, b)` with `ψ ≤ φ` and `ψ > φ - 1` has non-positive
+`Im(Z(F) · exp(-iπφ))`, and E ∈ P((a, b))` with phases ≤ φ and > φ-1, then
+`Im(Z(E) · exp(-iπφ)) ≤ 0`. -/
+theorem im_Z_nonpos_of_heart_phases
+    (σ : StabilityCondition C) {φ : ℝ}
+    {E : C} (hE : ¬IsZero E)
+    (hle : σ.slicing.phiPlus C E hE ≤ φ)
+    (hgt : φ - 1 < σ.slicing.phiMinus C E hE) :
+    (σ.Z (K₀.of C E) *
+      Complex.exp (-(↑(Real.pi * φ) * Complex.I))).im ≤ 0 := by
+  -- Get HN filtration with nonzero first and last factors
+  obtain ⟨F, hn, hfirst, hlast⟩ := HNFiltration.exists_both_nonzero C σ.slicing hE
+  -- Phase bounds for all factors: φ - 1 < F.φ i ≤ φ
+  have hphases : ∀ i : Fin F.n, φ - 1 < F.φ i ∧ F.φ i ≤ φ := by
+    intro i
+    exact ⟨by calc φ - 1 < σ.slicing.phiMinus C E hE := hgt
+          _ = F.φ ⟨F.n - 1, by omega⟩ :=
+            σ.slicing.phiMinus_eq C E hE F hn hlast
+          _ ≤ F.φ i := F.hφ.antitone (Fin.mk_le_mk.mpr (by omega)),
+      by calc F.φ i ≤ F.φ ⟨0, hn⟩ :=
+            F.hφ.antitone (Fin.mk_le_mk.mpr (Nat.zero_le _))
+          _ = σ.slicing.phiPlus C E hE :=
+            (σ.slicing.phiPlus_eq C E hE F hn hfirst).symm
+          _ ≤ φ := hle⟩
+  -- K₀ decomposition: Z(E) = Σ Z(factors)
+  set P := F.toPostnikovTower
+  rw [show σ.Z (K₀.of C E) = ∑ i : Fin F.n, σ.Z (K₀.of C (P.factor i)) from by
+    rw [K₀.of_postnikovTower_eq_sum C P, map_sum]]
+  set rot := Complex.exp (-(↑(Real.pi * φ) * Complex.I))
+  rw [Finset.sum_mul, show (∑ i : Fin F.n, σ.Z (K₀.of C (P.factor i)) * rot).im =
+      ∑ i : Fin F.n, (σ.Z (K₀.of C (P.factor i)) * rot).im from
+    map_sum Complex.imAddGroupHom _ _]
+  -- Each term ≤ 0
+  apply Finset.sum_nonpos
+  intro i _
+  by_cases hi : IsZero (P.factor i)
+  · simp [K₀.of_isZero C hi]
+  · -- Nonzero factor: Z(factor) = m · exp(iπ · F.φ i) with m > 0
+    obtain ⟨m, hm, hval⟩ := σ.compat (F.φ i) (P.factor i) (F.semistable i) hi
+    rw [hval, mul_assoc, ← Complex.exp_add]
+    have harg : ↑(Real.pi * F.φ i) * Complex.I + -(↑(Real.pi * φ) * Complex.I) =
+        ↑(Real.pi * (F.φ i - φ)) * Complex.I := by push_cast; ring
+    rw [harg, Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im,
+      Complex.exp_ofReal_mul_I_re, Complex.exp_ofReal_mul_I_im,
+      zero_mul, add_zero]
+    -- m * sin(π(F.φ i - φ)) ≤ 0 since F.φ i - φ ∈ (-1, 0]
+    exact mul_nonpos_of_nonneg_of_nonpos (le_of_lt hm)
+      (Real.sin_nonpos_of_nonpos_of_neg_pi_le
+        (by nlinarith [Real.pi_pos, (hphases i).2])
+        (by nlinarith [Real.pi_pos, (hphases i).1]))
+
+/-- **P(φ) closure.** If `E ∈ P(φ)` is nonzero and `K → E → Q → K⟦1⟧` is a
+distinguished triangle where both `K` and `Q` have all σ-phases in `(φ-1, φ]`
+(i.e., both are in the heart of the t-structure at cutoff `φ`), then `K ∈ P(φ)`
+(and `Q ∈ P(φ)`).
+
+This is the key step in **Bridgeland's Lemma 5.2** (each P(φ) is abelian): it shows
+P(φ) is closed under subobjects in the abelian heart P((φ-1, φ]).
+
+**Proof.** The central charge Z satisfies Z(E) = Z(K) + Z(Q) (K₀ additivity).
+Since E ∈ P(φ), `Z(E) = r · exp(iπφ)` with `r > 0`, so `Im(Z(E)·exp(-iπφ)) = 0`.
+Each HN factor of K has phase `ψ ∈ (φ-1, φ]`, giving
+`Im(Z(factor)·exp(-iπφ)) = r_j · sin(π(ψ-φ)) ≤ 0`. Hence `Im(Z(K)·exp(-iπφ)) ≤ 0`,
+and likewise for Q. Since the sum is zero and both summands are non-positive, both are
+zero. This forces every factor of K to have `sin(π(ψ-φ)) = 0` with `ψ ∈ (φ-1, φ]`,
+giving `ψ = φ`. By strict anti of HN phases, `K` has exactly one HN factor of phase
+`φ`, i.e., `K ∈ P(φ)`. -/
+theorem P_phi_of_heart_triangle
+    (σ : StabilityCondition C) {φ : ℝ}
+    {K E Q : C} {f₁ : K ⟶ E} {f₂ : E ⟶ Q} {f₃ : Q ⟶ K⟦(1 : ℤ)⟧}
+    (hT : Triangle.mk f₁ f₂ f₃ ∈ distTriang C)
+    (hPφ : σ.slicing.P φ E) (hE : ¬IsZero E)
+    (hKne : ¬IsZero K)
+    (hK_le : σ.slicing.phiPlus C K hKne ≤ φ)
+    (hK_gt : φ - 1 < σ.slicing.phiMinus C K hKne)
+    (hQne : ¬IsZero Q)
+    (hQ_le : σ.slicing.phiPlus C Q hQne ≤ φ)
+    (hQ_gt : φ - 1 < σ.slicing.phiMinus C Q hQne) :
+    σ.slicing.P φ K := by
+  -- Step 1: K₀ additivity gives Z(E) = Z(K) + Z(Q)
+  have hZsum : σ.Z (K₀.of C E) = σ.Z (K₀.of C K) + σ.Z (K₀.of C Q) := by
+    have h := K₀.of_triangle C (Triangle.mk f₁ f₂ f₃) hT
+    simp only [Pretriangulated.Triangle.mk] at h
+    rw [h, map_add]
+  -- Step 2: Im(Z(E) · exp(-iπφ)) = 0
+  obtain ⟨mE, hmE, hvE⟩ := σ.compat φ E hPφ hE
+  set rot := Complex.exp (-(↑(Real.pi * φ) * Complex.I))
+  have him_E : (σ.Z (K₀.of C E) * rot).im = 0 := by
+    rw [hvE, mul_assoc, ← Complex.exp_add]
+    have : ↑(Real.pi * φ) * Complex.I + -(↑(Real.pi * φ) * Complex.I) = 0 := by ring
+    rw [this, Complex.exp_zero, mul_one, Complex.ofReal_im]
+  -- Step 3: Im(Z(K) · rot) ≤ 0 and Im(Z(Q) · rot) ≤ 0
+  have him_K := im_Z_nonpos_of_heart_phases C σ hKne hK_le hK_gt
+  have him_Q := im_Z_nonpos_of_heart_phases C σ hQne hQ_le hQ_gt
+  -- Step 4: Sum = 0 forces both = 0
+  have him_sum : (σ.Z (K₀.of C K) * rot).im + (σ.Z (K₀.of C Q) * rot).im = 0 := by
+    have : (σ.Z (K₀.of C E) * rot).im =
+        (σ.Z (K₀.of C K) * rot).im + (σ.Z (K₀.of C Q) * rot).im := by
+      rw [hZsum, add_mul, Complex.add_im]
+    linarith
+  have him_K_zero : (σ.Z (K₀.of C K) * rot).im = 0 := by linarith
+  -- Step 5: Decompose K via HN filtration and show all factors have phase φ
+  obtain ⟨FK, hnK, hfirstK, hlastK⟩ :=
+    HNFiltration.exists_both_nonzero C σ.slicing hKne
+  -- All factor phases lie in (φ-1, φ]
+  have hphases_K : ∀ i : Fin FK.n, φ - 1 < FK.φ i ∧ FK.φ i ≤ φ := by
+    intro i
+    exact ⟨by calc φ - 1 < σ.slicing.phiMinus C K hKne := hK_gt
+          _ = FK.φ ⟨FK.n - 1, by omega⟩ :=
+            σ.slicing.phiMinus_eq C K hKne FK hnK hlastK
+          _ ≤ FK.φ i := FK.hφ.antitone (Fin.mk_le_mk.mpr (by omega)),
+      by calc FK.φ i ≤ FK.φ ⟨0, hnK⟩ :=
+            FK.hφ.antitone (Fin.mk_le_mk.mpr (Nat.zero_le _))
+          _ = σ.slicing.phiPlus C K hKne :=
+            (σ.slicing.phiPlus_eq C K hKne FK hnK hfirstK).symm
+          _ ≤ φ := hK_le⟩
+  -- K₀ decomposition: Z(K) = Σ Z(factor_i)
+  have hZK : σ.Z (K₀.of C K) =
+      ∑ i : Fin FK.n,
+        σ.Z (K₀.of C (FK.toPostnikovTower.factor i)) := by
+    rw [K₀.of_postnikovTower_eq_sum C FK.toPostnikovTower, map_sum]
+  -- Each Im(Z(factor_i) · rot) ≤ 0
+  have hterms_nonpos : ∀ i ∈ Finset.univ,
+      (σ.Z (K₀.of C (FK.toPostnikovTower.factor i)) * rot).im ≤ 0 := by
+    intro i _
+    by_cases hi : IsZero (FK.toPostnikovTower.factor i)
+    · simp [K₀.of_isZero C hi]
+    · obtain ⟨mi, hmi, hvali⟩ := σ.compat (FK.φ i) _ (FK.semistable i) hi
+      rw [hvali, mul_assoc, ← Complex.exp_add]
+      have hargi : ↑(Real.pi * FK.φ i) * Complex.I +
+          -(↑(Real.pi * φ) * Complex.I) =
+          ↑(Real.pi * (FK.φ i - φ)) * Complex.I := by push_cast; ring
+      rw [hargi, Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im,
+        Complex.exp_ofReal_mul_I_re, Complex.exp_ofReal_mul_I_im,
+        zero_mul, add_zero]
+      exact mul_nonpos_of_nonneg_of_nonpos (le_of_lt hmi)
+        (Real.sin_nonpos_of_nonpos_of_neg_pi_le
+          (by nlinarith [Real.pi_pos, (hphases_K i).2])
+          (by nlinarith [Real.pi_pos, (hphases_K i).1]))
+  -- Sum of Im terms = Im(Z(K)·rot) = 0
+  have hsum_zero : ∑ i ∈ Finset.univ,
+      (σ.Z (K₀.of C (FK.toPostnikovTower.factor i)) * rot).im = 0 := by
+    have : (σ.Z (K₀.of C K) * rot).im =
+        ∑ i : Fin FK.n,
+          (σ.Z (K₀.of C (FK.toPostnikovTower.factor i)) * rot).im := by
+      rw [hZK, Finset.sum_mul]
+      exact map_sum Complex.imAddGroupHom _ _
+    linarith
+  -- Each term = 0 (nonpos summands summing to 0)
+  have hterm_zero : ∀ i ∈ Finset.univ,
+      (σ.Z (K₀.of C (FK.toPostnikovTower.factor i)) * rot).im = 0 :=
+    (Finset.sum_eq_zero_iff_of_nonpos hterms_nonpos).mp hsum_zero
+  -- Helper: nonzero factor with Im = 0 and phase in (φ-1, φ] has phase = φ
+  have factor_phase_eq :
+      ∀ i : Fin FK.n, ¬IsZero (FK.toPostnikovTower.factor i) → FK.φ i = φ := by
+    intro i hi
+    have him := hterm_zero i (Finset.mem_univ _)
+    obtain ⟨mi, hmi, hvali⟩ := σ.compat (FK.φ i) _ (FK.semistable i) hi
+    rw [hvali, mul_assoc, ← Complex.exp_add] at him
+    have hargi : ↑(Real.pi * FK.φ i) * Complex.I +
+        -(↑(Real.pi * φ) * Complex.I) =
+        ↑(Real.pi * (FK.φ i - φ)) * Complex.I := by push_cast; ring
+    rw [hargi, Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im,
+      Complex.exp_ofReal_mul_I_re, Complex.exp_ofReal_mul_I_im,
+      zero_mul, add_zero] at him
+    -- mi > 0 and mi * sin(π(FK.φ i - φ)) = 0, so sin(π(FK.φ i - φ)) = 0
+    have hsin_zero : Real.sin (Real.pi * (FK.φ i - φ)) = 0 := by
+      rcases mul_eq_zero.mp him with h | h
+      · linarith
+      · exact h
+    -- sin(πx) = 0 with x ∈ (-1, 0] forces x = 0
+    have hx_gt : -1 < FK.φ i - φ := by linarith [(hphases_K i).1]
+    have hx_le : FK.φ i - φ ≤ 0 := by linarith [(hphases_K i).2]
+    -- πx ∈ (-π, 0], sin = 0 only at 0
+    by_contra hne
+    have hlt : FK.φ i - φ < 0 := lt_of_le_of_ne hx_le (sub_ne_zero.mpr hne)
+    exact absurd hsin_zero (ne_of_lt (Real.sin_neg_of_neg_of_neg_pi_lt
+      (by nlinarith [Real.pi_pos]) (by nlinarith [Real.pi_pos])))
+  -- Top and bottom phases = φ
+  have htop_phi : FK.φ ⟨0, hnK⟩ = φ := factor_phase_eq ⟨0, hnK⟩ hfirstK
+  have hbot_phi : FK.φ ⟨FK.n - 1, by omega⟩ = φ := factor_phase_eq ⟨FK.n - 1, by omega⟩ hlastK
+  -- n = 1: if n > 1, strict anti gives φ = FK.φ 0 > FK.φ (n-1) = φ, contradiction
+  have hn1 : FK.n = 1 := by
+    by_contra h
+    have h2 : 2 ≤ FK.n := by omega
+    have := FK.hφ (show (⟨0, hnK⟩ : Fin FK.n) < ⟨FK.n - 1, by omega⟩ from
+      Fin.mk_lt_mk.mpr (by omega))
+    linarith
+  -- K ≅ FK.factor 0 ∈ P(φ) via the n=1 PostnikovTower
+  have hfact0 : σ.slicing.P φ (FK.toPostnikovTower.factor ⟨0, hnK⟩) := by
+    rw [← htop_phi]; exact FK.semistable ⟨0, hnK⟩
+  -- When n = 1 and base is zero, obj₁ ≅ 0 so mor₂ is an iso: obj₂ ≅ obj₃ = factor
+  let T := FK.triangle ⟨0, hnK⟩
+  have hZ₁ : IsZero T.obj₁ :=
+    IsZero.of_iso FK.base_isZero (Classical.choice (FK.triangle_obj₁ ⟨0, hnK⟩))
+  have : IsIso T.mor₂ :=
+    (Triangle.isZero₁_iff_isIso₂ T (FK.triangle_dist ⟨0, hnK⟩)).mp hZ₁
+  -- T.obj₂ ≅ chain(1) = chain(Fin.last n) ≅ K
+  have hobj₂_eq : FK.chain.obj' (0 + 1) (by omega) =
+      FK.chain.obj (Fin.last FK.n) :=
+    congrArg FK.chain.obj (Fin.ext (by simp [Fin.last]; omega))
+  let e₂K : T.obj₂ ≅ K :=
+    (Classical.choice (FK.triangle_obj₂ ⟨0, hnK⟩)).trans
+      ((eqToIso hobj₂_eq).trans (Classical.choice FK.top_iso))
+  -- K ≅ T.obj₃ = factor via e₂K.symm ≫ asIso(mor₂)
+  haveI := σ.slicing.closedUnderIso φ
+  exact (σ.slicing.P φ).prop_of_iso (e₂K.symm.trans (asIso T.mor₂)).symm hfact0
+
 /-! ### Lemma 7.5: Interval independence of W-semistability -/
 
 variable [IsTriangulated C] in
