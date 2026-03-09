@@ -58,7 +58,7 @@ theorem StabilityCondition.exists_epsilon0 (σ : StabilityCondition C) :
     ∃ ε₀ : ℝ, 0 < ε₀ ∧ ε₀ < 1 / 8 ∧
       ∀ t : ℝ, ∀ (E : C),
         σ.slicing.intervalProp C (t - 4 * ε₀) (t + 4 * ε₀) E →
-          WellFoundedLT (Subobject E) ∧ WellFoundedGT (Subobject E) := by
+          Finite (Subobject E) := by
   obtain ⟨η, hη, hlf⟩ := σ.locallyFinite
   refine ⟨min (η / 4) (1 / 16), by positivity,
     by linarith [min_le_right (η / 4) (1 / 16 : ℝ)],
@@ -71,7 +71,7 @@ theorem StabilityCondition.exists_epsilon0_sector (σ : StabilityCondition C) :
     ∃ ε₀ : ℝ, 0 < ε₀ ∧ ε₀ < 1 / 4 ∧
       ∀ t : ℝ, ∀ (E : C),
         σ.slicing.intervalProp C (t - 2 * ε₀) (t + 2 * ε₀) E →
-          WellFoundedLT (Subobject E) ∧ WellFoundedGT (Subobject E) := by
+          Finite (Subobject E) := by
   obtain ⟨η, hη, hlf⟩ := σ.locallyFinite
   refine ⟨min (η / 2) (1 / 8), by positivity,
     by linarith [min_le_right (η / 2) (1 / 8 : ℝ)],
@@ -2996,7 +2996,7 @@ theorem bridgeland_7_1 (σ : StabilityCondition C)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     (hε₀_lf : ∃ δ : ℝ, 0 < δ ∧ ∀ t (E : C),
       σ.slicing.intervalProp C (t - (ε₀ + δ)) (t + (ε₀ + δ)) E →
-      WellFoundedLT (Subobject E) ∧ WellFoundedGT (Subobject E)) :
+      Finite (Subobject E)) :
     ∃ (τ : StabilityCondition C), τ.Z = W ∧
       slicingDist C σ.slicing τ.slicing ≤ ENNReal.ofReal ε₀ := by
   refine ⟨⟨σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hsin, W,
