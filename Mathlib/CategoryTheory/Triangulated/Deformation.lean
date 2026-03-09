@@ -6,8 +6,9 @@ Authors: Formalization
 import Mathlib.CategoryTheory.Triangulated.StabilityCondition
 import Mathlib.CategoryTheory.Triangulated.StabilityFunction
 import Mathlib.CategoryTheory.Triangulated.IntervalCategory
+import Mathlib.CategoryTheory.Triangulated.TStructure.HeartAbelian
 
-set_option linter.style.longFile 2400
+set_option linter.style.longFile 2800
 
 /-!
 # Deformation of Stability Conditions
@@ -34,8 +35,6 @@ construct a new slicing `Q` such that `τ = (W, Q)` is a stability condition wit
 
 * Bridgeland, "Stability conditions on triangulated categories", §7
 -/
-
-set_option linter.style.longFile 2400
 
 noncomputable section
 
@@ -782,7 +781,7 @@ hperturb condition needed by phase confinement. -/
 theorem hperturb_of_stabSeminorm (σ : StabilityCondition C)
     (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     {a b : ℝ} (hthin : b - a < 1)
-    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ ≤ 1 / 2)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hsin : stabSeminorm C σ (W - σ.Z) <
       ENNReal.ofReal (Real.sin (Real.pi * ε₀))) :
     ∀ (F : C) (φ : ℝ), (σ.slicing.P φ) F → ¬IsZero F → a < φ → φ < b →
@@ -819,7 +818,8 @@ theorem hperturb_of_stabSeminorm (σ : StabilityCondition C)
   have hφα : φ ∈ Set.Ioo ((a + b) / 2 - 1 / 2) ((a + b) / 2 + 1 / 2) :=
     ⟨by linarith, by linarith⟩
   -- Apply wPhaseOf_perturbation
-  have h := wPhaseOf_perturbation C σ hP hFne W hφα hε₀ hε₀2 hbd_strict
+  have h := wPhaseOf_perturbation C σ hP hFne W hφα hε₀
+    (hε₀2.le.trans (by norm_num)) hbd_strict
   exact ⟨by linarith [abs_lt.mp h], by linarith [abs_lt.mp h]⟩
 
 /-! ### Upper half-plane membership from positive argument -/
@@ -1606,7 +1606,7 @@ theorem phase_confinement_from_stabSeminorm
     (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     {E : C} {a b : ℝ} (hab : a < b)
-    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ ≤ 1 / 2)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hthin : b - a + 2 * ε₀ < 1)
     (hsin : stabSeminorm C σ (W - σ.Z) <
       ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
@@ -1881,104 +1881,221 @@ theorem P_phi_of_heart_triangle
   exact ⟨P_phi_of_im_zero_heart C σ hKne hK_le hK_gt him_K_zero,
     P_phi_of_im_zero_heart C σ hQne hQ_le hQ_gt him_Q_zero⟩
 
-/-! ### Lemma 7.5: Interval independence of W-semistability -/
+/-! ### P(φ) is abelian (Bridgeland Lemma 5.2)
+
+Each slicing slice `P(φ)` of a stability condition is an abelian category.
+The proof uses:
+1. Extension closure (`semistable_of_triangle`) for finite products
+2. Hom-vanishing from the slicing for negative Hom spaces
+3. Admissibility via the t-structure truncation from the shifted slicing,
+   with a Z-ray argument promoting heart membership to P(φ) membership -/
+
+/-- P(φ) is closed under biproducts for a stability condition. -/
+lemma StabilityCondition.P_phi_biprod
+    (σ : StabilityCondition C) {φ : ℝ} {X Y : C}
+    (hX : σ.slicing.P φ X) (hY : σ.slicing.P φ Y) :
+    σ.slicing.P φ (X ⊞ Y) :=
+  σ.slicing.semistable_of_triangle C φ hX hY
+    (binaryBiproductTriangle_distinguished X Y)
+
+/-- P(φ) is closed under binary products for a stability condition. -/
+instance StabilityCondition.P_phi_closedUnderBinaryProducts
+    (σ : StabilityCondition C) (φ : ℝ) :
+    (σ.slicing.P φ).IsClosedUnderBinaryProducts :=
+  ObjectProperty.IsClosedUnderLimitsOfShape.mk' (by
+    rintro _ ⟨F, hF⟩
+    exact (σ.slicing.P φ).prop_of_iso
+      ((biprod.isoProd (F.obj ⟨WalkingPair.left⟩) (F.obj ⟨WalkingPair.right⟩)) ≪≫
+        (HasLimit.isoOfNatIso (Discrete.natIso (fun ⟨j⟩ ↦ match j with
+          | WalkingPair.left => Iso.refl _
+          | WalkingPair.right => Iso.refl _))).symm)
+      (σ.P_phi_biprod C (hF ⟨WalkingPair.left⟩) (hF ⟨WalkingPair.right⟩)))
+
+/-- P(φ) is closed under finite products for a stability condition. -/
+instance StabilityCondition.P_phi_closedUnderFiniteProducts
+    (σ : StabilityCondition C) (φ : ℝ) :
+    (σ.slicing.P φ).IsClosedUnderFiniteProducts :=
+  ObjectProperty.IsClosedUnderFiniteProducts.mk'
+
+/-- P(φ) has finite products for a stability condition. -/
+noncomputable instance StabilityCondition.P_phi_hasFiniteProducts
+    (σ : StabilityCondition C) (φ : ℝ) :
+    HasFiniteProducts (σ.slicing.P φ).FullSubcategory :=
+  hasFiniteProducts_of_has_binary_and_terminal
+
+/-- **No negative Hom spaces in P(φ).** For `X, Y ∈ P(φ)`, every morphism
+`ι X ⟶ (ι Y)⟦n⟧` is zero when `n < 0`. Y⟦n⟧ ∈ P(φ+n)` by the shift axiom,
+and since `n < 0` we have `φ > φ + n`, so hom-vanishing applies. -/
+theorem StabilityCondition.P_phi_hom_vanishing
+    (σ : StabilityCondition C) (φ : ℝ) :
+    ∀ ⦃X Y : (σ.slicing.P φ).FullSubcategory⦄ ⦃n : ℤ⦄
+      (f : (σ.slicing.P φ).ι.obj X ⟶ ((σ.slicing.P φ).ι.obj Y)⟦n⟧),
+      n < 0 → f = 0 := by
+  intro X Y n f hn
+  exact σ.slicing.hom_vanishing φ (φ + ↑n) X.obj (Y.obj⟦n⟧)
+    (by linarith [show (↑n : ℝ) < 0 from Int.cast_lt_zero.mpr hn])
+    X.property
+    ((σ.slicing.shift_int C φ Y.obj n).mp Y.property) f
 
 variable [IsTriangulated C] in
-/-- **Bridgeland's Lemma 7.5** (interval independence of W-semistability). If `E` is
-W-semistable of W-phase `ψ` in a thin interval `(a₁, b₁)`, then `E` is also W-semistable
-of W-phase `ψ` in any other thin interval `(a₂, b₂)` that contains `E`.
+/-- **Z-ray argument for P(φ) membership from truncation of a P(φ)-cone.**
+Given a distinguished triangle `A → B → X₃ → A⟦1⟧` with `A, B ∈ P(φ)`, the
+t-structure truncation pieces of `X₃` (from the shifted slicing) lie in `P(φ)`.
 
-The proof uses **Proposition 5.3** (stability functions ↔ stability conditions on hearts)
-to show that W-semistability in the abelian heart is intrinsic, and then transfers between
-different interval choices. The abelian heart factorization gives the key implication:
-subobjects in any thin interval containing `E` satisfy the phase bound. -/
-theorem Semistable_interval_indep
-    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
-    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
-    {E : C} {a₁ b₁ : ℝ} (hab₁ : a₁ < b₁)
-    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ ≤ 1 / 2)
-    (hsin : stabSeminorm C σ (W - σ.Z) <
-      ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
-    (hthin₁ : b₁ - a₁ + 2 * ε₀ < 1) {ψ : ℝ}
-    (hSS : (σ.skewedStabilityFunction_of_near C W hW hab₁).Semistable C E ψ)
-    {a₂ b₂ : ℝ} (hab₂ : a₂ < b₂) (hthin₂ : b₂ - a₂ + 2 * ε₀ < 1)
-    (hI₂ : σ.slicing.intervalProp C a₂ b₂ E) :
-    (σ.skewedStabilityFunction_of_near C W hW hab₂).Semistable C E ψ := by
-  -- Proof strategy (Bridgeland Lemma 7.5):
-  -- Conditions 1-3 (intervalProp, nonzero, W≠0) transfer directly.
-  -- Condition 4 (wPhaseOf = ψ): use wPhaseOf_indep since ψ ∈ (α₂-1, α₂+1]
-  --   (follows from ψ ∈ (φ-ε₀, φ+ε₀) where φ ∈ (a₂,b₂), and thin interval width).
-  -- Condition 5 (subobject phase bound): for K,Q ∈ P((a₂,b₂)):
-  --   Case (a₂,b₂) ⊆ (a₁,b₁): K,Q also in P((a₁,b₁)), use hSS + wPhaseOf_indep.
-  --   General case: K is a subobject of E in heart P((a₂, a₂+1]).
-  --     phiPlus(K) ≤ phiPlus(E) (by hom-vanishing: top HN factor of K maps
-  --     mono to E, so phase ≤ phiPlus(E)). Similarly phiMinus(Q) ≥ phiMinus(E).
-  --     This confines K's σ-phases to the intersection of intervals, allowing
-  --     transfer of the W-semistability bound.
-  -- Blockers: heart-subobject phase bounds (phiPlus(K) ≤ phiPlus(E)),
-  --   heart-SES-to-triangle correspondence.
+The proof uses K₀ additivity on the original and truncation triangles to show
+`Z(truncLT) + Z(Q_obj)` lies on the ray `ℝ · exp(iπφ)`. Since `truncLT` has
+phases in `(φ, φ+1]` and `Q_obj` has phases in `(φ-1, φ]`, the imaginary parts
+after rotation by `exp(-iπφ)` have opposite signs and must both vanish. The sector
+bound then forces all HN factors to have phase exactly `φ` (resp. `φ+1`). -/
+private theorem P_phi_of_truncation_of_P_phi_cone
+    (σ : StabilityCondition C) (φ : ℝ)
+    {A B X₃ : C} (hA : σ.slicing.P φ A) (hB : σ.slicing.P φ B)
+    {f₁ : A ⟶ B} {f₂ : B ⟶ X₃} {f₃ : X₃ ⟶ A⟦(1 : ℤ)⟧}
+    (hT : Triangle.mk f₁ f₂ f₃ ∈ distTriang C) :
+    σ.slicing.P φ
+      (((σ.slicing.phaseShift C (φ - 1)).toTStructure.truncGE 0).obj X₃) ∧
+    σ.slicing.P φ
+      ((((σ.slicing.phaseShift C (φ - 1)).toTStructure.truncLT 0).obj X₃)⟦(-1 : ℤ)⟧) := by
   sorry
 
 variable [IsTriangulated C] in
-/-- **Corollary of Lemma 7.5**: Two Q-semistable objects can always be placed in a
-common thin interval. If `E ∈ Q(ψ₁)` and `F ∈ Q(ψ₂)` with `ε₀ ≤ 1/4`,
-then there exists a thin interval `(a, b)` with `b - a + 2ε₀ < 1` containing
-both `E` and `F`, with both `E` and `F` semistable in it. -/
-theorem deformedPred_common_interval
-    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
-    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
-    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ ≤ 1 / 2)
-    (hsin : stabSeminorm C σ (W - σ.Z) <
-      ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
-    {E F : C} {ψ₁ ψ₂ : ℝ}
-    {a₁ b₁ : ℝ} (hab₁ : a₁ < b₁) (hthin₁ : b₁ - a₁ + 2 * ε₀ < 1)
-    (hSS₁ : (σ.skewedStabilityFunction_of_near C W hW hab₁).Semistable C E ψ₁)
-    {a₂ b₂ : ℝ} (hab₂ : a₂ < b₂) (hthin₂ : b₂ - a₂ + 2 * ε₀ < 1)
-    (hSS₂ : (σ.skewedStabilityFunction_of_near C W hW hab₂).Semistable C F ψ₂)
-    (hgap : |ψ₁ - ψ₂| + 2 * ε₀ + 2 * ε₀ < 1) :
-    ∃ (a b : ℝ) (hab : a < b) (_ : b - a + 2 * ε₀ < 1),
-      (σ.skewedStabilityFunction_of_near C W hW hab).Semistable C E ψ₁ ∧
-      (σ.skewedStabilityFunction_of_near C W hW hab).Semistable C F ψ₂ := by
-  -- Choose interval covering both phase confinement ranges
-  have ⟨hE_lo, hE_hi⟩ := phase_confinement_from_stabSeminorm C σ W hW hab₁
-    hε₀ hε₀2 hthin₁ hsin hSS₁
-  have ⟨hF_lo, hF_hi⟩ := phase_confinement_from_stabSeminorm C σ W hW hab₂
-    hε₀ hε₀2 hthin₂ hsin hSS₂
-  set δ := (1 - |ψ₁ - ψ₂| - 4 * ε₀) / 4 with hδ_def
-  have hδ_pos : 0 < δ := by linarith
-  set a := min (ψ₁ - ε₀) (ψ₂ - ε₀) - δ
-  set b := max (ψ₁ + ε₀) (ψ₂ + ε₀) + δ
-  have hab : a < b := by
-    simp only [a, b]
-    nlinarith [min_le_left (ψ₁ - ε₀) (ψ₂ - ε₀), min_le_right (ψ₁ - ε₀) (ψ₂ - ε₀),
-      le_max_left (ψ₁ + ε₀) (ψ₂ + ε₀), le_max_right (ψ₁ + ε₀) (ψ₂ + ε₀)]
-  have hthin : b - a + 2 * ε₀ < 1 := by
-    -- b - a = max(ψ₁+ε₀, ψ₂+ε₀) - min(ψ₁-ε₀, ψ₂-ε₀) + 2δ
-    -- max(x+c, y+c) - min(x-c, y-c) = |x-y| + 2c, so b - a = |ψ₁-ψ₂| + 2ε₀ + 2δ
-    -- Thus b - a + 2ε₀ = |ψ₁-ψ₂| + 4ε₀ + 2δ = |ψ₁-ψ₂| + 4ε₀ + (1-|ψ₁-ψ₂|-4ε₀)/2
-    -- = (|ψ₁-ψ₂| + 4ε₀ + 1) / 2 < 1 iff |ψ₁-ψ₂| + 4ε₀ < 1, which is hgap
-    simp only [a, b, hδ_def]
-    have h1 : max (ψ₁ + ε₀) (ψ₂ + ε₀) - min (ψ₁ - ε₀) (ψ₂ - ε₀) =
-        |ψ₁ - ψ₂| + 2 * ε₀ := by
-      rcases le_total ψ₁ ψ₂ with h | h
-      · rw [max_eq_right (by linarith), min_eq_left (by linarith),
-            abs_of_nonpos (by linarith)]
-        ring
-      · rw [max_eq_left (by linarith), min_eq_right (by linarith),
-            abs_of_nonneg (by linarith)]
-        ring
-    linarith
-  have hEI : σ.slicing.intervalProp C a b E :=
-    σ.slicing.intervalProp_of_intrinsic_phases C hSS₁.2.1
-      (by simp only [a]; nlinarith [min_le_left (ψ₁ - ε₀) (ψ₂ - ε₀)])
-      (by simp only [b]; nlinarith [le_max_left (ψ₁ + ε₀) (ψ₂ + ε₀)])
-  have hFI : σ.slicing.intervalProp C a b F :=
-    σ.slicing.intervalProp_of_intrinsic_phases C hSS₂.2.1
-      (by simp only [a]; nlinarith [min_le_right (ψ₁ - ε₀) (ψ₂ - ε₀)])
-      (by simp only [b]; nlinarith [le_max_right (ψ₁ + ε₀) (ψ₂ + ε₀)])
-  exact ⟨a, b, hab, hthin,
-    Semistable_interval_indep C σ W hW hab₁ hε₀ hε₀2 hsin hthin₁ hSS₁ hab hthin hEI,
-    Semistable_interval_indep C σ W hW hab₂ hε₀ hε₀2 hsin hthin₂ hSS₂ hab hthin hFI⟩
+/-- **Admissibility of morphisms in P(φ)** (**Bridgeland's Lemma 5.2**). For any morphism
+`f₁ : X₁ → X₂` in `P(φ)` and distinguished triangle `ι(X₁) → ι(X₂) → X₃ → ι(X₁)⟦1⟧`,
+there exist `K, Q ∈ P(φ)` and a distinguished triangle `(ι K)⟦1⟧ → X₃ → ι Q`.
+
+The proof uses the truncation from the t-structure `(s.phaseShift(φ-1)).toTStructure`
+to decompose X₃, then promotes the truncation pieces from heart `P((φ-1, φ])`
+to `P(φ)` via `P_phi_of_truncation_of_P_phi_cone` (the Z-ray argument). -/
+theorem StabilityCondition.P_phi_admissible
+    (σ : StabilityCondition C) (φ : ℝ) :
+    AbelianSubcategory.admissibleMorphism (σ.slicing.P φ).ι = ⊤ := by
+  set s := σ.slicing
+  set ss := s.phaseShift C (φ - 1)
+  set t := ss.toTStructure
+  ext X₁ X₂ f₁; simp only [MorphismProperty.top_apply, iff_true]
+  intro X₃ f₂ f₃ hT
+  -- P(φ) objects have phase 1 in the shifted slicing
+  have hP1 : ∀ X : (s.P φ).FullSubcategory, ss.P 1 X.obj := by
+    intro X; change s.P (1 + (φ - 1)) X.obj
+    rw [show (1 : ℝ) + (φ - 1) = φ from by ring]; exact X.property
+  -- Cast cleanup helpers
+  have cast_le : (-↑(0 : ℤ) : ℝ) = 0 := by simp
+  have cast_ge : (1 - ↑(0 : ℤ) : ℝ) = 1 := by simp
+  -- Step 1: P(φ) objects are IsLE 0 and IsGE 0 for t
+  haveI hX₁_le : t.IsLE X₁.obj 0 := by
+    refine ⟨?_⟩; change ss.gtProp C (-↑(0 : ℤ)) X₁.obj
+    rw [cast_le]; exact ss.gtProp_of_semistable C 1 0 X₁.obj (hP1 X₁) (by norm_num)
+  haveI hX₂_le : t.IsLE X₂.obj 0 := by
+    refine ⟨?_⟩; change ss.gtProp C (-↑(0 : ℤ)) X₂.obj
+    rw [cast_le]; exact ss.gtProp_of_semistable C 1 0 X₂.obj (hP1 X₂) (by norm_num)
+  haveI hX₁_ge : t.IsGE X₁.obj 0 := by
+    refine ⟨?_⟩; change ss.leProp C (1 - ↑(0 : ℤ)) X₁.obj
+    rw [cast_ge]; exact ss.leProp_of_semistable C 1 1 X₁.obj (hP1 X₁) le_rfl
+  haveI hX₂_ge : t.IsGE X₂.obj 0 := by
+    refine ⟨?_⟩; change ss.leProp C (1 - ↑(0 : ℤ)) X₂.obj
+    rw [cast_ge]; exact ss.leProp_of_semistable C 1 1 X₂.obj (hP1 X₂) le_rfl
+  -- Shifted objects for the rotation
+  haveI : t.IsLE (X₁.obj⟦(1 : ℤ)⟧) 0 := by
+    haveI := t.isLE_shift X₁.obj 0 1 (-1); exact t.isLE_of_le _ (-1) 0
+  haveI : t.IsGE X₂.obj (-1) := t.isGE_of_ge _ (-1) 0
+  haveI : t.IsGE (X₁.obj⟦(1 : ℤ)⟧) (-1) := t.isGE_shift X₁.obj 0 1 (-1)
+  -- Step 2: X₃ is IsLE 0 and IsGE(-1) from the rotation triangle
+  have hrot := rot_of_distTriang _ hT
+  haveI hX₃_le : t.IsLE X₃ 0 := by
+    refine t.isLE₂ _ hrot 0 ?_ ?_
+    · simp only [Triangle.rotate_obj₁, Triangle.mk_obj₂, ObjectProperty.ι_obj]
+      exact hX₂_le
+    · simp only [Triangle.rotate_obj₃, Triangle.mk_obj₁, ObjectProperty.ι_obj]
+      exact ‹t.IsLE (X₁.obj⟦(1 : ℤ)⟧) 0›
+  haveI hX₃_ge : t.IsGE X₃ (-1) := by
+    refine t.isGE₂ _ hrot (-1) ?_ ?_
+    · simp only [Triangle.rotate_obj₁, Triangle.mk_obj₂, ObjectProperty.ι_obj]
+      exact ‹t.IsGE X₂.obj (-1)›
+    · simp only [Triangle.rotate_obj₃, Triangle.mk_obj₁, ObjectProperty.ι_obj]
+      exact ‹t.IsGE (X₁.obj⟦(1 : ℤ)⟧) (-1)›
+  -- Step 3: Truncation — decompose X₃ via the t-structure
+  have htrunc := t.triangleLTGE_distinguished 0 X₃
+  -- Q := (truncGE 0).obj X₃ is IsLE 0 (rotation of truncation + isLE₂)
+  haveI hQ_le : t.IsLE ((t.truncGE 0).obj X₃) 0 := by
+    have hrot_trunc := rot_of_distTriang _ htrunc
+    refine t.isLE₂ _ hrot_trunc 0 ?_ ?_
+    · dsimp; exact hX₃_le
+    · dsimp
+      haveI : t.IsLE ((t.truncLT 0).obj X₃) (-1) := t.isLE_truncLT_obj ..
+      haveI := t.isLE_shift ((t.truncLT 0).obj X₃) (-1) 1 (-2)
+      exact t.isLE_of_le _ (-2) 0
+  -- (truncLT 0).obj X₃ is IsGE(-1) (inverse rotation + isGE₂)
+  haveI hK_ge : t.IsGE ((t.truncLT 0).obj X₃) (-1) := by
+    have hinv := inv_rot_of_distTriang _ htrunc
+    refine t.isGE₂ _ hinv (-1) ?_ ?_
+    · dsimp
+      haveI : t.IsGE (((t.truncGE 0).obj X₃)⟦(-1 : ℤ)⟧) 1 :=
+        t.isGE_shift _ 0 (-1) 1
+      exact t.isGE_of_ge _ (-1) 1
+    · dsimp; exact hX₃_ge
+  -- Q is in the heart (IsGE 0 by truncation + IsLE 0)
+  haveI : t.IsGE ((t.truncGE 0).obj X₃) 0 := inferInstance
+  -- K' := ((truncLT 0).obj X₃)⟦-1⟧ is in the heart
+  haveI : t.IsLE ((t.truncLT 0).obj X₃) (-1) := t.isLE_truncLT_obj ..
+  -- Step 4: Promote from heart to P(φ) via Z-ray argument
+  have ⟨hQ_Pφ, hK_Pφ⟩ := P_phi_of_truncation_of_P_phi_cone C σ φ
+    X₁.property X₂.property hT
+  -- Step 5: Build the admissible triangle from the truncation triangle
+  let K : (s.P φ).FullSubcategory := ⟨_, hK_Pφ⟩
+  let Q : (s.P φ).FullSubcategory := ⟨_, hQ_Pφ⟩
+  let e₁ : ((s.P φ).ι.obj K)⟦(1 : ℤ)⟧ ≅ (t.truncLT 0).obj X₃ :=
+    (shiftEquiv C (1 : ℤ)).counitIso.app ((t.truncLT 0).obj X₃)
+  let α : ((s.P φ).ι.obj K)⟦(1 : ℤ)⟧ ⟶ X₃ := e₁.hom ≫ (t.truncLTι 0).app X₃
+  let β : X₃ ⟶ (s.P φ).ι.obj Q := (t.truncGEπ 0).app X₃
+  let γ : (s.P φ).ι.obj Q ⟶ ((s.P φ).ι.obj K)⟦(1 : ℤ)⟧⟦(1 : ℤ)⟧ :=
+    (t.truncGEδLT 0).app X₃ ≫ (shiftFunctor C (1 : ℤ)).map e₁.inv
+  exact ⟨K, Q, α, β, γ, isomorphic_distinguished _
+    (t.triangleLTGE_distinguished 0 X₃) _
+    (Triangle.isoMk _ _ e₁ (Iso.refl _) (Iso.refl _)
+      (by dsimp [α, TStructure.triangleLTGE]; simp)
+      (by dsimp [β, TStructure.triangleLTGE]; simp)
+      (by dsimp [γ]; simp))⟩
+
+variable [IsTriangulated C] in
+/-- **P(φ) is abelian** (**Bridgeland's Lemma 5.2**). Each slicing slice `P(φ)` of a
+stability condition is an abelian category. -/
+noncomputable def StabilityCondition.P_phi_abelian
+    (σ : StabilityCondition C) (φ : ℝ) :
+    Abelian (σ.slicing.P φ).FullSubcategory :=
+  AbelianSubcategory.abelian (σ.slicing.P φ).ι
+    (σ.P_phi_hom_vanishing C φ) (σ.P_phi_admissible C φ)
+
+/-! ### Interval widening for W-semistability (Lemma 7.5)
+
+**Bridgeland's Lemma 7.5**: W-semistability is independent of the choice of enveloping
+thin subcategory. Concretely, if `E` is W-semistable on a thin interval `(a₁, b₁)` and
+`E ∈ P((a, b))` for a wider thin interval `(a, b) ⊃ (a₁, b₁)`, then `E` is also
+W-semistable on `(a, b)` (with the same W-phase, recomputed for `α = (a+b)/2`).
+
+The proof uses the quasi-abelian structure of thin subcategories: strict subobjects and
+quotients in `P((a, b))` that appear in distinguished triangles with `E` already lie in
+`P((a₁, b₁))` (by phase confinement and the abelian heart factorization). -/
+
+variable [IsTriangulated C] in
+/-- **Interval widening for W-semistability** (**Bridgeland's Lemma 7.5**). If `E` is
+W-semistable of W-phase `ψ` in the thin interval `(a₁, b₁)`, and `E ∈ P((a, b))` for
+another thin interval `(a, b)`, then `E` is also W-semistable on `(a, b)` with the same
+W-phase (adjusted for the new skewing parameter `α = (a+b)/2`). -/
+theorem SkewedStabilityFunction.Semistable_of_wider_interval
+    {s : Slicing C} {a₁ b₁ a b : ℝ}
+    (σ : StabilityCondition C)
+    (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    (hab₁ : a₁ < b₁) (hab : a < b)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hthin₁ : b₁ - a₁ + 2 * ε₀ < 1) (hthin : b - a + 2 * ε₀ < 1)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    (hs : s = σ.slicing)
+    {E : C} {ψ : ℝ}
+    (hSS : (σ.skewedStabilityFunction_of_near C W hW hab₁).Semistable C E ψ)
+    (hEab : s.intervalProp C a b E) :
+    (σ.skewedStabilityFunction_of_near C W hW hab).Semistable C E
+      (wPhaseOf (W (K₀.of C E)) ((a + b) / 2)) := by
+  sorry
 
 /-! ### Deformed slicing predicate -/
 
@@ -1989,7 +2106,7 @@ zero objects and objects that are W-semistable of W-phase `ψ` in some thin inte
 (Node 7.3) is always available. -/
 def StabilityCondition.deformedPred (σ : StabilityCondition C)
     (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
-    (ε₀ : ℝ) (_hε₀ : 0 < ε₀) (_hε₀2 : ε₀ ≤ 1 / 2)
+    (ε₀ : ℝ) (_hε₀ : 0 < ε₀) (_hε₀2 : ε₀ < 1 / 4)
     (_hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     (ψ : ℝ) : ObjectProperty C :=
   fun E ↦ IsZero E ∨ ∃ (a b : ℝ) (hab : a < b) (_ : b - a + 2 * ε₀ < 1),
@@ -1998,7 +2115,7 @@ def StabilityCondition.deformedPred (σ : StabilityCondition C)
 /-- Zero objects are in every `Q(ψ)`. -/
 lemma StabilityCondition.deformedPred_zero (σ : StabilityCondition C)
     (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
-    (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ ≤ 1 / 2)
+    (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     (ψ : ℝ) {E : C} (hE : IsZero E) :
     σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin ψ E :=
@@ -2027,7 +2144,7 @@ requires abelian heart factorization and K₀ arithmetic in the heart. -/
 theorem StabilityCondition.hom_eq_zero_of_deformedPred
     (σ : StabilityCondition C)
     (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
-    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ ≤ 1 / 2)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     {E F : C} {ψ₁ ψ₂ : ℝ}
     (hE : σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin ψ₁ E)
@@ -2092,7 +2209,7 @@ subcategory should be the extension-closure, but for semistable inputs this suff
 and avoids needing Q-HN filtrations. -/
 def StabilityCondition.deformedGtPred (σ : StabilityCondition C)
     (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
-    (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ ≤ 1 / 2)
+    (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     (t : ℝ) : ObjectProperty C :=
   fun E ↦ IsZero E ∨ ∃ (ψ : ℝ), ψ > t ∧
@@ -2102,7 +2219,7 @@ def StabilityCondition.deformedGtPred (σ : StabilityCondition C)
 Dual of `deformedGtPred`. -/
 def StabilityCondition.deformedLePred (σ : StabilityCondition C)
     (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
-    (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ ≤ 1 / 2)
+    (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     (t : ℝ) : ObjectProperty C :=
   fun E ↦ IsZero E ∨ ∃ (ψ : ℝ), ψ ≤ t ∧
@@ -2114,7 +2231,7 @@ variable [IsTriangulated C] in
 theorem StabilityCondition.hom_eq_zero_of_deformedGt_deformedLe
     (σ : StabilityCondition C)
     (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
-    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ ≤ 1 / 2)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     {E F : C} {t : ℝ}
     (hE : σ.deformedGtPred C W hW ε₀ hε₀ hε₀2 hsin t E)
@@ -2142,7 +2259,7 @@ The `closedUnderIso` and `shift_iff` fields are complete. The `hom_vanishing` fi
 handles the large-gap case via phase confinement and interval disjointness. -/
 def StabilityCondition.deformedSlicing (σ : StabilityCondition C)
     (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
-    (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ ≤ 1 / 2)
+    (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀))) :
     Slicing C where
   P := σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin
@@ -2330,7 +2447,7 @@ follows directly from the `Semistable` definition, which stores
 theorem StabilityCondition.deformedSlicing_compat
     (σ : StabilityCondition C)
     (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
-    (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ ≤ 1 / 2)
+    (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     (ψ : ℝ) (E : C)
     (hQ : (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hsin).P ψ E)
@@ -2363,7 +2480,7 @@ factor in `P(φ)` has W-phase within `ε₀` of `φ`, giving the desired interva
 theorem sigma_semistable_intervalProp
     (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
-    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ ≤ 1 / 2)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     {E : C} {φ : ℝ} (hP : σ.slicing.P φ E) (hE : ¬IsZero E)
     {δ : ℝ} (hδ : 0 < δ) :
@@ -2394,7 +2511,7 @@ finite length. -/
 theorem bridgeland_7_1 (σ : StabilityCondition C)
     (W : K₀ C →+ ℂ)
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
-    (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ ≤ 1 / 2)
+    (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     (hε₀_lf : ∃ δ : ℝ, 0 < δ ∧ ∀ t (E : C),
       σ.slicing.intervalProp C (t - (ε₀ + δ)) (t + (ε₀ + δ)) E →
