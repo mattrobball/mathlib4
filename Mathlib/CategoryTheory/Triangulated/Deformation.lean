@@ -2940,6 +2940,67 @@ structure of P(φ) rather than K₀ additivity on K and Q separately. This is wh
 `sigma_semistable_intervalProp` constructs the Q-HN filtration inside P(φ)
 using the restricted stability function, not via the Z-ray approach. -/
 
+/-! ### K₀ additivity for SES in abelian subcategories
+
+For a short exact sequence `0 → A → B → C → 0` in the abelian subcategory `P(φ)` of a
+stability condition, the K₀ relation `[B] = [A] + [C]` holds in `K₀(C)`. The proof uses
+the admissibility of `P(φ)` (from `P_phi_admissible`) and the fact that the kernel of a
+monomorphism is zero: if `f : A → B` is mono and the admissibility kernel `K` satisfies
+`K → A` mono and `K → A → B = 0`, then `K = 0`, which makes the admissibility triangle
+degenerate, giving `T.obj₃ ≅ ι(Q)` and hence `[B] = [A] + [Q]`. -/
+
+variable [IsTriangulated C] in
+/-- **K₀ additivity for SES in P(φ)**. For any short exact sequence in the abelian
+category `P(φ)`, the K₀ relation `[B] = [A] + [C]` holds in `K₀(C)`. This is the key
+bridge between the abelian HN theory in `P(φ)` and the triangulated K₀ group. -/
+theorem K0_of_shortExact_P_phi (σ : StabilityCondition C) (φ : ℝ)
+    (S : @ShortComplex (σ.slicing.P φ).FullSubcategory _
+      (@Preadditive.preadditiveHasZeroMorphisms _ _ (σ.P_phi_abelian C φ).toPreadditive))
+    (hS : S.ShortExact) :
+    K₀.of C ((σ.slicing.P φ).ι.obj S.X₂) =
+      K₀.of C ((σ.slicing.P φ).ι.obj S.X₁) +
+      K₀.of C ((σ.slicing.P φ).ι.obj S.X₃) := by
+  letI hab := σ.P_phi_abelian C φ
+  haveI : IsNormalEpiCategory (σ.slicing.P φ).FullSubcategory := hab.toIsNormalEpiCategory
+  set ι := (σ.slicing.P φ).ι
+  -- Step 1: ι.map S.f extends to a distinguished triangle
+  obtain ⟨cone, f₂, f₃, hT⟩ := distinguished_cocone_triangle (ι.map S.f)
+  have hK0_T := K₀.of_triangle C (Triangle.mk (ι.map S.f) f₂ f₃) hT
+  -- Step 2: Admissibility gives K, Q ∈ P(φ) and decomposition of cone
+  have hadm : AbelianSubcategory.admissibleMorphism ι S.f := by
+    rw [σ.P_phi_admissible C φ]; trivial
+  obtain ⟨K, Q, α, β, γ, hT'⟩ := hadm f₂ f₃ hT
+  have hK0_T' := K₀.of_triangle C (Triangle.mk α β γ) hT'
+  have hK0_shift : K₀.of C ((ι.obj K)⟦(1 : ℤ)⟧) = -K₀.of C (ι.obj K) :=
+    K₀.of_shift_one C (ι.obj K)
+  -- Step 3: K = 0 (ιK ≫ S.f = 0 with S.f mono and ιK mono gives K zero)
+  have hιK := AbelianSubcategory.ιK_mor₁ hT α
+  haveI := hS.mono_f
+  have hιK_eq_zero : AbelianSubcategory.ιK f₃ α = 0 :=
+    (cancel_mono S.f).mp (by rw [hιK, zero_comp])
+  have hK_zero : IsZero K := by
+    have hιK_mono := AbelianSubcategory.mono_ιK
+      (σ.P_phi_hom_vanishing C φ) hT hT'
+    rw [hιK_eq_zero] at hιK_mono
+    rw [IsZero.iff_id_eq_zero]
+    exact (cancel_mono (0 : K ⟶ S.X₁)).mp (by simp)
+  have hιK_isZero : IsZero (ι.obj K) := ι.map_isZero hK_zero
+  have hK0_K : K₀.of C (ι.obj K) = 0 := K₀.of_isZero C hιK_isZero
+  -- Step 4: Q ≅ S.X₃ (both are cokernels of S.f, so isomorphic by universality)
+  have hπQ_coker := AbelianSubcategory.isColimitCokernelCofork
+    (σ.P_phi_hom_vanishing C φ) hT hT'
+  have hSg_coker := hS.gIsCokernel
+  have iso_Q_X₃ : Q ≅ S.X₃ := hπQ_coker.coconePointUniqueUpToIso hSg_coker
+  have hK0_Q : K₀.of C (ι.obj Q) = K₀.of C (ι.obj S.X₃) :=
+    K₀.of_iso C (ι.mapIso iso_Q_X₃)
+  -- Combine: [ι(B)] = [ι(A)] + [cone], [cone] = -[ι(K)] + [ι(Q)] = [ι(C)]
+  have hcone : K₀.of C cone = K₀.of C (ι.obj S.X₃) := by
+    have h := hK0_T'; simp only [Triangle.mk] at h
+    rw [hK0_shift, hK0_K, neg_zero, zero_add, hK0_Q] at h
+    exact h
+  simp only [Triangle.mk] at hK0_T
+  rw [hK0_T, hcone]
+
 /-! ### Reverse phase confinement: σ-semistable → Q-interval -/
 
 variable [IsTriangulated C] in
