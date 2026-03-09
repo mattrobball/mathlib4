@@ -8,7 +8,7 @@ import Mathlib.CategoryTheory.Triangulated.StabilityFunction
 import Mathlib.CategoryTheory.Triangulated.IntervalCategory
 import Mathlib.CategoryTheory.Triangulated.TStructure.HeartAbelian
 
-set_option linter.style.longFile 2900
+set_option linter.style.longFile 3400
 
 /-!
 # Deformation of Stability Conditions
@@ -1881,6 +1881,150 @@ theorem P_phi_of_heart_triangle
   exact ⟨P_phi_of_im_zero_heart C σ hKne hK_le hK_gt him_K_zero,
     P_phi_of_im_zero_heart C σ hQne hQ_le hQ_gt him_Q_zero⟩
 
+/-- **Im non-negativity for objects with phases above φ.** If `X` has all σ-phases in
+`[φ, φ + 1)` (i.e., `φ ≤ phiMinus` and `phiPlus < φ + 1`), then
+`Im(Z(X) · exp(-iπφ)) ≥ 0`. Symmetric to `im_Z_nonpos_of_heart_phases`. -/
+theorem im_Z_nonneg_of_phases_above
+    (σ : StabilityCondition C) {φ : ℝ}
+    {E : C} (hE : ¬IsZero E)
+    (hge : φ ≤ σ.slicing.phiMinus C E hE)
+    (hlt : σ.slicing.phiPlus C E hE < φ + 1) :
+    0 ≤ (σ.Z (K₀.of C E) *
+      Complex.exp (-(↑(Real.pi * φ) * Complex.I))).im := by
+  obtain ⟨F, hn, hfirst, hlast⟩ := HNFiltration.exists_both_nonzero C σ.slicing hE
+  have hphases : ∀ i : Fin F.n, φ ≤ F.φ i ∧ F.φ i < φ + 1 := by
+    intro i
+    exact ⟨by calc φ ≤ σ.slicing.phiMinus C E hE := hge
+          _ = F.φ ⟨F.n - 1, by omega⟩ :=
+            σ.slicing.phiMinus_eq C E hE F hn hlast
+          _ ≤ F.φ i := F.hφ.antitone (Fin.mk_le_mk.mpr (by omega)),
+      by calc F.φ i ≤ F.φ ⟨0, hn⟩ :=
+            F.hφ.antitone (Fin.mk_le_mk.mpr (Nat.zero_le _))
+          _ = σ.slicing.phiPlus C E hE :=
+            (σ.slicing.phiPlus_eq C E hE F hn hfirst).symm
+          _ < φ + 1 := hlt⟩
+  set P := F.toPostnikovTower
+  rw [show σ.Z (K₀.of C E) = ∑ i : Fin F.n, σ.Z (K₀.of C (P.factor i)) from by
+    rw [K₀.of_postnikovTower_eq_sum C P, map_sum]]
+  set rot := Complex.exp (-(↑(Real.pi * φ) * Complex.I))
+  rw [Finset.sum_mul, show (∑ i : Fin F.n, σ.Z (K₀.of C (P.factor i)) * rot).im =
+      ∑ i : Fin F.n, (σ.Z (K₀.of C (P.factor i)) * rot).im from
+    map_sum Complex.imAddGroupHom _ _]
+  apply Finset.sum_nonneg
+  intro i _
+  by_cases hi : IsZero (P.factor i)
+  · simp [K₀.of_isZero C hi]
+  · obtain ⟨m, hm, hval⟩ := σ.compat (F.φ i) (P.factor i) (F.semistable i) hi
+    rw [hval, mul_assoc, ← Complex.exp_add]
+    have harg : ↑(Real.pi * F.φ i) * Complex.I + -(↑(Real.pi * φ) * Complex.I) =
+        ↑(Real.pi * (F.φ i - φ)) * Complex.I := by push_cast; ring
+    rw [harg, Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im,
+      Complex.exp_ofReal_mul_I_re, Complex.exp_ofReal_mul_I_im,
+      zero_mul, add_zero]
+    exact mul_nonneg (le_of_lt hm)
+      (Real.sin_nonneg_of_nonneg_of_le_pi
+        (by nlinarith [Real.pi_pos, (hphases i).1])
+        (by nlinarith [Real.pi_pos, (hphases i).2]))
+
+/-- **From Im = 0 to P(φ) for objects with phases above φ.** If `X` is nonzero with
+all σ-phases in `[φ, φ + 1)` and `Im(Z(X) · exp(-iπφ)) = 0`, then `X ∈ P(φ)`.
+Symmetric to `P_phi_of_im_zero_heart`. -/
+theorem P_phi_of_im_zero_above
+    (σ : StabilityCondition C) {φ : ℝ}
+    {X : C} (hXne : ¬IsZero X)
+    (hX_ge : φ ≤ σ.slicing.phiMinus C X hXne)
+    (hX_lt : σ.slicing.phiPlus C X hXne < φ + 1)
+    (him_zero : (σ.Z (K₀.of C X) *
+      Complex.exp (-(↑(Real.pi * φ) * Complex.I))).im = 0) :
+    σ.slicing.P φ X := by
+  set rot := Complex.exp (-(↑(Real.pi * φ) * Complex.I))
+  obtain ⟨F, hn, hfirst, hlast⟩ := HNFiltration.exists_both_nonzero C σ.slicing hXne
+  have hphases : ∀ i : Fin F.n, φ ≤ F.φ i ∧ F.φ i < φ + 1 := by
+    intro i
+    exact ⟨by calc φ ≤ σ.slicing.phiMinus C X hXne := hX_ge
+          _ = F.φ ⟨F.n - 1, by omega⟩ :=
+            σ.slicing.phiMinus_eq C X hXne F hn hlast
+          _ ≤ F.φ i := F.hφ.antitone (Fin.mk_le_mk.mpr (by omega)),
+      by calc F.φ i ≤ F.φ ⟨0, hn⟩ :=
+            F.hφ.antitone (Fin.mk_le_mk.mpr (Nat.zero_le _))
+          _ = σ.slicing.phiPlus C X hXne :=
+            (σ.slicing.phiPlus_eq C X hXne F hn hfirst).symm
+          _ < φ + 1 := hX_lt⟩
+  have hZX : σ.Z (K₀.of C X) =
+      ∑ i : Fin F.n, σ.Z (K₀.of C (F.toPostnikovTower.factor i)) := by
+    rw [K₀.of_postnikovTower_eq_sum C F.toPostnikovTower, map_sum]
+  have hterms : ∀ i ∈ Finset.univ,
+      0 ≤ (σ.Z (K₀.of C (F.toPostnikovTower.factor i)) * rot).im := by
+    intro i _
+    by_cases hi : IsZero (F.toPostnikovTower.factor i)
+    · simp [K₀.of_isZero C hi]
+    · obtain ⟨mi, hmi, hvali⟩ := σ.compat (F.φ i) _ (F.semistable i) hi
+      rw [hvali, mul_assoc, ← Complex.exp_add]
+      have hargi : ↑(Real.pi * F.φ i) * Complex.I +
+          -(↑(Real.pi * φ) * Complex.I) =
+          ↑(Real.pi * (F.φ i - φ)) * Complex.I := by push_cast; ring
+      rw [hargi, Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im,
+        Complex.exp_ofReal_mul_I_re, Complex.exp_ofReal_mul_I_im,
+        zero_mul, add_zero]
+      exact mul_nonneg (le_of_lt hmi)
+        (Real.sin_nonneg_of_nonneg_of_le_pi
+          (by nlinarith [Real.pi_pos, (hphases i).1])
+          (by nlinarith [Real.pi_pos, (hphases i).2]))
+  have hsum : ∑ i ∈ Finset.univ,
+      (σ.Z (K₀.of C (F.toPostnikovTower.factor i)) * rot).im = 0 := by
+    have : (σ.Z (K₀.of C X) * rot).im =
+        ∑ i : Fin F.n,
+          (σ.Z (K₀.of C (F.toPostnikovTower.factor i)) * rot).im := by
+      rw [hZX, Finset.sum_mul]
+      exact map_sum Complex.imAddGroupHom _ _
+    linarith
+  have hterm_zero : ∀ i ∈ Finset.univ,
+      (σ.Z (K₀.of C (F.toPostnikovTower.factor i)) * rot).im = 0 :=
+    (Finset.sum_eq_zero_iff_of_nonneg hterms).mp hsum
+  have factor_eq : ∀ i : Fin F.n,
+      ¬IsZero (F.toPostnikovTower.factor i) → F.φ i = φ := by
+    intro i hi
+    have him := hterm_zero i (Finset.mem_univ _)
+    obtain ⟨mi, hmi, hvali⟩ := σ.compat (F.φ i) _ (F.semistable i) hi
+    rw [hvali, mul_assoc, ← Complex.exp_add] at him
+    have hargi : ↑(Real.pi * F.φ i) * Complex.I +
+        -(↑(Real.pi * φ) * Complex.I) =
+        ↑(Real.pi * (F.φ i - φ)) * Complex.I := by push_cast; ring
+    rw [hargi, Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im,
+      Complex.exp_ofReal_mul_I_re, Complex.exp_ofReal_mul_I_im,
+      zero_mul, add_zero] at him
+    have hsin_zero : Real.sin (Real.pi * (F.φ i - φ)) = 0 := by
+      rcases mul_eq_zero.mp him with h | h
+      · linarith
+      · exact h
+    by_contra hne
+    have hlt' : 0 < F.φ i - φ := lt_of_le_of_ne
+      (by linarith [(hphases i).1]) (fun h ↦ hne (by linarith))
+    exact absurd hsin_zero (ne_of_gt (Real.sin_pos_of_pos_of_lt_pi
+      (by nlinarith [Real.pi_pos]) (by nlinarith [Real.pi_pos, (hphases i).2])))
+  have htop : F.φ ⟨0, hn⟩ = φ := factor_eq ⟨0, hn⟩ hfirst
+  have hbot : F.φ ⟨F.n - 1, by omega⟩ = φ := factor_eq ⟨F.n - 1, by omega⟩ hlast
+  have hn1 : F.n = 1 := by
+    by_contra h
+    have := F.hφ (show (⟨0, hn⟩ : Fin F.n) < ⟨F.n - 1, by omega⟩ from
+      Fin.mk_lt_mk.mpr (by omega))
+    linarith
+  have hfact : σ.slicing.P φ (F.toPostnikovTower.factor ⟨0, hn⟩) := by
+    rw [← htop]; exact F.semistable ⟨0, hn⟩
+  let T := F.triangle ⟨0, hn⟩
+  have hZ₁ : IsZero T.obj₁ :=
+    IsZero.of_iso F.base_isZero (Classical.choice (F.triangle_obj₁ ⟨0, hn⟩))
+  have : IsIso T.mor₂ :=
+    (Triangle.isZero₁_iff_isIso₂ T (F.triangle_dist ⟨0, hn⟩)).mp hZ₁
+  have hobj₂_eq : F.chain.obj' (0 + 1) (by omega) =
+      F.chain.obj (Fin.last F.n) :=
+    congrArg F.chain.obj (Fin.ext (by simp [Fin.last]; omega))
+  let e₂ : T.obj₂ ≅ X :=
+    (Classical.choice (F.triangle_obj₂ ⟨0, hn⟩)).trans
+      ((eqToIso hobj₂_eq).trans (Classical.choice F.top_iso))
+  haveI := σ.slicing.closedUnderIso φ
+  exact (σ.slicing.P φ).prop_of_iso (e₂.symm.trans (asIso T.mor₂)).symm hfact
+
 /-! ### P(φ) is abelian (Bridgeland Lemma 5.2)
 
 Each slicing slice `P(φ)` of a stability condition is an abelian category.
@@ -2325,38 +2469,6 @@ noncomputable def StabilityCondition.P_phi_abelian
   AbelianSubcategory.abelian (σ.slicing.P φ).ι
     (σ.P_phi_hom_vanishing C φ) (σ.P_phi_admissible C φ)
 
-/-! ### Interval widening for W-semistability (Lemma 7.5)
-
-**Bridgeland's Lemma 7.5**: W-semistability is independent of the choice of enveloping
-thin subcategory. Concretely, if `E` is W-semistable on a thin interval `(a₁, b₁)` and
-`E ∈ P((a, b))` for a wider thin interval `(a, b) ⊃ (a₁, b₁)`, then `E` is also
-W-semistable on `(a, b)` (with the same W-phase, recomputed for `α = (a+b)/2`).
-
-The proof uses the quasi-abelian structure of thin subcategories: strict subobjects and
-quotients in `P((a, b))` that appear in distinguished triangles with `E` already lie in
-`P((a₁, b₁))` (by phase confinement and the abelian heart factorization). -/
-
-variable [IsTriangulated C] in
-/-- **Interval widening for W-semistability** (**Bridgeland's Lemma 7.5**). If `E` is
-W-semistable of W-phase `ψ` in the thin interval `(a₁, b₁)`, and `E ∈ P((a, b))` for
-another thin interval `(a, b)`, then `E` is also W-semistable on `(a, b)` with the same
-W-phase (adjusted for the new skewing parameter `α = (a+b)/2`). -/
-theorem SkewedStabilityFunction.Semistable_of_wider_interval
-    {s : Slicing C} {a₁ b₁ a b : ℝ}
-    (σ : StabilityCondition C)
-    (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
-    (hab₁ : a₁ < b₁) (hab : a < b)
-    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
-    (hthin₁ : b₁ - a₁ + 2 * ε₀ < 1) (hthin : b - a + 2 * ε₀ < 1)
-    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
-    (hs : s = σ.slicing)
-    {E : C} {ψ : ℝ}
-    (hSS : (σ.skewedStabilityFunction_of_near C W hW hab₁).Semistable C E ψ)
-    (hEab : s.intervalProp C a b E) :
-    (σ.skewedStabilityFunction_of_near C W hW hab).Semistable C E
-      (wPhaseOf (W (K₀.of C E)) ((a + b) / 2)) := by
-  sorry
-
 /-! ### Deformed slicing predicate -/
 
 /-- **Deformed slicing predicate** (Node 7.Q). Given a stability condition `σ`, a
@@ -2718,6 +2830,19 @@ theorem StabilityCondition.deformedSlicing_compat
   rcases hQ with hEZ | ⟨a, b, hab, _, hSS⟩
   · exact absurd hEZ hE
   · exact ⟨‖W (K₀.of C E)‖, norm_pos_iff.mpr hSS.2.2.1, hSS.polar⟩
+
+/-! ### Note on Z-ray lemma
+
+The Z-ray argument at the AGGREGATE level (Im(Z(K)·rot) + Im(Z(Q)·rot) = 0 with
+each ≤ 0 resp. ≥ 0) does NOT force each to vanish. A counterexample: K with one factor
+of phase φ-ε (contributing negative Im) and Q with one factor of phase φ+ε (contributing
+positive Im that exactly cancels). The aggregate sums satisfy the sign constraints and
+sum to zero without each being zero.
+
+The correct argument works at the INDIVIDUAL FACTOR level inside P(φ), using the abelian
+structure of P(φ) rather than K₀ additivity on K and Q separately. This is why
+`sigma_semistable_intervalProp` constructs the Q-HN filtration inside P(φ)
+using the restricted stability function, not via the Z-ray approach. -/
 
 /-! ### Reverse phase confinement: σ-semistable → Q-interval -/
 
