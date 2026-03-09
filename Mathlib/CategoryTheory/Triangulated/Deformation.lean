@@ -2565,14 +2565,18 @@ noncomputable def StabilityCondition.P_phi_abelian
 /-- **Deformed slicing predicate** (Node 7.Q). Given a stability condition `σ`, a
 perturbation `W` with `‖W - Z‖_σ < sin(πε₀)`, the deformed slicing `Q(ψ)` consists of
 zero objects and objects that are W-semistable of W-phase `ψ` in some thin interval
-`P((a, b))` with `b - a + 2ε₀ < 1`. The thinness constraint ensures phase confinement
-(Node 7.3) is always available. -/
+`P((a, b))` with `b - a + 2ε₀ < 1` and the **enveloping condition** `a + ε₀ ≤ ψ ≤ b - ε₀`.
+The thinness constraint ensures phase confinement (Node 7.3) is always available.
+The enveloping condition (matching Bridgeland §7) ensures the object's W-phase is well
+inside the interval, which is needed for heart factorization arguments in hom-vanishing
+(Lemma 7.6) and interval independence (Lemma 7.5). -/
 def StabilityCondition.deformedPred (σ : StabilityCondition C)
     (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     (ε₀ : ℝ) (_hε₀ : 0 < ε₀) (_hε₀2 : ε₀ < 1 / 4)
     (_hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     (ψ : ℝ) : ObjectProperty C :=
-  fun E ↦ IsZero E ∨ ∃ (a b : ℝ) (hab : a < b) (_ : b - a + 2 * ε₀ < 1),
+  fun E ↦ IsZero E ∨ ∃ (a b : ℝ) (hab : a < b) (_ : b - a + 2 * ε₀ < 1)
+    (_ : a + ε₀ ≤ ψ) (_ : ψ ≤ b - ε₀),
     (σ.skewedStabilityFunction_of_near C W hW hab).Semistable C E ψ
 
 /-- Zero objects are in every `Q(ψ)`. -/
@@ -2615,9 +2619,9 @@ theorem StabilityCondition.hom_eq_zero_of_deformedPred
     (hgap : ψ₁ > ψ₂)
     (f : E ⟶ F) : f = 0 := by
   -- Dispatch IsZero cases
-  rcases hE with hEZ | ⟨a₁, b₁, hab₁, hthin₁, hSS₁⟩
+  rcases hE with hEZ | ⟨a₁, b₁, hab₁, hthin₁, henv₁_lo, henv₁_hi, hSS₁⟩
   · exact hEZ.eq_of_src f 0
-  rcases hF with hFZ | ⟨a₂, b₂, hab₂, hthin₂, hSS₂⟩
+  rcases hF with hFZ | ⟨a₂, b₂, hab₂, hthin₂, henv₂_lo, henv₂_hi, hSS₂⟩
   · exact hFZ.eq_of_tgt f 0
   -- Both nonzero: E is W-semistable on (a₁, b₁) with phase ψ₁,
   -- F is W-semistable on (a₂, b₂) with phase ψ₂.
@@ -2727,10 +2731,10 @@ def StabilityCondition.deformedSlicing (σ : StabilityCondition C)
     Slicing C where
   P := σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin
   closedUnderIso := fun φ ↦ ⟨fun {E E'} e h ↦ by
-    rcases h with hZ | ⟨a, b, hab, hthin, hSS⟩
+    rcases h with hZ | ⟨a, b, hab, hthin, henv_lo, henv_hi, hSS⟩
     · exact Or.inl ((Iso.isZero_iff e).mp hZ)
-    · refine Or.inr ⟨a, b, hab, hthin, ?_, fun h ↦ hSS.2.1 ((Iso.isZero_iff e).mpr h), ?_,
-        ?_, fun K Q f₁ f₂ f₃ hT hK hQ hKne ↦ ?_⟩
+    · refine Or.inr ⟨a, b, hab, hthin, henv_lo, henv_hi, ?_, fun h ↦ hSS.2.1
+        ((Iso.isZero_iff e).mpr h), ?_, ?_, fun K Q f₁ f₂ f₃ hT hK hQ hKne ↦ ?_⟩
       · -- intervalProp: transport via HNFiltration.ofIso
         rcases hSS.1 with hZ' | ⟨F, hF⟩
         · exact absurd hZ' hSS.2.1
@@ -2750,10 +2754,11 @@ def StabilityCondition.deformedSlicing (σ : StabilityCondition C)
     constructor
     · -- Forward: deformedPred φ X → deformedPred (φ+1) (X⟦1⟧)
       intro h
-      rcases h with hZ | ⟨a, b, hab, hthin, hSS⟩
+      rcases h with hZ | ⟨a, b, hab, hthin, henv_lo, henv_hi, hSS⟩
       · exact Or.inl ((shiftFunctor C (1 : ℤ)).map_isZero hZ)
       · -- Use interval (a+1, b+1) with α' = (a+b)/2 + 1
-        refine Or.inr ⟨a + 1, b + 1, by linarith, by linarith, ?_, fun h ↦ hSS.2.1
+        refine Or.inr ⟨a + 1, b + 1, by linarith, by linarith, by linarith, by linarith,
+          ?_, fun h ↦ hSS.2.1
           (IsZero.of_full_of_faithful_of_isZero (shiftFunctor C (1 : ℤ)) X h), ?_,
           ?_, fun K Q f₁ f₂ f₃ hT hK hQ hKne ↦ ?_⟩
         · -- intervalProp C (a+1) (b+1) (X⟦1⟧)
@@ -2819,11 +2824,11 @@ def StabilityCondition.deformedSlicing (σ : StabilityCondition C)
             linarith
     · -- Backward: deformedPred (φ+1) (X⟦1⟧) → deformedPred φ X
       intro h
-      rcases h with hZ | ⟨a, b, hab, hthin, hSS⟩
+      rcases h with hZ | ⟨a, b, hab, hthin, henv_lo, henv_hi, hSS⟩
       · exact Or.inl (IsZero.of_full_of_faithful_of_isZero
           (shiftFunctor C (1 : ℤ)) X hZ)
       · -- Use interval (a-1, b-1) with α' = (a+b)/2 - 1
-        refine Or.inr ⟨a - 1, b - 1, by linarith, by linarith, ?_,
+        refine Or.inr ⟨a - 1, b - 1, by linarith, by linarith, by linarith, by linarith, ?_,
           fun h ↦ hSS.2.1 ((shiftFunctor C (1 : ℤ)).map_isZero h), ?_, ?_,
           fun K Q f₁ f₂ f₃ hT hK hQ hKne ↦ ?_⟩
         · -- intervalProp C (a-1) (b-1) X from intervalProp C a b (X⟦1⟧)
@@ -2918,7 +2923,7 @@ theorem StabilityCondition.deformedSlicing_compat
     ∃ (m : ℝ), 0 < m ∧
       W (K₀.of C E) = ↑m * Complex.exp (↑(Real.pi * ψ) * Complex.I) := by
   -- hQ : deformedPred, so either IsZero or ∃ a b hab hthin, Semistable
-  rcases hQ with hEZ | ⟨a, b, hab, _, hSS⟩
+  rcases hQ with hEZ | ⟨a, b, hab, _, _, _, hSS⟩
   · exact absurd hEZ hE
   · exact ⟨‖W (K₀.of C E)‖, norm_pos_iff.mpr hSS.2.2.1, hSS.polar⟩
 
@@ -3009,7 +3014,7 @@ theorem bridgeland_7_1 (σ : StabilityCondition C)
         intro i
         have hsem := F.semistable i
         change σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin (F.φ i) _ at hsem
-        rcases hsem with hZ_i | ⟨a_i, b_i, hab_i, hthin_i, hSS_i⟩
+        rcases hsem with hZ_i | ⟨a_i, b_i, hab_i, hthin_i, _, _, hSS_i⟩
         · exact Or.inl hZ_i
         · have ⟨hlo, hhi⟩ := phase_confinement_from_stabSeminorm C σ W hW hab_i
             hε₀ hε₀2 hthin_i hsin hSS_i
@@ -3030,7 +3035,7 @@ theorem bridgeland_7_1 (σ : StabilityCondition C)
       · exact Or.inl hGi
       · have hsem := G.semistable i
         change σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin (G.φ i) _ at hsem
-        rcases hsem with hZ_i | ⟨a_i, b_i, hab_i, hthin_i, hSS_i⟩
+        rcases hsem with hZ_i | ⟨a_i, b_i, hab_i, hthin_i, _, _, hSS_i⟩
         · exact absurd hZ_i hGi
         · have ⟨hlo, hhi⟩ := phase_confinement_from_stabSeminorm C σ W hW hab_i
             hε₀ hε₀2 hthin_i hsin hSS_i
