@@ -8,7 +8,7 @@ import Mathlib.CategoryTheory.Triangulated.StabilityFunction
 import Mathlib.CategoryTheory.Triangulated.IntervalCategory
 import Mathlib.CategoryTheory.Triangulated.TStructure.HeartAbelian
 
-set_option linter.style.longFile 2800
+set_option linter.style.longFile 2900
 
 /-!
 # Deformation of Stability Conditions
@@ -1937,16 +1937,18 @@ theorem StabilityCondition.P_phi_hom_vanishing
     X.property
     ((σ.slicing.shift_int C φ Y.obj n).mp Y.property) f
 
+set_option backward.isDefEq.respectTransparency false in
 variable [IsTriangulated C] in
-/-- **Z-ray argument for P(φ) membership from truncation of a P(φ)-cone.**
+/-- **P(φ) membership for truncation of a P(φ)-cone** (**Bridgeland's Lemma 5.2**).
 Given a distinguished triangle `A → B → X₃ → A⟦1⟧` with `A, B ∈ P(φ)`, the
 t-structure truncation pieces of `X₃` (from the shifted slicing) lie in `P(φ)`.
 
-The proof uses K₀ additivity on the original and truncation triangles to show
-`Z(truncLT) + Z(Q_obj)` lies on the ray `ℝ · exp(iπφ)`. Since `truncLT` has
-phases in `(φ, φ+1]` and `Q_obj` has phases in `(φ-1, φ]`, the imaginary parts
-after rotation by `exp(-iπφ)` have opposite signs and must both vanish. The sector
-bound then forces all HN factors to have phase exactly `φ` (resp. `φ+1`). -/
+The proof uses K₀ additivity and sign analysis of `Im(Z(·) · exp(-iπφ))`.
+From the original triangle, `Im(Z(X₃)·rot) = 0`. From the truncation triangle,
+`Im(Z(L)·rot) + Im(Z(Q)·rot) = 0`. Since Q has phases in `(φ-1, φ]`, we get
+`Im(Z(Q)·rot) ≤ 0`. Since L has phases in `(φ, φ+1]`, an extra π rotation
+gives `Im(Z(L)·rot) ≥ 0`. Both must vanish, and `P_phi_of_im_zero_heart`
+promotes to `Q ∈ P(φ)` and `L ∈ P(φ+1)`. -/
 private theorem P_phi_of_truncation_of_P_phi_cone
     (σ : StabilityCondition C) (φ : ℝ)
     {A B X₃ : C} (hA : σ.slicing.P φ A) (hB : σ.slicing.P φ B)
@@ -1956,7 +1958,265 @@ private theorem P_phi_of_truncation_of_P_phi_cone
       (((σ.slicing.phaseShift C (φ - 1)).toTStructure.truncGE 0).obj X₃) ∧
     σ.slicing.P φ
       ((((σ.slicing.phaseShift C (φ - 1)).toTStructure.truncLT 0).obj X₃)⟦(-1 : ℤ)⟧) := by
-  sorry
+  set s := σ.slicing
+  set ss := s.phaseShift C (φ - 1)
+  set t := ss.toTStructure
+  -- P(φ) objects have phase 1 in the shifted slicing
+  have hP1A : ss.P 1 A := by
+    change s.P (1 + (φ - 1)) A; rw [show (1 : ℝ) + (φ - 1) = φ from by ring]; exact hA
+  have hP1B : ss.P 1 B := by
+    change s.P (1 + (φ - 1)) B; rw [show (1 : ℝ) + (φ - 1) = φ from by ring]; exact hB
+  have cast_le : (-↑(0 : ℤ) : ℝ) = 0 := by simp
+  have cast_ge : (1 - ↑(0 : ℤ) : ℝ) = 1 := by simp
+  -- A, B are in the heart of t
+  haveI hA_le : t.IsLE A 0 := ⟨by
+    change ss.gtProp C (-↑(0 : ℤ)) A; rw [cast_le]
+    exact ss.gtProp_of_semistable C 1 0 A hP1A (by norm_num)⟩
+  haveI hB_le : t.IsLE B 0 := ⟨by
+    change ss.gtProp C (-↑(0 : ℤ)) B; rw [cast_le]
+    exact ss.gtProp_of_semistable C 1 0 B hP1B (by norm_num)⟩
+  haveI : t.IsGE A 0 := ⟨by
+    change ss.leProp C (1 - ↑(0 : ℤ)) A; rw [cast_ge]
+    exact ss.leProp_of_semistable C 1 1 A hP1A le_rfl⟩
+  haveI : t.IsGE B 0 := ⟨by
+    change ss.leProp C (1 - ↑(0 : ℤ)) B; rw [cast_ge]
+    exact ss.leProp_of_semistable C 1 1 B hP1B le_rfl⟩
+  -- Shift bounds for the rotation
+  haveI : t.IsLE (A⟦(1 : ℤ)⟧) 0 := by
+    haveI := t.isLE_shift A 0 1 (-1); exact t.isLE_of_le _ (-1) 0
+  haveI : t.IsGE B (-1) := t.isGE_of_ge _ (-1) 0
+  haveI : t.IsGE (A⟦(1 : ℤ)⟧) (-1) := t.isGE_shift A 0 1 (-1)
+  -- X₃ bounds from the rotation triangle
+  have hrot := rot_of_distTriang _ hT
+  haveI hX₃_le : t.IsLE X₃ 0 := by
+    refine t.isLE₂ _ hrot 0 ?_ ?_
+    · simp only [Triangle.rotate_obj₁, Triangle.mk_obj₂]; exact hB_le
+    · simp only [Triangle.rotate_obj₃, Triangle.mk_obj₁]
+      exact ‹t.IsLE (A⟦(1 : ℤ)⟧) 0›
+  haveI : t.IsGE X₃ (-1) := by
+    refine t.isGE₂ _ hrot (-1) ?_ ?_
+    · simp only [Triangle.rotate_obj₁, Triangle.mk_obj₂]; exact ‹t.IsGE B (-1)›
+    · simp only [Triangle.rotate_obj₃, Triangle.mk_obj₁]
+      exact ‹t.IsGE (A⟦(1 : ℤ)⟧) (-1)›
+  -- Truncation of X₃
+  have htrunc := t.triangleLTGE_distinguished 0 X₃
+  -- Q bounds: IsLE 0, IsGE 0 (heart)
+  haveI hQ_le : t.IsLE ((t.truncGE 0).obj X₃) 0 := by
+    have hrot_trunc := rot_of_distTriang _ htrunc
+    refine t.isLE₂ _ hrot_trunc 0 ?_ ?_
+    · dsimp; exact hX₃_le
+    · dsimp
+      haveI : t.IsLE ((t.truncLT 0).obj X₃) (-1) := t.isLE_truncLT_obj ..
+      haveI := t.isLE_shift ((t.truncLT 0).obj X₃) (-1) 1 (-2)
+      exact t.isLE_of_le _ (-2) 0
+  haveI : t.IsGE ((t.truncGE 0).obj X₃) 0 := inferInstance
+  -- L bounds: IsLE(-1), IsGE(-1)
+  haveI hL_le : t.IsLE ((t.truncLT 0).obj X₃) (-1) := t.isLE_truncLT_obj ..
+  haveI : t.IsGE ((t.truncLT 0).obj X₃) (-1) := by
+    have hinv := inv_rot_of_distTriang _ htrunc
+    refine t.isGE₂ _ hinv (-1) ?_ ?_
+    · dsimp
+      haveI : t.IsGE (((t.truncGE 0).obj X₃)⟦(-1 : ℤ)⟧) 1 :=
+        t.isGE_shift _ 0 (-1) 1
+      exact t.isGE_of_ge _ (-1) 1
+    · dsimp; exact ‹t.IsGE X₃ (-1)›
+  -- Convert t-structure bounds to original slicing phase bounds
+  -- Q has s-phases in (φ-1, φ]
+  have hQ_sgt : s.gtProp C (φ - 1) ((t.truncGE 0).obj X₃) :=
+    (s.phaseShift_gtProp_zero C (φ - 1) _).mp (by
+      have h := hQ_le.le; change ss.gtProp C (-↑(0 : ℤ)) _ at h; rwa [cast_le] at h)
+  have hQ_sle : s.leProp C φ ((t.truncGE 0).obj X₃) := by
+    have h : ss.leProp C 1 ((t.truncGE 0).obj X₃) := by
+      have h := (inferInstance : t.IsGE ((t.truncGE 0).obj X₃) 0).ge
+      change ss.leProp C (1 - ↑(0 : ℤ)) _ at h; rwa [cast_ge] at h
+    rcases h with hZ | ⟨F, hF, hle⟩
+    · exact Or.inl hZ
+    · simp only [HNFiltration.phiPlus] at hle
+      exact Or.inr ⟨⟨F.toPostnikovTower, fun i ↦ F.φ i + (φ - 1),
+        fun i j hij ↦ by linarith [F.hφ hij], fun j ↦ F.semistable j⟩, hF, by
+        dsimp only [HNFiltration.phiPlus]; linarith⟩
+  -- L has s-phases in (φ, φ+1]
+  have hL_sgt : s.gtProp C φ ((t.truncLT 0).obj X₃) := by
+    have h : ss.gtProp C 1 ((t.truncLT 0).obj X₃) := by
+      have h := hL_le.le; change ss.gtProp C (-↑(-1 : ℤ)) _ at h
+      simpa only [Int.cast_neg, Int.cast_one, neg_neg] using h
+    rcases h with hZ | ⟨F, hF, hgt⟩
+    · exact Or.inl hZ
+    · simp only [HNFiltration.phiMinus] at hgt
+      exact Or.inr ⟨⟨F.toPostnikovTower, fun i ↦ F.φ i + (φ - 1),
+        fun i j hij ↦ by linarith [F.hφ hij], fun j ↦ F.semistable j⟩, hF, by
+        dsimp only [HNFiltration.phiMinus]; linarith⟩
+  have hL_sle : s.leProp C (φ + 1) ((t.truncLT 0).obj X₃) := by
+    have h : ss.leProp C (1 + 1) ((t.truncLT 0).obj X₃) := by
+      have h := (inferInstance : t.IsGE ((t.truncLT 0).obj X₃) (-1)).ge
+      change ss.leProp C (1 - ↑(-1 : ℤ)) _ at h
+      simpa only [Int.cast_neg, Int.cast_one, sub_neg_eq_add] using h
+    rcases h with hZ | ⟨F, hF, hle⟩
+    · exact Or.inl hZ
+    · simp only [HNFiltration.phiPlus] at hle
+      exact Or.inr ⟨⟨F.toPostnikovTower, fun i ↦ F.φ i + (φ - 1),
+        fun i j hij ↦ by linarith [F.hφ hij], fun j ↦ F.semistable j⟩, hF, by
+        dsimp only [HNFiltration.phiPlus]; linarith⟩
+  -- === Epi approach for Q, K₀ for L ===
+  have hB_heart : t.heart B := (t.mem_heart_iff _).mpr ⟨hB_le, inferInstance⟩
+  have hQ_heart : t.heart ((t.truncGE 0).obj X₃) :=
+    (t.mem_heart_iff _).mpr ⟨hQ_le, inferInstance⟩
+  letI := t.hasHeartFullSubcategory
+  let B_H : t.heart.FullSubcategory := ⟨B, hB_heart⟩
+  let Q_H : t.heart.FullSubcategory := ⟨(t.truncGE 0).obj X₃, hQ_heart⟩
+  let g_C : B ⟶ (t.truncGE 0).obj X₃ :=
+    f₂ ≫ ((t.triangleLTGE 0).obj X₃).mor₂
+  let g_H : B_H ⟶ Q_H := ObjectProperty.homMk g_C
+  let ι := t.ιHeart (H := t.heart.FullSubcategory)
+  -- Type conversion for ι.obj
+  have hι_simp : ∀ (X : t.heart.FullSubcategory), ι.obj X = X.obj := by
+    intro X; rfl
+  -- g_H is epi in the heart
+  haveI : Epi g_H := by
+    rw [Preadditive.epi_iff_cancel_zero]
+    intro R k hk
+    haveI : t.IsGE R.obj 0 :=
+      ((t.mem_heart_iff R.obj).mp R.property).2
+    have hk_C : g_C ≫ k.hom = 0 := by
+      have := congr_arg InducedCategory.Hom.hom hk
+      simp only [ObjectProperty.FullSubcategory.comp_hom] at this
+      exact this
+    have hmk : ((t.triangleLTGE 0).obj X₃).mor₂ ≫ k.hom = 0 := by
+      have : f₂ ≫ (((t.triangleLTGE 0).obj X₃).mor₂ ≫ k.hom) = 0 := by
+        rwa [← Category.assoc]
+      obtain ⟨a, ha⟩ := Triangle.yoneda_exact₃
+        (Triangle.mk f₁ f₂ f₃) hT _ this
+      dsimp only [Triangle.mk] at a ha
+      haveI : t.IsLE (A⟦(1 : ℤ)⟧) (-1) := t.isLE_shift A 0 1 (-1)
+      rw [show a = 0 from t.zero a (-1) 0 (by norm_num), comp_zero] at ha
+      exact ha
+    obtain ⟨b, hb⟩ := Triangle.yoneda_exact₃
+      ((t.triangleLTGE 0).obj X₃) htrunc k.hom hmk
+    dsimp only [TStructure.triangleLTGE, Triangle.functorMk, Triangle.mk] at b hb
+    haveI : t.IsLE (((t.truncLT 0).obj X₃)⟦(1 : ℤ)⟧) (-2) :=
+      t.isLE_shift ((t.truncLT 0).obj X₃) (-1) 1 (-2)
+    rw [show b = 0 from t.zero b (-2) 0 (by norm_num), comp_zero] at hb
+    exact ObjectProperty.hom_ext (P := t.heart) hb
+  -- Get heart triangle I → B → Q → I⟦1⟧
+  obtain ⟨I_H, i_H, δ_heart, hT_heart⟩ :=
+    AbelianSubcategory.exists_distinguished_triangle_of_epi
+      (TStructure.heart_hι t) (TStructure.heart_admissible t) g_H
+  -- K₀ conversions via eqToIso
+  have hK₀_B : K₀.of C (ι.obj B_H) = K₀.of C B :=
+    K₀.of_iso C (eqToIso (hι_simp B_H))
+  have hK₀_I : K₀.of C (ι.obj I_H) = K₀.of C I_H.obj :=
+    K₀.of_iso C (eqToIso (hι_simp I_H))
+  have hK₀_Q : K₀.of C (ι.obj Q_H) = K₀.of C ((t.truncGE 0).obj X₃) :=
+    K₀.of_iso C (eqToIso (hι_simp Q_H))
+  have hK₀_heart : K₀.of C B =
+      K₀.of C I_H.obj + K₀.of C ((t.truncGE 0).obj X₃) := by
+    have h := K₀.of_triangle C _ hT_heart
+    dsimp only [Triangle.mk] at h; rwa [hK₀_B, hK₀_I, hK₀_Q] at h
+  -- I_H phase bounds
+  haveI hI_le : t.IsLE I_H.obj 0 :=
+    ((t.mem_heart_iff I_H.obj).mp I_H.property).1
+  haveI hI_ge : t.IsGE I_H.obj 0 :=
+    ((t.mem_heart_iff I_H.obj).mp I_H.property).2
+  have hI_sgt : s.gtProp C (φ - 1) I_H.obj :=
+    (s.phaseShift_gtProp_zero C (φ - 1) _).mp (by
+      have h := hI_le.le; change ss.gtProp C (-↑(0 : ℤ)) _ at h; rwa [cast_le] at h)
+  have hI_sle : s.leProp C φ I_H.obj := by
+    have h : ss.leProp C 1 I_H.obj := by
+      have h := hI_ge.ge
+      change ss.leProp C (1 - ↑(0 : ℤ)) _ at h; rwa [cast_ge] at h
+    rcases h with hZ | ⟨F, hF, hle⟩
+    · exact Or.inl hZ
+    · simp only [HNFiltration.phiPlus] at hle
+      exact Or.inr ⟨⟨F.toPostnikovTower, fun i ↦ F.φ i + (φ - 1),
+        fun i j hij ↦ by linarith [F.hφ hij], fun j ↦ F.semistable j⟩, hF, by
+        dsimp only [HNFiltration.phiPlus]; linarith⟩
+  -- === K₀ + Im(Z·rot) ===
+  -- P(φ) objects lie on the real axis after rotation by exp(-iπφ)
+  set rot := Complex.exp (-(↑(Real.pi * φ) * Complex.I))
+  have him_ray : ∀ {E : C}, s.P φ E → (σ.Z (K₀.of C E) * rot).im = 0 := by
+    intro E hPφ
+    by_cases hne : IsZero E
+    · simp [K₀.of_isZero C hne]
+    · obtain ⟨m, _, hv⟩ := σ.compat φ E hPφ hne
+      rw [hv, mul_assoc, ← Complex.exp_add,
+        show ↑(Real.pi * φ) * Complex.I + -(↑(Real.pi * φ) * Complex.I) = 0 from
+          by ring,
+        Complex.exp_zero, mul_one, Complex.ofReal_im]
+  -- K₀ on truncation triangle: Z(X₃) = Z(L) + Z(Q)
+  have hZtrunc : σ.Z (K₀.of C X₃) =
+      σ.Z (K₀.of C ((t.truncLT 0).obj X₃)) +
+      σ.Z (K₀.of C ((t.truncGE 0).obj X₃)) := by
+    have h := K₀.of_triangle C _ htrunc
+    dsimp [TStructure.triangleLTGE] at h; rw [h, map_add]
+  -- K₀ on original triangle: Im(Z(X₃)·rot) = 0 since A, B ∈ P(φ)
+  have hZX₃_im : (σ.Z (K₀.of C X₃) * rot).im = 0 := by
+    have hZorig : σ.Z (K₀.of C B) =
+        σ.Z (K₀.of C A) + σ.Z (K₀.of C X₃) := by
+      have h := K₀.of_triangle C _ hT
+      dsimp [Triangle.mk] at h; rw [h, map_add]
+    have : (σ.Z (K₀.of C A) * rot).im + (σ.Z (K₀.of C X₃) * rot).im =
+        (σ.Z (K₀.of C B) * rot).im := by
+      rw [← Complex.add_im, ← add_mul, hZorig]
+    linarith [him_ray hA, him_ray hB]
+  -- Q ∈ P(φ) via K₀ on heart triangle
+  have hQ_Pφ : s.P φ ((t.truncGE 0).obj X₃) := by
+    by_cases hQne : IsZero ((t.truncGE 0).obj X₃)
+    · exact s.zero_mem' C φ _ hQne
+    · by_cases hIne : IsZero I_H.obj
+      · -- I = 0 ⟹ g_H is iso ⟹ Q ≅ B ∈ P(φ)
+        have hIne' : IsZero (ι.obj I_H) := by rwa [hι_simp]
+        haveI : IsIso (ι.map g_H) :=
+          (Triangle.isZero₁_iff_isIso₂
+            (Triangle.mk (ι.map i_H) (ι.map g_H) δ_heart) hT_heart).mp hIne'
+        exact (s.P φ).prop_of_iso
+          ((eqToIso (hι_simp B_H)).symm ≪≫
+            asIso (ι.map g_H) ≪≫ eqToIso (hι_simp Q_H)) hB
+      · -- Both I and Q nonzero: K₀ + Im argument in the heart
+        have him_I := im_Z_nonpos_of_heart_phases C σ hIne
+          (s.phiPlus_le_of_leProp C hIne hI_sle)
+          (s.phiMinus_gt_of_gtProp C hIne hI_sgt)
+        have him_Q := im_Z_nonpos_of_heart_phases C σ hQne
+          (s.phiPlus_le_of_leProp C hQne hQ_sle)
+          (s.phiMinus_gt_of_gtProp C hQne hQ_sgt)
+        have him_sum_heart : (σ.Z (K₀.of C I_H.obj) * rot).im +
+            (σ.Z (K₀.of C ((t.truncGE 0).obj X₃)) * rot).im = 0 := by
+          have h : σ.Z (K₀.of C I_H.obj) * rot +
+              σ.Z (K₀.of C ((t.truncGE 0).obj X₃)) * rot =
+              σ.Z (K₀.of C B) * rot := by
+            rw [← add_mul, ← map_add, ← hK₀_heart]
+          have him := congr_arg Complex.im h
+          simp only [Complex.add_im] at him
+          linarith [him_ray hB]
+        exact P_phi_of_im_zero_heart C σ hQne
+          (s.phiPlus_le_of_leProp C hQne hQ_sle)
+          (s.phiMinus_gt_of_gtProp C hQne hQ_sgt) (by linarith)
+  -- Im(Z(L)·rot) = 0 from truncation K₀ + hZX₃_im + him_ray hQ_Pφ
+  have hL_im0 : (σ.Z (K₀.of C ((t.truncLT 0).obj X₃)) * rot).im = 0 := by
+    have : (σ.Z (K₀.of C ((t.truncLT 0).obj X₃)) * rot).im +
+        (σ.Z (K₀.of C ((t.truncGE 0).obj X₃)) * rot).im =
+        (σ.Z (K₀.of C X₃) * rot).im := by
+      rw [← Complex.add_im, ← add_mul, ← hZtrunc]
+    linarith [him_ray hQ_Pφ, hZX₃_im]
+  -- L ∈ P(φ+1) via P_phi_of_im_zero_heart at phase φ+1
+  have hL_Pφ1 : s.P (φ + 1) ((t.truncLT 0).obj X₃) := by
+    by_cases hLne : IsZero ((t.truncLT 0).obj X₃)
+    · exact s.zero_mem' C (φ + 1) _ hLne
+    · exact P_phi_of_im_zero_heart C σ hLne
+        (s.phiPlus_le_of_leProp C hLne hL_sle)
+        (show φ + 1 - 1 < s.phiMinus C _ hLne from by
+          linarith [s.phiMinus_gt_of_gtProp C hLne hL_sgt])
+        (by rw [show -(↑(Real.pi * (φ + 1)) * Complex.I) =
+              -(↑(Real.pi * φ) * Complex.I) + -(↑Real.pi * Complex.I) from by
+                push_cast; ring,
+            Complex.exp_add, ← mul_assoc,
+            show Complex.exp (-(↑Real.pi * Complex.I)) = -1 from by
+              rw [Complex.exp_neg, Complex.exp_pi_mul_I, inv_neg, inv_one],
+            mul_neg_one, Complex.neg_im, hL_im0, neg_zero])
+  -- L⟦-1⟧ ∈ P(φ) via shift
+  have hK_Pφ : s.P φ (((t.truncLT 0).obj X₃)⟦(-1 : ℤ)⟧) := by
+    have h := (s.shift_int C (φ + 1) ((t.truncLT 0).obj X₃) (-1)).mp hL_Pφ1
+    convert h using 1; push_cast; ring
+  exact ⟨hQ_Pφ, hK_Pφ⟩
 
 variable [IsTriangulated C] in
 /-- **Admissibility of morphisms in P(φ)** (**Bridgeland's Lemma 5.2**). For any morphism
@@ -1965,7 +2225,7 @@ there exist `K, Q ∈ P(φ)` and a distinguished triangle `(ι K)⟦1⟧ → X�
 
 The proof uses the truncation from the t-structure `(s.phaseShift(φ-1)).toTStructure`
 to decompose X₃, then promotes the truncation pieces from heart `P((φ-1, φ])`
-to `P(φ)` via `P_phi_of_truncation_of_P_phi_cone` (the Z-ray argument). -/
+to `P(φ)` via `P_phi_of_truncation_of_P_phi_cone` (the epi approach). -/
 theorem StabilityCondition.P_phi_admissible
     (σ : StabilityCondition C) (φ : ℝ) :
     AbelianSubcategory.admissibleMorphism (σ.slicing.P φ).ι = ⊤ := by
