@@ -62,14 +62,16 @@ need changing. The missing piece is proof infrastructure, not definitions.
 - [x] `TStructure.heart_shortExact_triangle` — PROVED (~80 lines)
 - [ ] 8 scaffolding sorrys remain (HeartStabilityData, heart_equiv, etc.)
 
-### Slicing.lean additions (~64 lines added)
+### Slicing.lean additions (~140 lines added)
 - [x] `toTStructure_bounded` — fully proved
 - [x] `toTStructure_heart_iff` — fully proved
 - [x] `IsLocallyFinite` upgraded to `structure` with `intervalFinite` + `phaseFinite`
+- [x] `ltProp` (P(< t)) and `geProp` (P(≥ t)) subcategory predicates
+- [x] `phiPlus_lt_of_ltProp` / `phiMinus_ge_of_geProp` extraction lemmas
 
 **Dependencies**: Independent of each other.
 
-## Phase 2: Two-Heart Embedding Theory (~700 lines) — PARTIALLY COMPLETE
+## Phase 2: Two-Heart Embedding Theory (~700 lines) — MOSTLY COMPLETE
 
 ### IntervalCategory.lean (694 lines, was 191)
 
@@ -93,8 +95,63 @@ This is the core of Bridgeland's Lemma 4.3. For P((a,b)) with b-a < 1:
      Q has ltProp(b) ⟹ Q ∈ P((a,b))
    - Uses right heart P([b-1, b)) with OPEN right endpoint (key insight)
    - φ⁺(Q) < b: free from ltProp(b); φ⁻(Q) > a: yoneda_exact₃ + K[1] phases ≥ b > a
-8. [ ] **Quasi-abelian**: `intervalCat_quasiAbelian` — NOT YET STARTED
-9. [ ] **Strict SES ↔ triangles**: `strictSES_of_distTriang` — NOT YET STARTED
+
+### Remaining Phase 2 items: quasi-abelian instance
+
+Items 1–7 establish the **triangle-level** containment lemmas corresponding to
+Schneiders' conditions (a) and (b). What remains is wiring these into a
+`QuasiAbelian` instance on P((a,b)).
+
+**Schneiders' criterion (Bridgeland Lemma 4.2):** P((a,b)) is quasi-abelian if
+there exist abelian categories A♯, A♭ with fully faithful embeddings such that:
+- (a) monos in A♯ with target in P((a,b)) have source in P((a,b))
+- (b) epis in A♭ with source in P((a,b)) have target in P((a,b))
+
+The A♯ and A♭ are **existential** — we just need to exhibit them and verify
+conditions (a) and (b). The natural choices are:
+- A♯ = P((a, a+1]) — left heart of t-structure from P(> a)
+- A♭ = P([b-1, b)) — right heart of t-structure from P(≥ b-1)
+
+The "embedding functors" are just full subcategory inclusions — since
+P((a,b)) ⊂ A♯ and P((a,b)) ⊂ A♭ by the containment lemmas, the inclusions
+are automatic from the `FullSubcategory` structure.
+
+#### 8. Second t-structure and right heart (~100 lines)
+
+Currently we only have one t-structure: from P(> φ), giving heart P((φ, φ+1]).
+For the right heart P([b-1, b)), we need the t-structure from P(≥ φ), giving
+heart P([φ, φ+1)).
+
+This is straightforward: define `toTStructureGE` (or similar) from the slicing
+using P(≥ φ) instead of P(> φ). The construction mirrors `toTStructure` exactly,
+with `gtProp` replaced by `geProp` and `leProp` replaced by `ltProp`. Then:
+- `intervalProp_implies_rightHeart'`: P((a,b)) ⊂ P([b-1, b)) via the new heart
+- The right heart is abelian (same `HeartAbelian` machinery)
+
+#### 9. Schneiders criterion → QuasiAbelian (~200 lines)
+
+Prove a general Schneiders criterion theorem:
+```
+theorem quasiAbelian_of_schneiders (A♯ A♭ : abelian)
+    (i♯ : A ⥤ A♯) (i♭ : A ⥤ A♭) [Faithful i♯] [Full i♯] [Faithful i♭] [Full i♭]
+    (ha : ∀ mono in A♯ with target in im(i♯), source ∈ im(i♯))
+    (hb : ∀ epi in A♭ with source in im(i♭), target ∈ im(i♭))
+    : QuasiAbelian A
+```
+
+Then instantiate with A♯ = left heart, A♭ = right heart, using
+`first_intervalProp_of_triangle` for (a) and `third_intervalProp_of_triangle`
+for (b).
+
+Alternatively, bypass the general Schneiders theorem and directly construct
+kernels/cokernels/pullbacks/pushouts for P((a,b)) using the two hearts, then
+prove `pullback_strictEpi` and `pushout_strictMono` directly.
+
+#### 10. Strict SES ↔ triangles (~100 lines)
+
+Once P((a,b)) is quasi-abelian, prove that strict SES in P((a,b)) correspond
+to distinguished triangles in C. This is needed for the skewed stability
+function arguments in Phase 4.
 
 Also added: `SkewedStabilityFunction` definition, `stabilityFunctionOnP` in Deformation.lean.
 
@@ -182,6 +239,8 @@ Phase 1: Strict.lean + HeartEquivalence foundations
     |
     v
 Phase 2: IntervalCategory.lean two-heart theory (Lemma 4.3)
+    |  Items 1-7: DONE (triangle-level containment)
+    |  Items 8-10: TODO (second t-structure, Schneiders, strict SES)
     |
     +---> Sorry #5 (finiteness, independent)
     +---> Sorry #3 (triangle test)
@@ -206,3 +265,18 @@ Sorry #2 (HN existence) [depends on #1, #3, #4 + Phase 3]
 - Phase confinement, sector bounds, distance estimates — all sorry-free and correct
 - P_phi_abelian (line 2557) — correct, useful as auxiliary
 - All 5 sorry signatures — correct, no changes needed
+
+## Key Insight: Two Hearts with Complementary Endpoints
+
+The two hearts have **complementary** half-open intervals:
+- Left heart A♯ = P((a, a+1]) — open at a, closed at a+1
+- Right heart A♭ = P([b-1, b)) — closed at b-1, open at b
+
+This is why P((a,b)) is quasi-abelian but NOT abelian: no single heart
+controls both kernels and cokernels. The left heart's cokernels can escape
+P((a,b)) (phases up to a+1 > b), and the right heart's kernels can escape
+(phases down to b-1 < a). But:
+- Kernels in the LEFT heart stay in P((a,b)) (first_intervalProp_of_triangle)
+- Cokernels in the RIGHT heart stay in P((a,b)) (third_intervalProp_of_triangle)
+
+The `QuasiAbelian` instance uses both hearts together.
