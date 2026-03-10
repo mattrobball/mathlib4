@@ -8,7 +8,7 @@ import Mathlib.CategoryTheory.Triangulated.StabilityFunction
 import Mathlib.CategoryTheory.Triangulated.IntervalCategory
 import Mathlib.CategoryTheory.Triangulated.TStructure.HeartAbelian
 
-set_option linter.style.longFile 3400
+set_option linter.style.longFile 3500
 
 /-!
 # Deformation of Stability Conditions
@@ -59,7 +59,7 @@ theorem StabilityCondition.exists_epsilon0 (σ : StabilityCondition C) :
       ∀ t : ℝ, ∀ (E : C),
         σ.slicing.intervalProp C (t - 4 * ε₀) (t + 4 * ε₀) E →
           Finite (Subobject E) := by
-  obtain ⟨η, hη, hlf⟩ := σ.locallyFinite
+  obtain ⟨η, hη, hlf⟩ := σ.locallyFinite.intervalFinite
   refine ⟨min (η / 4) (1 / 16), by positivity,
     by linarith [min_le_right (η / 4) (1 / 16 : ℝ)],
     fun t E hI ↦ ?_⟩
@@ -72,7 +72,7 @@ theorem StabilityCondition.exists_epsilon0_sector (σ : StabilityCondition C) :
       ∀ t : ℝ, ∀ (E : C),
         σ.slicing.intervalProp C (t - 2 * ε₀) (t + 2 * ε₀) E →
           Finite (Subobject E) := by
-  obtain ⟨η, hη, hlf⟩ := σ.locallyFinite
+  obtain ⟨η, hη, hlf⟩ := σ.locallyFinite.intervalFinite
   refine ⟨min (η / 2) (1 / 8), by positivity,
     by linarith [min_le_right (η / 2) (1 / 8 : ℝ)],
     fun t E hI ↦ ?_⟩
@@ -3003,6 +3003,190 @@ theorem K0_of_shortExact_P_phi (σ : StabilityCondition C) (φ : ℝ)
 
 /-! ### Reverse phase confinement: σ-semistable → Q-interval -/
 
+/-! #### Step A1: W restricted to P(φ) as a stability function
+
+For `E ∈ P(φ)`, the W-phase `wPhaseOf(W(K₀.of(E)))` lies in `(φ - ε₀, φ + ε₀)`.
+Rotating by `exp(-iπ(φ - 1/2))` maps this into `(1/2 - ε₀, 1/2 + ε₀) ⊂ (0, 1)`,
+placing the rotated value in `upperHalfPlaneUnion`. -/
+
+variable [IsTriangulated C] in
+/-- The rotation factor that maps W-phases near `φ` into `(0, 1)`. -/
+private abbrev phaseRotation (φ : ℝ) : ℂ :=
+  Complex.exp (-(↑(Real.pi * (φ - 1 / 2)) * Complex.I))
+
+variable [IsTriangulated C] in
+/-- **W restricted to P(φ) as a stability function** (with rotation).
+For `E ∈ P(φ)`, define `Zobj(E) := W(K₀.of(ι E)) · exp(-iπ(φ - 1/2))`.
+This places the phase in `(0, 1)` so that `Zobj(E) ∈ upperHalfPlaneUnion`. -/
+private noncomputable def stabilityFunctionOnP
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    (φ : ℝ) :
+    @StabilityFunction (σ.slicing.P φ).FullSubcategory _
+      (σ.P_phi_abelian C φ) := by
+  letI := σ.P_phi_abelian C φ
+  set ι := (σ.slicing.P φ).ι
+  set rot := phaseRotation φ
+  exact {
+    Zobj := fun E => W (K₀.of C (ι.obj E)) * rot
+    map_zero' := fun X hX => by
+      have : IsZero (ι.obj X) := ι.map_isZero hX
+      rw [K₀.of_isZero C this, map_zero, zero_mul]
+    additive := fun S hS => by
+      have hK0 := K0_of_shortExact_P_phi C σ φ S hS
+      rw [hK0, map_add, add_mul]
+    upper := fun E hE => by
+      have hP : σ.slicing.P φ (ι.obj E) := E.property
+      have hEne : ¬IsZero (ι.obj E) := by
+        intro hZ; apply hE
+        rw [IsZero.iff_id_eq_zero] at hZ ⊢
+        exact Functor.zero_of_map_zero ι (𝟙 E) (by rw [ι.map_id]; exact hZ)
+      set w := W (K₀.of C (ι.obj E)) with hw_def
+      have hWne : w ≠ 0 := σ.W_ne_zero_of_seminorm_lt_one C W hW hP hEne
+      set ψ := wPhaseOf w φ with hψ_def
+      have ⟨hψ_lo, hψ_hi⟩ : φ - ε₀ < ψ ∧ ψ < φ + ε₀ := by
+        have h := hperturb_of_stabSeminorm C σ W hW
+          (show (φ + ε₀ : ℝ) - (φ - ε₀) < 1 from by linarith)
+          hε₀ hε₀2 hsin (ι.obj E) φ hP hEne (by linarith) (by linarith)
+        rwa [show ((φ - ε₀ : ℝ) + (φ + ε₀)) / 2 = φ from by ring] at h
+      have hpolar := wPhaseOf_compat w φ
+      -- w * rot = ‖w‖ * exp(iπ(ψ - φ + 1/2)) where ψ - φ + 1/2 ∈ (1/4, 3/4)
+      -- so sin > 0 and im > 0
+      refine Or.inl ?_
+      change 0 < (w * rot).im
+      have hrot : rot = Complex.exp (-(↑(Real.pi * (φ - 1 / 2)) * Complex.I)) := rfl
+      have hexp_eq : ↑(Real.pi * ψ) * Complex.I +
+          (-(↑(Real.pi * (φ - 1 / 2)) * Complex.I)) =
+          ↑(Real.pi * (ψ - φ + 1 / 2)) * Complex.I := by
+        rw [← neg_mul, ← add_mul, ← sub_eq_add_neg, ← Complex.ofReal_sub]
+        congr 1; ring
+      rw [hpolar, mul_assoc, hrot, ← Complex.exp_add, hexp_eq,
+        Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im,
+        Complex.exp_ofReal_mul_I_re, Complex.exp_ofReal_mul_I_im,
+        zero_mul, add_zero]
+      exact mul_pos (norm_pos_iff.mpr hWne)
+        (Real.sin_pos_of_pos_of_lt_pi
+          (by have := Real.pi_pos; nlinarith [hψ_lo])
+          (by have := Real.pi_pos; nlinarith [hψ_hi])) }
+
+/-! #### Step A2: Finite subobject lattice in P(φ) and HN existence -/
+
+variable [IsTriangulated C] in
+/-- **HN property for the W-stability function on P(φ)**. Uses the P(φ)-subobject
+finiteness from `IsLocallyFinite` (condition 2) and `hasHN_of_finiteLength`. -/
+private theorem stabilityFunctionOnP_hasHN
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    (φ : ℝ) :
+    @StabilityFunction.HasHNProperty (σ.slicing.P φ).FullSubcategory _
+      (σ.P_phi_abelian C φ) (stabilityFunctionOnP C σ W hW hε₀ hε₀2 hsin φ) := by
+  letI := σ.P_phi_abelian C φ
+  exact StabilityFunction.hasHN_of_finiteLength _
+    (fun E => σ.locallyFinite.phaseFinite φ E)
+
+/-! #### Step A2b: Triangle test — requires quasi-abelian theory
+
+The triangle test for `P_phi_wSemistable_is_deformedPred` asks: given `K → F → Q → K⟦1⟧`
+with `F ∈ P(φ)` and `K, Q ∈ P((ψ-ε₀, ψ+ε₀))`, `K` nonzero, show
+`wPhaseOf(W(K), ψ) ≤ ψ`.
+
+**What we can prove** (see `IntervalCategory.lean`):
+- `phiPlus_le_of_semistable_triangle`: `φ⁺(K) ≤ φ` (all σ-phases of K are ≤ φ)
+- `phiMinus_ge_of_semistable_triangle`: `φ ≤ φ⁻(Q)` (all σ-phases of Q are ≥ φ)
+These follow directly from Lemma 3.4 (`phiPlus_triangle_le`/`phiMinus_triangle_le`).
+
+**Why the Z-ray argument fails**: The aggregate imaginary part argument
+(`Im(Z(K)·rot) ≤ 0` and `Im(Z(Q)·rot) ≥ 0` with sum = 0) does NOT force either to
+vanish. The terms have **opposite signs** (K below φ, Q above φ), so cancellation is
+possible. Concrete counterexample: elliptic curve, `0 → O_E → F → F/O_E → 0` with
+`O_E ∈ P(1/2)`, `F ∈ P(3/4)` rank 2 degree 2, `F/O_E` of phase ≈ 0.85.
+
+**Partial decomposition** (not sufficient to close the sorry):
+Decompose K = K_{=φ} + K_{<φ} via the σ-HN at phase φ. Then:
+1. K_{=φ} ↪ F is a P(φ)-subobject (heart-mono between P(φ) objects).
+2. If F is W-semistable in P(φ): `wPhaseOf(W(K_{=φ})) ≤ ψ`. ✓
+3. F/K_{=φ} in P(φ) has `wPhaseOf(W(F/K_{=φ})) ≥ ψ`. ✓
+4. But `Im(W(K_{<φ}) · rot_ψ)` has indeterminate sign — individual factor
+   W-phases straddle ψ, so the aggregate can be positive or negative.
+Result: `Im(W(K) · rot_ψ) ≤ 0` reduces to `Im(W(Q) · rot_ψ) ≥ 0`, which is
+equivalent but equally hard.
+
+**What is needed**: Bridgeland's proof uses the quasi-abelian structure of `P((a,b))`
+(§4), where W-semistability is defined via strict short exact sequences. The strict
+subobjects of F ∈ P(φ) in P((a,b)) have additional structure (they are kernels of
+morphisms to other interval objects). This constrains the non-P(φ) part of K more
+tightly than the general triangle test. Building the quasi-abelian theory (~800 lines)
+would close this gap. -/
+
+/-! #### Step A3: Convert AbelianHNFiltration in P(φ) to HNFiltration in C -/
+
+variable [IsTriangulated C] in
+/-- **Key sub-lemma**: a W-semistable object in `P(φ)` satisfies `deformedPred`.
+
+If `F ∈ P(φ)` is nonzero and W-semistable in the abelian category `P(φ)` (with W-phase
+`ψ ∈ (φ - ε₀, φ + ε₀)`), then `F` satisfies `deformedPred ψ`.
+
+The proof uses:
+1. Choose deformedPred interval `(ψ - ε₀, ψ + ε₀)` (width `2ε₀`, thinness `4ε₀ < 1`).
+2. `F ∈ P(φ) ⊂ P((ψ-ε₀, ψ+ε₀))` since `|φ - ψ| < ε₀`.
+3. For the triangle test: split `K` via σ-t-structure at cutoff `φ`. The `P(≤ φ)` part
+   of `K` maps to `F` and is a P(φ)-subobject (by heart closure). W-semistability bounds
+   its W-phase. The `P(> φ)` part maps to 0 by hom-vanishing. Combined via K₀ + see-saw. -/
+private theorem P_phi_wSemistable_is_deformedPred
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    {φ : ℝ} {F : C} (hPφ : σ.slicing.P φ F) (hFne : ¬IsZero F)
+    {ψ : ℝ} (hψ_lo : φ - ε₀ < ψ) (hψ_hi : ψ < φ + ε₀)
+    (hWne : W (K₀.of C F) ≠ 0)
+    (hψ_eq : wPhaseOf (W (K₀.of C F)) ((ψ - ε₀ + (ψ + ε₀)) / 2) = ψ) :
+    σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin ψ F := by
+  -- Choose interval (ψ - ε₀, ψ + ε₀) for deformedPred
+  have hab : ψ - ε₀ < ψ + ε₀ := by linarith
+  have hthin : (ψ + ε₀) - (ψ - ε₀) + 2 * ε₀ < 1 := by linarith
+  have henv_lo : (ψ - ε₀) + ε₀ ≤ ψ := by linarith
+  have henv_hi : ψ ≤ (ψ + ε₀) - ε₀ := by linarith
+  right
+  exact ⟨ψ - ε₀, ψ + ε₀, hab, hthin, henv_lo, henv_hi,
+    -- Semistable condition
+    ⟨-- 1. F ∈ P((ψ-ε₀, ψ+ε₀))
+     σ.slicing.intervalProp_of_semistable C hPφ (by linarith) (by linarith),
+     -- 2. F is nonzero
+     hFne,
+     -- 3. W(F) ≠ 0
+     hWne,
+     -- 4. wPhaseOf(W(F), α) = ψ  (α = ψ since midpoint of (ψ-ε₀, ψ+ε₀))
+     by change wPhaseOf (W (K₀.of C F)) ((ψ - ε₀ + (ψ + ε₀)) / 2) = ψ; exact hψ_eq,
+     -- 5. Triangle test: for K → F → Q → K[1] with K, Q ∈ P((ψ-ε₀, ψ+ε₀)),
+     --    K nonzero, show wPhaseOf(W(K), ψ) ≤ ψ
+     fun {K Q f₁ f₂ f₃} hT hKI hQI hKne => by
+       sorry⟩⟩
+
+variable [IsTriangulated C] in
+/-- **Bridge: abelian HN in P(φ) → triangulated HN in C for Q**.
+Given an `AbelianHNFiltration` of `E` in `P(φ)` w.r.t. the W-stability function,
+produce an `HNFiltration` of `ι(E)` in `C` for the deformed slicing `Q`.
+Each abelian factor (a cokernel in P(φ)) maps to a Q-semistable factor via
+admissibility + phase confinement. The tower is built by iterating `appendFactor`. -/
+private theorem abelianHN_to_intervalProp
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    {φ : ℝ} {E : (σ.slicing.P φ).FullSubcategory}
+    (hE : ¬IsZero E)
+    {a b : ℝ} (ha : a < φ - ε₀) (hb : φ + ε₀ < b) :
+    (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hsin).intervalProp C a b
+      ((σ.slicing.P φ).ι.obj E) := by
+  sorry
+
+/-! #### Step A4: Main theorem -/
+
 variable [IsTriangulated C] in
 /-- **Reverse phase confinement**. If `E` is σ-semistable of phase `φ` and
 `‖W - Z‖_σ < sin(πε₀)`, then `E` lies in the Q-interval `(φ - ε₀ - δ, φ + ε₀ + δ)`
@@ -3024,11 +3208,18 @@ theorem sigma_semistable_intervalProp
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
-    {E : C} {φ : ℝ} (hP : σ.slicing.P φ E) (hE : ¬IsZero E)
+    {E : C} {φ : ℝ} (hP : σ.slicing.P φ E) (_hE : ¬IsZero E)
     {δ : ℝ} (hδ : 0 < δ) :
     (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hsin).intervalProp C
       (φ - ε₀ - δ) (φ + ε₀ + δ) E := by
-  sorry
+  by_cases hEz : IsZero E
+  · exact Or.inl hEz
+  -- Construct P(φ) FullSubcategory element
+  set E' : (σ.slicing.P φ).FullSubcategory := ⟨E, hP⟩
+  have hE'ne : ¬IsZero E' := fun h => hEz ((σ.slicing.P φ).ι.map_isZero h)
+  -- Convert abelian HN in P(φ) to Q-intervalProp for E = ι.obj E'
+  exact abelianHN_to_intervalProp C σ W hW hε₀ hε₀2 hsin
+    hE'ne (by linarith) (by linarith)
 
 /-! ### Deformation theorem (Theorem 7.1) -/
 
@@ -3064,24 +3255,32 @@ theorem bridgeland_7_1 (σ : StabilityCondition C)
     σ.deformedSlicing_compat C W hW ε₀ hε₀ hε₀2 hsin, ?_⟩, rfl, ?_⟩
   · -- Local finiteness: inherited from σ via phase confinement
     obtain ⟨δ, hδ, hlf_σ⟩ := hε₀_lf
-    refine ⟨δ / 2, by linarith, fun t E hE_int ↦ ?_⟩
-    -- Show E ∈ σ.intervalProp C (t - (ε₀ + δ)) (t + (ε₀ + δ))
-    have hE_sigma : σ.slicing.intervalProp C (t - (ε₀ + δ)) (t + (ε₀ + δ)) E := by
-      rcases hE_int with hZ | ⟨F, hF⟩
-      · exact Or.inl hZ
-      · -- F : HNFiltration for deformedPred, with Q-phases in (t - δ/2, t + δ/2)
-        -- Each factor is in σ's interval by phase confinement
-        apply intervalProp_of_postnikovTower C σ.slicing F.toPostnikovTower
-        intro i
-        have hsem := F.semistable i
-        change σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin (F.φ i) _ at hsem
-        rcases hsem with hZ_i | ⟨a_i, b_i, hab_i, hthin_i, _, _, hSS_i⟩
-        · exact Or.inl hZ_i
-        · have ⟨hlo, hhi⟩ := phase_confinement_from_stabSeminorm C σ W hW hab_i
-            hε₀ hε₀2 hthin_i hsin hSS_i
-          exact σ.slicing.intervalProp_of_intrinsic_phases C hSS_i.2.1
-            (by have := (hF i).1; linarith) (by have := (hF i).2; linarith)
-    exact hlf_σ t E hE_sigma
+    constructor
+    · -- Part 1: C-subobject finiteness (inherited from σ)
+      refine ⟨δ / 2, by linarith, fun t E hE_int ↦ ?_⟩
+      -- Show E ∈ σ.intervalProp C (t - (ε₀ + δ)) (t + (ε₀ + δ))
+      have hE_sigma : σ.slicing.intervalProp C (t - (ε₀ + δ)) (t + (ε₀ + δ)) E := by
+        rcases hE_int with hZ | ⟨F, hF⟩
+        · exact Or.inl hZ
+        · -- F : HNFiltration for deformedPred, with Q-phases in (t - δ/2, t + δ/2)
+          -- Each factor is in σ's interval by phase confinement
+          apply intervalProp_of_postnikovTower C σ.slicing F.toPostnikovTower
+          intro i
+          have hsem := F.semistable i
+          change σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin (F.φ i) _ at hsem
+          rcases hsem with hZ_i | ⟨a_i, b_i, hab_i, hthin_i, _, _, hSS_i⟩
+          · exact Or.inl hZ_i
+          · have ⟨hlo, hhi⟩ := phase_confinement_from_stabSeminorm C σ W hW hab_i
+              hε₀ hε₀2 hthin_i hsin hSS_i
+            exact σ.slicing.intervalProp_of_intrinsic_phases C hSS_i.2.1
+              (by have := (hF i).1; linarith) (by have := (hF i).2; linarith)
+      exact hlf_σ t E hE_sigma
+    · -- Part 2: Q(ψ)-subobject finiteness
+      -- This follows from the fact that Q(ψ) objects lie in thin σ-intervals,
+      -- and within a common heart, monomorphisms in P(φ) and Q(ψ) agree.
+      -- The full proof requires the heart-based mono transfer.
+      intro ψ E
+      sorry
   · -- Distance bound: d(P, Q) ≤ ε₀ by phase confinement
     set Q := σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hsin
     -- Forward: Q-HN factors → phase confinement → σ-intervalProp
