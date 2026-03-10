@@ -1131,6 +1131,54 @@ theorem wPhaseOf_seesaw_strict {w w₁ w₂ : ℂ} {α ψ : ℝ}
   -- Conclude phase(w₁) > ψ
   exact wPhaseOf_gt_of_im_pos him_w₁ hw₁_range
 
+/-- **Dual strict phase see-saw**: if `w = w₁ + w₂` with `wPhaseOf(w, α) = ψ`,
+`ψ < wPhaseOf(w₁, α)` and both summands lie in the same branch window
+`(ψ - 1, ψ + 1)`, then the other nonzero summand has phase `< ψ`.
+
+This is the quotient-side form used when a strict subobject destabilizes an object:
+the complementary strict quotient must have strictly smaller phase. -/
+theorem wPhaseOf_seesaw_dual {w w₁ w₂ : ℂ} {α ψ : ℝ}
+    (hsum : w₁ + w₂ = w)
+    (hψ : wPhaseOf w α = ψ)
+    (hw₁_gt : ψ < wPhaseOf w₁ α)
+    (hw₁_ne : w₁ ≠ 0)
+    (hw₁_range : wPhaseOf w₁ α ∈ Set.Ioo (ψ - 1) (ψ + 1))
+    (hw₂_range : wPhaseOf w₂ α ∈ Set.Ioo (ψ - 1) (ψ + 1)) :
+    wPhaseOf w₂ α < ψ := by
+  by_contra h
+  push_neg at h
+  set rot := Complex.exp (-(↑(Real.pi * ψ) * Complex.I))
+  have him_w : (w * rot).im = 0 := im_eq_zero_of_wPhaseOf_eq hψ
+  have him_w₁ : 0 < (w₁ * rot).im := by
+    have hw₁_compat := wPhaseOf_compat w₁ α
+    rw [hw₁_compat, mul_assoc, ← Complex.exp_add]
+    have harg : ↑(Real.pi * wPhaseOf w₁ α) * Complex.I +
+        -(↑(Real.pi * ψ) * Complex.I) =
+        ↑(Real.pi * (wPhaseOf w₁ α - ψ)) * Complex.I := by push_cast; ring
+    rw [harg, Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im,
+      Complex.exp_ofReal_mul_I_re, Complex.exp_ofReal_mul_I_im,
+      zero_mul, add_zero]
+    exact mul_pos (norm_pos_iff.mpr hw₁_ne)
+      (Real.sin_pos_of_pos_of_lt_pi
+        (by nlinarith [Real.pi_pos, hw₁_gt])
+        (by nlinarith [Real.pi_pos, hw₁_range.2]))
+  have him_w₂ : 0 ≤ (w₂ * rot).im := by
+    have hw₂_compat := wPhaseOf_compat w₂ α
+    rw [hw₂_compat, mul_assoc, ← Complex.exp_add]
+    have harg : ↑(Real.pi * wPhaseOf w₂ α) * Complex.I +
+        -(↑(Real.pi * ψ) * Complex.I) =
+        ↑(Real.pi * (wPhaseOf w₂ α - ψ)) * Complex.I := by push_cast; ring
+    rw [harg, Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im,
+      Complex.exp_ofReal_mul_I_re, Complex.exp_ofReal_mul_I_im,
+      zero_mul, add_zero]
+    exact mul_nonneg (norm_nonneg w₂)
+      (Real.sin_nonneg_of_nonneg_of_le_pi
+        (by nlinarith [Real.pi_pos, h])
+        (by nlinarith [Real.pi_pos, hw₂_range.2]))
+  have hsum_im : (w * rot).im = (w₁ * rot).im + (w₂ * rot).im := by
+    rw [← hsum, add_mul, Complex.add_im]
+  linarith
+
 /-! ### K₀ decomposition of imaginary parts -/
 
 /-- **Im positivity from HN factors.** If `E ∈ P((a, b))` is nonzero and every nonzero
