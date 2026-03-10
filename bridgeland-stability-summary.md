@@ -26,7 +26,7 @@ covering Sections 2–7 and the main deformation theorem (Theorem 7.1 / Theorem 
 | `IntervalCategory.lean` | 584 | 0 | §4: IntervalCat, two-heart theory, SkewedStabilityFunction |
 | `HeartEquivalence.lean` | 336 | 11 | §5.3: Prop 5.3, Lemma 5.2, HeartStabilityData scaffolding |
 | `GrothendieckGroup.lean` | 208 | 0 | K₀, K₀.of, K₀.lift |
-| `Strict.lean` | 152 | 1 | §4: IsStrict, QuasiAbelian, StrictShortExact |
+| `Strict.lean` | 252 | 0 | §4: IsStrict, QuasiAbelian, StrictShortExact, kernel/cokernel strictness |
 | `PostnikovTower.lean` | ~120 | 0 | Postnikov towers, factor extraction |
 | `NumericalStability.lean` | ~60 | 0 | Cor 1.3 statement |
 
@@ -52,7 +52,7 @@ These are the real blockers for completing the deformation theorem.
 
 - **Deformation.lean** (5 more): `stabilityFunctionOnP` construction sorrys (lines 3033-3109)
 - **HeartEquivalence.lean** (11): HeartStabilityData, heart_equiv, P(φ) closure, Prop 5.3
-- **Strict.lean** (1): `Finite.subobject_of_fullyFaithful`
+- **Strict.lean** (0): fully proved
 
 ### What is sorry-free
 
@@ -75,9 +75,9 @@ These are the real blockers for completing the deformation theorem.
 - [x] `toTStructure_heart_iff` — proved (Slicing.lean)
 - [x] `heart_shortExact_triangle` — proved (HeartEquivalence.lean)
 - [x] `IsLocallyFinite` upgraded to structure with `intervalFinite` + `phaseFinite`
-- [ ] `Finite.subobject_of_fullyFaithful` — 1 sorry
+- [x] `Finite.subobject_of_faithful_preservesMono` — proved (Strict.lean)
+- [x] `isStrictMono_kernel` / `isStrictEpi_cokernel` — proved (Strict.lean)
 - [ ] `Subobject.IsStrict` predicate on subobjects
-- [ ] `kernel_strictMono_of_strictEpi` / `cokernel_strictEpi_of_strictMono`
 
 ### Phase 2: Two-Heart Embedding (Lemma 4.3) — ~50% complete
 

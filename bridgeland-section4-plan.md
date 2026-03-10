@@ -52,9 +52,9 @@ need changing. The missing piece is proof infrastructure, not definitions.
 - [x] `QuasiAbelian` class
 - [x] `StrictShortExact` structure
 - [x] Abelian instances: `isStrict_of_abelian`, `isStrictMono_of_mono`, etc.
-- [ ] `Finite.subobject_of_fullyFaithful` — 1 sorry remaining
+- [x] `Finite.subobject_of_faithful_preservesMono` — PROVED (0 sorrys)
 - [ ] `Subobject.IsStrict` predicate on subobjects (not yet started)
-- [ ] `kernel_strictMono_of_strictEpi` / `cokernel_strictEpi_of_strictMono`
+- [x] `isStrictMono_kernel` / `isStrictEpi_cokernel` — PROVED (no quasi-abelian hyp needed)
 
 ### HeartEquivalence.lean (336 lines, was 283)
 - [x] `Slicing.toTStructure_bounded` — PROVED (in Slicing.lean)
