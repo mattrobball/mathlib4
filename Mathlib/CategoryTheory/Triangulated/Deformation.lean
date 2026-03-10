@@ -1736,6 +1736,124 @@ theorem hom_eq_zero_of_wSemistable_gap
   -- Apply interval hom-vanishing
   exact σ.slicing.intervalHom_eq_zero C hEI hFI hdisjoint f
 
+set_option maxHeartbeats 800000 in
+variable [IsTriangulated C] in
+/-- A nonzero strict quotient of a `W`-semistable interval object has `W`-phase at least
+that of the middle term. This is the quotient-side semistability inequality needed for the
+thin-interval HN recursion. -/
+theorem SkewedStabilityFunction.phase_le_of_strictQuotient
+    (σ : StabilityCondition C) {a b : ℝ}
+    {ssf : SkewedStabilityFunction C σ.slicing a b}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X Y : σ.slicing.IntervalCat C a b} {ψ ε₀ : ℝ}
+    (hX : ssf.Semistable C X.obj ψ)
+    (hε₀ : 0 < ε₀) (hthin : b - a + 2 * ε₀ < 1)
+    (hW_interval : ∀ {F : C}, σ.slicing.intervalProp C a b F → ¬IsZero F →
+      ssf.W (K₀.of C F) ≠ 0)
+    (hperturb : ∀ (F : C) (φ : ℝ), (σ.slicing.P φ) F → ¬IsZero F →
+        a < φ → φ < b →
+        φ - ε₀ < wPhaseOf (ssf.W (K₀.of C F)) ssf.α ∧
+        wPhaseOf (ssf.W (K₀.of C F)) ssf.α < φ + ε₀)
+    (p : X ⟶ Y) (hp : IsStrictEpi p)
+    (hY : ¬IsZero Y.obj) :
+    ψ ≤ wPhaseOf (ssf.W (K₀.of C Y.obj)) ssf.α := by
+  let S : ShortComplex (σ.slicing.IntervalCat C a b) :=
+    ShortComplex.mk (kernel.ι p) p (kernel.condition p)
+  let t := (σ.slicing.phaseShift C a).toTStructure
+  letI := t.hasHeartFullSubcategory
+  letI : Abelian t.heart.FullSubcategory := t.heartFullSubcategoryAbelian
+  letI : CategoryWithHomology t.heart.FullSubcategory :=
+    CategoryTheory.categoryWithHomology_of_abelian (C := t.heart.FullSubcategory)
+  let FL := Slicing.IntervalCat.toLeftHeart (C := C) (s := σ.slicing) a b (Fact.out : b - a ≤ 1)
+  have hEpi : Epi ((S.map FL).g) := by
+    simpa [S, FL] using
+      Slicing.IntervalCat.epi_toLeftHeart_of_strictEpi
+        (C := C) (s := σ.slicing) (a := a) (b := b) p hp
+  have hKerBase : IsLimit (KernelFork.ofι S.f S.zero) := by
+    simpa [S] using (kernelIsKernel p)
+  have hKer :
+      IsLimit (KernelFork.ofι ((S.map FL).f) (S.map FL).zero) :=
+    isLimitForkMapOfIsLimit' FL S.zero hKerBase
+  letI : (S.map FL).HasHomology :=
+    ShortComplex.HasHomology.mk' (ShortComplex.HomologyData.ofAbelian (S := S.map FL))
+  have hExact : (S.map FL).Exact := ShortComplex.exact_of_f_is_kernel (S := S.map FL) hKer
+  have hL : (S.map FL).ShortExact :=
+    ShortComplex.ShortExact.mk' hExact (Fork.IsLimit.mono hKer) hEpi
+  have hW_ne : ∀ (F : C) (φ : ℝ), (σ.slicing.P φ) F → ¬IsZero F →
+      a < φ → φ < b → ssf.W (K₀.of C F) ≠ 0 :=
+    fun F φ hP hFne haφ hφb ↦ ssf.nonzero F φ haφ hφb hP hFne
+  have hperturb_gt : ∀ (F : C) (φ : ℝ), (σ.slicing.P φ) F → ¬IsZero F →
+      a < φ → φ < b →
+      a - ε₀ < wPhaseOf (ssf.W (K₀.of C F)) ssf.α ∧
+      wPhaseOf (ssf.W (K₀.of C F)) ssf.α < a - ε₀ + 1 := by
+    intro F φ hP hFne haφ hφb
+    obtain ⟨hlo, hhi⟩ := hperturb F φ hP hFne haφ hφb
+    exact ⟨by linarith, by linarith⟩
+  have hperturb_lt : ∀ (F : C) (φ : ℝ), (σ.slicing.P φ) F → ¬IsZero F →
+      a < φ → φ < b →
+      b + ε₀ - 1 < wPhaseOf (ssf.W (K₀.of C F)) ssf.α ∧
+      wPhaseOf (ssf.W (K₀.of C F)) ssf.α < b + ε₀ := by
+    intro F φ hP hFne haφ hφb
+    obtain ⟨hlo, hhi⟩ := hperturb F φ hP hFne haφ hφb
+    exact ⟨by linarith, by linarith⟩
+  have hψ_lo : a - ε₀ < ψ := by
+    rw [← hX.2.2.2.1]
+    exact wPhaseOf_gt_of_intervalProp C σ hX.2.1 ssf.W
+      (le_of_lt (by linarith [ssf.hα_mem.1])) hX.1 hW_ne hperturb_gt
+  have hψ_hi : ψ < b + ε₀ := by
+    rw [← hX.2.2.2.1]
+    exact wPhaseOf_lt_of_intervalProp C σ hX.2.1 ssf.W
+      (le_of_lt (by linarith [ssf.hα_mem.2])) hX.1 hW_ne hperturb_lt
+  by_cases hKz : IsZero (kernel p).obj
+  · have hKz' : IsZero (kernel p) :=
+      Slicing.IntervalCat.isZero_of_obj_isZero (C := C) (s := σ.slicing) (a := a) (b := b) hKz
+    have hkernel_zero : kernel.ι p = 0 := zero_of_source_iso_zero _ hKz'.isoZero
+    haveI : Mono p := Preadditive.mono_of_kernel_zero hkernel_zero
+    haveI : IsIso p := IsStrictEpi.isIso hp
+    let eC : X.obj ≅ Y.obj := ((Slicing.IntervalCat.ι (C := C) (s := σ.slicing) a b).mapIso
+      (asIso p))
+    rw [← hX.2.2.2.1, ← K₀.of_iso C eC]
+  · have hK : ¬IsZero (kernel p).obj := hKz
+    obtain ⟨δ, hT⟩ := Slicing.IntervalCat.exists_distTriang_of_shortExact_toLeftHeart
+      (C := C) (s := σ.slicing) (a := a) (b := b) hL
+    have hK_le : wPhaseOf (ssf.W (K₀.of C (kernel p).obj)) ssf.α ≤ ψ :=
+      hX.2.2.2.2 hT (kernel p).property Y.property hK
+    have hK_lo : a - ε₀ < wPhaseOf (ssf.W (K₀.of C (kernel p).obj)) ssf.α :=
+      wPhaseOf_gt_of_intervalProp C σ hK ssf.W
+        (le_of_lt (by linarith [ssf.hα_mem.1])) (kernel p).property hW_ne hperturb_gt
+    have hY_ne : ssf.W (K₀.of C Y.obj) ≠ 0 := hW_interval Y.property hY
+    have hY_lo : a - ε₀ < wPhaseOf (ssf.W (K₀.of C Y.obj)) ssf.α :=
+      wPhaseOf_gt_of_intervalProp C σ hY ssf.W
+        (le_of_lt (by linarith [ssf.hα_mem.1])) Y.property hW_ne hperturb_gt
+    have hY_hi : wPhaseOf (ssf.W (K₀.of C Y.obj)) ssf.α < b + ε₀ :=
+      wPhaseOf_lt_of_intervalProp C σ hY ssf.W
+        (le_of_lt (by linarith [ssf.hα_mem.2])) Y.property hW_ne hperturb_lt
+    have hadd :
+        ssf.W (K₀.of C X.obj) =
+          ssf.W (K₀.of C (kernel p).obj) + ssf.W (K₀.of C Y.obj) := by
+      simpa [S, map_add] using
+        congrArg ssf.W (K₀.of_triangle C (Triangle.mk S.f.hom S.g.hom δ) hT)
+    exact wPhaseOf_seesaw
+      hadd.symm
+      hX.2.2.2.1
+      ⟨by
+          have : ψ - 1 < a - ε₀ := by
+            have hmid : b + ε₀ - 1 < a - ε₀ := by linarith
+            linarith
+          linarith,
+        hK_le⟩
+      hY_ne
+      ⟨by
+          have : ψ - 1 < a - ε₀ := by
+            have hmid : b + ε₀ - 1 < a - ε₀ := by linarith
+            linarith
+          linarith,
+        by
+          have : b + ε₀ < ψ + 1 := by
+            have hmid : b + ε₀ < a - ε₀ + 1 := by linarith
+            linarith
+          linarith⟩
+
 variable [IsTriangulated C] in
 /-- **Phase confinement from stabSeminorm.** If `E` is W-semistable with W-phase `ψ` in a
 thin interval `(a, b)` with `b - a + 2ε₀ < 1`, and `‖W - Z‖_σ < sin(πε₀)`, then
@@ -1756,6 +1874,164 @@ theorem phase_confinement_from_stabSeminorm
   have hthin1 : b - a < 1 := by linarith
   exact phase_confinement_of_wSemistable C σ hSS hε₀ hthin
     (hperturb_of_stabSeminorm C σ W hW hthin1 hε₀ hε₀2 hsin)
+
+/-! ### Thin-interval Phase 3 selection infrastructure -/
+
+private lemma intervalSubobject_isZero_iff_eq_bot
+    {s : Slicing C} {a b : ℝ} {X : s.IntervalCat C a b} (B : Subobject X) :
+    IsZero (B : s.IntervalCat C a b) ↔ B = ⊥ := by
+  constructor
+  · intro hZ
+    have : B.arrow = 0 := zero_of_source_iso_zero _ hZ.isoZero
+    rwa [← Subobject.mk_arrow B, Subobject.mk_eq_bot_iff_zero]
+  · intro h
+    subst h
+    exact (isZero_zero (s.IntervalCat C a b)).of_iso Subobject.botCoeIsoZero
+
+private lemma intervalSubobject_not_isZero_of_ne_bot
+    {s : Slicing C} {a b : ℝ} {X : s.IntervalCat C a b} {B : Subobject X}
+    (h : B ≠ ⊥) : ¬IsZero (B : s.IntervalCat C a b) :=
+  fun hZ ↦ h ((intervalSubobject_isZero_iff_eq_bot
+    (C := C) (s := s) (a := a) (b := b) (X := X) B).mp hZ)
+
+private lemma intervalSubobject_top_ne_bot_of_not_isZero
+    {s : Slicing C} {a b : ℝ} {X : s.IntervalCat C a b}
+    (hX : ¬IsZero X) : (⊤ : Subobject X) ≠ ⊥ := by
+  intro h
+  apply hX
+  have hZ : IsZero ((⊤ : Subobject X) : s.IntervalCat C a b) :=
+    (intervalSubobject_isZero_iff_eq_bot
+      (C := C) (s := s) (a := a) (b := b) (X := X) _).mpr h
+  exact hZ.of_iso (asIso (⊤ : Subobject X).arrow).symm
+
+variable [IsTriangulated C] in
+/-- Among the nonzero strict subobjects of a thin-interval object, there is one with maximal
+W-phase, and among those maximal-phase candidates we may choose one that is maximal for
+inclusion. This is the strict-subobject selection step needed for the thin-interval HN
+recursion. -/
+private theorem SkewedStabilityFunction.exists_maxPhase_maximal_strictSubobject
+    (σ : StabilityCondition C) {a b : ℝ}
+    {ssf : SkewedStabilityFunction C σ.slicing a b}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X : σ.slicing.IntervalCat C a b} (hX : ¬IsZero X)
+    [Finite (Subobject X)] :
+    ∃ M : Subobject X, M ≠ ⊥ ∧ IsStrictMono M.arrow ∧
+      (∀ B : Subobject X, B ≠ ⊥ → IsStrictMono B.arrow →
+        wPhaseOf (ssf.W (K₀.of C (B : σ.slicing.IntervalCat C a b).obj)) ssf.α ≤
+          wPhaseOf (ssf.W (K₀.of C (M : σ.slicing.IntervalCat C a b).obj)) ssf.α) ∧
+      (∀ B : Subobject X, IsStrictMono B.arrow → M < B →
+        wPhaseOf (ssf.W (K₀.of C (B : σ.slicing.IntervalCat C a b).obj)) ssf.α <
+          wPhaseOf (ssf.W (K₀.of C (M : σ.slicing.IntervalCat C a b).obj)) ssf.α) := by
+  let phase : Subobject X → ℝ := fun B ↦
+    wPhaseOf (ssf.W (K₀.of C (B : σ.slicing.IntervalCat C a b).obj)) ssf.α
+  let T : Set (Subobject X) := {B | B ≠ ⊥ ∧ IsStrictMono B.arrow}
+  have hT_ne : T.Nonempty := by
+    refine ⟨⊤,
+      intervalSubobject_top_ne_bot_of_not_isZero
+        (C := C) (s := σ.slicing) (a := a) (b := b) (X := X) hX, ?_⟩
+    exact isStrictMono_of_isIso
+  have hT_fin : T.Finite := Set.toFinite _
+  obtain ⟨M₀, hM₀T, hM₀max⟩ := Set.exists_max_image T phase hT_fin hT_ne
+  let S : Set (Subobject X) := {B | B ∈ T ∧ phase B = phase M₀}
+  have hS_ne : S.Nonempty := ⟨M₀, hM₀T, rfl⟩
+  have hS_fin : S.Finite := Set.toFinite _
+  obtain ⟨M, ⟨hMT, hM_phase⟩, hM_max⟩ := hS_fin.exists_maximal hS_ne
+  refine ⟨M, hMT.1, hMT.2, ?_, ?_⟩
+  · intro B hB hBstrict
+    change phase B ≤ phase M
+    rw [hM_phase]
+    exact hM₀max B ⟨hB, hBstrict⟩
+  · intro B hBstrict hMB
+    have hBT : B ∈ T := ⟨ne_bot_of_gt hMB, hBstrict⟩
+    have hle : phase B ≤ phase M := by
+      rw [hM_phase]
+      exact hM₀max B hBT
+    change phase B < phase M
+    exact lt_of_le_of_ne hle (fun hEq ↦
+      absurd (hM_max ⟨hBT, hEq.trans hM_phase⟩ hMB.le) (not_le_of_gt hMB))
+
+variable [IsTriangulated C] in
+/-- A nonzero strict subobject that is maximal for W-phase among all nonzero strict subobjects
+is W-semistable. -/
+private theorem SkewedStabilityFunction.semistable_of_maxPhase_strictSubobject
+    (σ : StabilityCondition C) {a b : ℝ}
+    {ssf : SkewedStabilityFunction C σ.slicing a b}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X : σ.slicing.IntervalCat C a b} {M : Subobject X}
+    (hM_ne : M ≠ ⊥) (hM_strict : IsStrictMono M.arrow)
+    (hM_max : ∀ B : Subobject X, B ≠ ⊥ → IsStrictMono B.arrow →
+      wPhaseOf (ssf.W (K₀.of C (B : σ.slicing.IntervalCat C a b).obj)) ssf.α ≤
+        wPhaseOf (ssf.W (K₀.of C (M : σ.slicing.IntervalCat C a b).obj)) ssf.α)
+    (hW_interval : ∀ {F : C}, σ.slicing.intervalProp C a b F → ¬IsZero F →
+      ssf.W (K₀.of C F) ≠ 0) :
+    ssf.Semistable C (M : σ.slicing.IntervalCat C a b).obj
+      (wPhaseOf (ssf.W (K₀.of C (M : σ.slicing.IntervalCat C a b).obj)) ssf.α) := by
+  let phaseObj : σ.slicing.IntervalCat C a b → ℝ := fun Y ↦
+    wPhaseOf (ssf.W (K₀.of C Y.obj)) ssf.α
+  have hMint_ne : ¬IsZero (M : σ.slicing.IntervalCat C a b) :=
+    intervalSubobject_not_isZero_of_ne_bot (C := C) (s := σ.slicing) (a := a) (b := b) hM_ne
+  have hMobj_ne : ¬IsZero (M : σ.slicing.IntervalCat C a b).obj := by
+    intro hZ
+    exact hMint_ne <|
+      Slicing.IntervalCat.isZero_of_obj_isZero
+        (C := C) (s := σ.slicing) (a := a) (b := b) hZ
+  refine ⟨(M : σ.slicing.IntervalCat C a b).property, hMobj_ne,
+    hW_interval (M : σ.slicing.IntervalCat C a b).property hMobj_ne, rfl, ?_⟩
+  intro K Q f₁ f₂ f₃ hT hK hQ hKne
+  let KI : σ.slicing.IntervalCat C a b := ⟨K, hK⟩
+  let QI : σ.slicing.IntervalCat C a b := ⟨Q, hQ⟩
+  let iKM : KI ⟶ (M : σ.slicing.IntervalCat C a b) := ObjectProperty.homMk f₁
+  let gMQ : (M : σ.slicing.IntervalCat C a b) ⟶ QI := ObjectProperty.homMk f₂
+  let S : ShortComplex (σ.slicing.IntervalCat C a b) :=
+    ShortComplex.mk iKM gMQ (by
+      ext
+      simpa [iKM, gMQ] using comp_distTriang_mor_zero₁₂ _ hT)
+  have hT' : Triangle.mk S.f.hom S.g.hom f₃ ∈ distTriang C := by
+    simpa [S, iKM, gMQ] using hT
+  have hK_strict : IsStrictMono iKM :=
+    (Slicing.IntervalCat.strictMono_strictEpi_of_distTriang
+      (C := C) (s := σ.slicing) (a := a) (b := b) hT').1
+  have hComp_strict : IsStrictMono (iKM ≫ M.arrow) :=
+    Slicing.IntervalCat.comp_strictMono
+      (C := C) (s := σ.slicing) (a := a) (b := b) iKM M.arrow hK_strict hM_strict
+  haveI : Mono (iKM ≫ M.arrow) := hComp_strict.mono
+  let B : Subobject X := Subobject.mk (iKM ≫ M.arrow)
+  have hKI_ne : ¬IsZero KI := by
+    intro hZ
+    exact hKne (((σ.slicing.intervalProp C a b).ι).map_isZero hZ)
+  have hB_ne : B ≠ ⊥ := by
+    intro hB
+    have hzero : iKM ≫ M.arrow = 0 := by
+      exact (Subobject.mk_eq_bot_iff_zero).mp (show Subobject.mk (iKM ≫ M.arrow) = ⊥ by simpa [B] using hB)
+    have hId : 𝟙 KI = 0 := by
+      apply (cancel_mono (iKM ≫ M.arrow)).1
+      simpa [hzero]
+    exact hKI_ne ((IsZero.iff_id_eq_zero KI).mpr hId)
+  have hB_strict : IsStrictMono B.arrow := by
+    let e := Subobject.underlyingIso (iKM ≫ M.arrow)
+    have he_strict : IsStrictMono e.hom := isStrictMono_of_isIso
+    have htmp : IsStrictMono (e.hom ≫ (iKM ≫ M.arrow)) :=
+      Slicing.IntervalCat.comp_strictMono
+        (C := C) (s := σ.slicing) (a := a) (b := b) e.hom (iKM ≫ M.arrow) he_strict hComp_strict
+    have hArrow : e.hom ≫ (iKM ≫ M.arrow) = B.arrow := by
+      simpa [e, B, Category.assoc] using
+        (Subobject.underlyingIso_hom_comp_eq_mk (iKM ≫ M.arrow))
+    rw [← hArrow]
+    exact htmp
+  have hPhaseB : phaseObj KI ≤ phaseObj (M : σ.slicing.IntervalCat C a b) := by
+    have hPhaseSub : phaseObj (B : σ.slicing.IntervalCat C a b) ≤
+        phaseObj (M : σ.slicing.IntervalCat C a b) :=
+      hM_max B hB_ne hB_strict
+    have hIsoK :
+        phaseObj KI = phaseObj (B : σ.slicing.IntervalCat C a b) := by
+      let eC : (B : σ.slicing.IntervalCat C a b).obj ≅ KI.obj :=
+        (Slicing.IntervalCat.ι (C := C) (s := σ.slicing) a b).mapIso
+          (Subobject.underlyingIso (iKM ≫ M.arrow))
+      simpa [phaseObj] using congrArg (fun x => wPhaseOf (ssf.W x) ssf.α)
+        (K₀.of_iso C eC).symm
+    exact hIsoK.trans_le hPhaseSub
+  simpa [phaseObj, KI]
+    using hPhaseB
 
 /-! ### Extension-closure of `intervalProp` over Postnikov towers -/
 
