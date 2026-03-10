@@ -2,7 +2,7 @@
 
 **Branch:** `feat/bridgeland-stability-conditions`
 **Repository:** `mattrobball/mathlib4_fork`
-**Last updated:** 2026-03-09
+**Last updated:** 2026-03-10
 
 ---
 
@@ -11,7 +11,7 @@
 Formalization of Bridgeland's "Stability conditions on triangulated categories" (Annals 2007),
 covering Sections 2–7 and the main deformation theorem (Theorem 7.1 / Theorem 1.2).
 
-**10 files, ~10,840 lines total.**
+**10 files, ~11,027 lines total.**
 
 ---
 
@@ -20,10 +20,10 @@ covering Sections 2–7 and the main deformation theorem (Theorem 7.1 / Theorem 
 | File | Lines | Sorrys | Description |
 |------|-------|--------|-------------|
 | `Deformation.lean` | 3365 | 10 | §7: deformation theorem, wPhaseOf, bridgeland_7_1 |
-| `Slicing.lean` | 2403 | 0 | §3: HNFiltration, Slicing, Lemma 3.4, toTStructure |
+| `Slicing.lean` | 2480 | 0 | §3: HNFiltration, Slicing, Lemma 3.4, toTStructure, ltProp/geProp |
 | `StabilityFunction.lean` | 1997 | 0 | §2: StabilityFunction, IsSemistable, hasHN_of_finiteLength |
 | `StabilityCondition.lean` | 1617 | 0 | §5-6: StabilityCondition, Lemma 6.4, Thm 1.2 skeleton |
-| `IntervalCategory.lean` | 584 | 0 | §4: IntervalCat, two-heart theory, SkewedStabilityFunction |
+| `IntervalCategory.lean` | 694 | 0 | §4: IntervalCat, two-heart theory, cokernel containment, SkewedStabilityFunction |
 | `HeartEquivalence.lean` | 336 | 11 | §5.3: Prop 5.3, Lemma 5.2, HeartStabilityData scaffolding |
 | `GrothendieckGroup.lean` | 208 | 0 | K₀, K₀.of, K₀.lift |
 | `Strict.lean` | 252 | 0 | §4: IsStrict, QuasiAbelian, StrictShortExact, kernel/cokernel strictness |
@@ -79,7 +79,7 @@ These are the real blockers for completing the deformation theorem.
 - [x] `isStrictMono_kernel` / `isStrictEpi_cokernel` — proved (Strict.lean)
 - [ ] `Subobject.IsStrict` predicate on subobjects
 
-### Phase 2: Two-Heart Embedding (Lemma 4.3) — ~50% complete
+### Phase 2: Two-Heart Embedding (Lemma 4.3) — ~70% complete
 
 - [x] Left heart embedding: `intervalProp_implies_leftHeart`
 - [x] Right heart embedding: `intervalProp_implies_rightHeart`
@@ -87,7 +87,8 @@ These are the real blockers for completing the deformation theorem.
 - [x] Kernel/image containment: `first_intervalProp_of_triangle`
 - [x] Extension closure: `intervalProp_extension_closed`
 - [x] Semistable phase bounds: `phiPlus_le_of_semistable_triangle`, `phiMinus_ge_of_semistable_triangle`
-- [ ] Cokernel containment via right heart (requires quasi-abelian theory)
+- [x] Cokernel containment via right heart: `third_intervalProp_of_triangle`
+- [x] Non-strict phase bound: `phiMinus_gt_of_triangle_with_geProp`
 - [ ] `intervalCat_quasiAbelian`
 - [ ] Strict SES ↔ triangles correspondence
 

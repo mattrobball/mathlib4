@@ -71,7 +71,7 @@ need changing. The missing piece is proof infrastructure, not definitions.
 
 ## Phase 2: Two-Heart Embedding Theory (~700 lines) — PARTIALLY COMPLETE
 
-### IntervalCategory.lean (584 lines, was 191)
+### IntervalCategory.lean (694 lines, was 191)
 
 This is the core of Bridgeland's Lemma 4.3. For P((a,b)) with b-a < 1:
 
@@ -80,6 +80,7 @@ This is the core of Bridgeland's Lemma 4.3. For P((a,b)) with b-a < 1:
 3. [x] **Phase bound lemmas** (one-sided, for triangles):
    - `phiPlus_lt_of_triangle_with_leProp` — PROVED (~50 lines)
    - `phiMinus_gt_of_triangle_with_gtProp` — PROVED (~50 lines, dual)
+   - `phiMinus_gt_of_triangle_with_geProp` — PROVED (~70 lines, non-strict variant)
 4. [x] **Kernel/image containment**: `first_intervalProp_of_triangle` — PROVED
    - In triangle K → E → Q → K[1] with E ∈ P((a,b)), Q has leProp(a+1),
      K has gtProp(a) ⟹ K ∈ P((a,b))
@@ -87,9 +88,11 @@ This is the core of Bridgeland's Lemma 4.3. For P((a,b)) with b-a < 1:
    - In triangle A → E → B → A[1] with A, B ∈ P((a,b)) ⟹ E ∈ P((a,b))
 6. [x] **Semistable phase bounds**: `phiPlus_le_of_semistable_triangle`,
    `phiMinus_ge_of_semistable_triangle` — PROVED
-7. [ ] **Cokernel containment via right heart** — NOT YET STARTED
-   - This requires quasi-abelian strict-epi/mono theory
-   - Cannot be proved purely from triangulated phase bounds (confirmed)
+7. [x] **Cokernel containment via right heart**: `third_intervalProp_of_triangle` — PROVED
+   - In triangle K → E → Q → K[1] with E ∈ P((a,b)), K has geProp(b-1),
+     Q has ltProp(b) ⟹ Q ∈ P((a,b))
+   - Uses right heart P([b-1, b)) with OPEN right endpoint (key insight)
+   - φ⁺(Q) < b: free from ltProp(b); φ⁻(Q) > a: yoneda_exact₃ + K[1] phases ≥ b > a
 8. [ ] **Quasi-abelian**: `intervalCat_quasiAbelian` — NOT YET STARTED
 9. [ ] **Strict SES ↔ triangles**: `strictSES_of_distTriang` — NOT YET STARTED
 
