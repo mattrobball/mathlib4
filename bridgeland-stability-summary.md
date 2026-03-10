@@ -79,7 +79,7 @@ These are the real blockers for completing the deformation theorem.
 - [x] `isStrictMono_kernel` / `isStrictEpi_cokernel` — proved (Strict.lean)
 - [ ] `Subobject.IsStrict` predicate on subobjects
 
-### Phase 2: Two-Heart Embedding (Lemma 4.3) — ~70% complete
+### Phase 2: Two-Heart Embedding (Lemma 4.3) — complete
 
 - [x] Left heart embedding: `intervalProp_implies_leftHeart`
 - [x] Right heart embedding: `intervalProp_implies_rightHeart`
@@ -89,8 +89,8 @@ These are the real blockers for completing the deformation theorem.
 - [x] Semistable phase bounds: `phiPlus_le_of_semistable_triangle`, `phiMinus_ge_of_semistable_triangle`
 - [x] Cokernel containment via right heart: `third_intervalProp_of_triangle`
 - [x] Non-strict phase bound: `phiMinus_gt_of_triangle_with_geProp`
-- [ ] `intervalCat_quasiAbelian`
-- [ ] Strict SES ↔ triangles correspondence
+- [x] `intervalCat_quasiAbelian`
+- [x] Strict SES ↔ triangles correspondence
 
 ### Phase 3: Quasi-Abelian HN — not started
 
