@@ -152,8 +152,12 @@ Current Phase 4 atomization:
      `semistable_of_interval_inclusion`.
    - newly compiled converse target-window transport:
      `semistable_of_target_subinterval`.
-   - next live gap: use that compiled inclusion transport to replace the remaining ad
-     hoc tails in `#3` and the small-gap branch of `#1`.
+   - newly compiled arbitrary-envelope transport:
+     `semistable_of_target_envelope`, obtained by intersecting source and target
+     envelopes and chaining `semistable_of_target_subinterval` with
+     `semistable_of_interval_inclusion`.
+   - next live gap: use that transport to rewrite the remaining ad hoc tails in `#3`
+     and the small-gap branch of `#1` around the actual Lemma 7.5 / 7.6 proof shape.
 4. Done: `abelianHN_to_intervalProp` is now closed. The proof uses
    `Fin.induction` on the abelian HN chain in `P(φ)`, the compiled single-factor bridges
    `stabilityFunctionOnP_semistable_deformedPred` /
@@ -162,11 +166,17 @@ Current Phase 4 atomization:
    containment up the chain.
 5. Return to the small-gap branch of `hom_eq_zero_of_deformedPred`, then finish
    `deformedSlicing.hn_exists`.
-   Current checkpoint: the small-gap branch now compiles through the shared-heart
-   setup and the ambient heart image factorisation `E_H ↠ I_H ↪ F_H`; the next live
-   step is to use the new interval-independence transport to place `I_H`, its kernel,
-   and its cokernel back into the original thin intervals so the phase inequalities can
-   be applied.
+   Current checkpoint: the shared-heart/image-factorisation setup is still compiled,
+   and the interval-independence layer now has the general target-envelope transport
+   theorem needed for the paper-faithful rewrite.
+   New constraint discovered during the audit: the natural Lemma 7.6 thin-envelope
+   argument uses target windows whose thinness needs `ε₀ < 1/8`, while the current
+   deformed-slicing wrapper API still advertises only `ε₀ < 1/4`.
+   The next live step is therefore:
+   first rewrite small-gap `#1` with the midpoint-heart plus two target envelopes
+   argument under the paper's `1/8` slack, then propagate that stronger bound through
+   `deformedSlicing` / `bridgeland_7_1` instead of forcing a non-blueprint proof under
+   the wider `1/4` signature.
 
 Current remaining sorry sites in `Deformation.lean`:
 

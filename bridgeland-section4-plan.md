@@ -236,9 +236,16 @@ Optional cleanup left for later, not on the blocker path:
      helper lemmas transport phase-confinement bounds into a shared heart
      `P((c,c+1])`, and the branch now constructs the ambient heart image factorisation
      `E_H ↠ I_H ↪ F_H`.
-   - Remaining: apply the new interval-independence transport to the common-heart image
-     factorisation so `I_H`, `ker(E_H ↠ I_H)`, and `coker(I_H ↪ F_H)` can be compared in
-     the relevant thin intervals, then close the `ψ₁ ≤ phase(I_H) ≤ ψ₂` contradiction.
+   - Done: the interval-independence layer now has a compiled general
+     `semistable_of_target_envelope` transport theorem, obtained by intersecting the
+     source and target envelopes and chaining the previously finished inclusion/subinterval
+     lemmas.
+   - Remaining: rewrite the small-gap proof around the paper's actual midpoint-heart plus
+     two target envelopes argument.
+   - Critical API note: this faithful Lemma 7.6 route uses thin target windows whose
+     thinness needs `ε₀ < 1/8`; the current deformed-slicing wrapper still only carries
+     `ε₀ < 1/4`, so the wrapper/final theorem signatures need to be tightened once the
+     rewritten proof is in place.
 5. **#2 deformed slicing HN**
    - Finish the `hn_exists` field from sigma-HN plus the Phase 3 thin-interval HN recursion.
 6. **#5 local finiteness**
@@ -246,13 +253,16 @@ Optional cleanup left for later, not on the blocker path:
      slicing, not through naive subobject injection.
 
 ### Sorry #1 (small-gap hom-vanishing) — correct strategy:
-1. E, F in common heart (eps0 < 1/4 ensures overlap)
-2. Factor f as E ->> im(f) --> F in the heart
-   Current checkpoint: this common-heart/image-factorisation setup now compiles.
-3. im(f) is strict subobject of F in P((a,b)) => W-phase <= psi2
-4. SES ker -> E -> im gives W(E) = W(ker) + W(im)
-5. E's W-semistability: W-phase of ker <= psi1
-6. See-saw: psi1 <= wPhaseOf(W(im)) <= psi2, contradiction
+1. Choose the paper's midpoint heart `A = P((a,a+1])`; `ε₀ < 1/4` is enough for the
+   common-heart entry step.
+2. Factor `f` in `A` as `E ↠ im_A(f) ↪ F`.
+3. Use the new general target-envelope transport to move `E` and `F` into the two thin
+   target windows from Lemma 7.6.
+4. Build the two strict short exact sequences from the heart triangles inside those thin
+   windows.
+5. Deduce `ψ₁ ≤ ψ(im_A(f)) ≤ ψ₂`, then contradict `ψ₁ > ψ₂`.
+6. Tighten the wrapper API to the paper's `ε₀ < 1/8`, because those target windows are
+   not thin under the weaker `1/4` bound.
 
 ### Sorry #2 (HN existence) — correct strategy (Bridgeland 7.7-7.9):
 1. Take sigma-HN filtration of E

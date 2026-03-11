@@ -4539,6 +4539,94 @@ private theorem semistable_of_target_subinterval
   rw [hK_eq_upper, hK_eq_lower]
   exact hK_phase₁
 
+private theorem semistable_of_target_envelope
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    [IsTriangulated C]
+    {a₁ a₂ b₁ b₂ ψ ε₀ : ℝ}
+    (hab₁ : a₁ < b₁) (hab₂ : a₂ < b₂)
+    {E : C}
+    (hSS : (σ.skewedStabilityFunction_of_near C W hW hab₁).Semistable C E ψ)
+    (hI₂ : σ.slicing.intervalProp C a₂ b₂ E)
+    (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (henv₁_lo : a₁ + ε₀ ≤ ψ) (henv₁_hi : ψ ≤ b₁ - ε₀)
+    (henv₂_lo : a₂ + ε₀ ≤ ψ) (henv₂_hi : ψ ≤ b₂ - ε₀)
+    (hthin₁ : b₁ - a₁ + 2 * ε₀ < 1)
+    (hthin₂ : b₂ - a₂ + 2 * ε₀ < 1)
+    (hsin : stabSeminorm C σ (W - σ.Z) <
+      ENNReal.ofReal (Real.sin (Real.pi * ε₀))) :
+    (σ.skewedStabilityFunction_of_near C W hW hab₂).Semistable C E ψ := by
+  set a : ℝ := max a₁ a₂
+  set b : ℝ := min b₁ b₂
+  have ha₁ : a₁ ≤ a := by
+    dsimp [a]
+    exact le_max_left _ _
+  have ha₂ : a₂ ≤ a := by
+    dsimp [a]
+    exact le_max_right _ _
+  have hb₁ : b ≤ b₁ := by
+    dsimp [b]
+    exact min_le_left _ _
+  have hb₂ : b ≤ b₂ := by
+    dsimp [b]
+    exact min_le_right _ _
+  have hab : a < b := by
+    have hlow₁ : a₁ ≤ ψ - ε₀ := by
+      linarith
+    have hlow₂ : a₂ ≤ ψ - ε₀ := by
+      linarith
+    have hlow : a ≤ ψ - ε₀ := by
+      dsimp [a]
+      exact max_le_iff.mpr ⟨hlow₁, hlow₂⟩
+    have hhigh₁ : ψ + ε₀ ≤ b₁ := by
+      linarith
+    have hhigh₂ : ψ + ε₀ ≤ b₂ := by
+      linarith
+    have hhigh : ψ + ε₀ ≤ b := by
+      dsimp [b]
+      exact le_min_iff.mpr ⟨hhigh₁, hhigh₂⟩
+    linarith
+  have hI : σ.slicing.intervalProp C a b E := by
+    by_cases hEZ : IsZero E
+    · exact Or.inl hEZ
+    · refine σ.slicing.intervalProp_of_intrinsic_phases C hEZ ?_ ?_
+      · dsimp [a]
+        exact max_lt_iff.mpr
+          ⟨σ.slicing.phiMinus_gt_of_intervalProp C hEZ hSS.1,
+            σ.slicing.phiMinus_gt_of_intervalProp C hEZ hI₂⟩
+      · dsimp [b]
+        exact lt_min_iff.mpr
+          ⟨σ.slicing.phiPlus_lt_of_intervalProp C hEZ hSS.1,
+            σ.slicing.phiPlus_lt_of_intervalProp C hEZ hI₂⟩
+  have henv_lo : a + ε₀ ≤ ψ := by
+    have hlow : a ≤ ψ - ε₀ := by
+      dsimp [a]
+      exact max_le_iff.mpr ⟨by linarith [henv₁_lo], by linarith [henv₂_lo]⟩
+    linarith
+  have henv_hi : ψ ≤ b - ε₀ := by
+    have hhigh : ψ + ε₀ ≤ b := by
+      dsimp [b]
+      exact le_min_iff.mpr ⟨by linarith [henv₁_hi], by linarith [henv₂_hi]⟩
+    linarith
+  have hthin : b - a + 2 * ε₀ < 1 := by
+    have hthin₁' : b - a + 2 * ε₀ ≤ b₁ - a₁ + 2 * ε₀ := by
+      linarith
+    have hthin₂' : b - a + 2 * ε₀ ≤ b₂ - a₂ + 2 * ε₀ := by
+      linarith
+    exact lt_of_le_of_lt hthin₁' hthin₁
+  have hmid :
+      (σ.skewedStabilityFunction_of_near C W hW hab).Semistable C E ψ :=
+    semistable_of_target_subinterval
+      (C := C) (σ := σ) (W := W) (hW := hW) hab₁ hab
+      (show a₁ ≤ a by dsimp [a]; exact le_max_left _ _) (show b ≤ b₁ by
+        dsimp [b]
+        exact min_le_left _ _) hSS hI hε₀ hε₀2 henv_lo henv_hi hthin₁ hthin hsin
+  exact semistable_of_interval_inclusion
+    (C := C) (σ := σ) (W := W) (hW := hW) hab hab₂
+    (show a₂ ≤ a by dsimp [a]; exact le_max_right _ _) (show b ≤ b₂ by
+      dsimp [b]
+      exact min_le_right _ _) hmid hε₀ hε₀2 henv_lo henv_hi hthin₂ hsin
+
 variable [IsTriangulated C] in
 /-- A minimal-phase strict kernel has semistable strict quotient. This is the mdq step used
 for the thin-interval HN recursion. The only quotient-side hypothesis needed is plain
