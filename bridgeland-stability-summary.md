@@ -130,10 +130,8 @@ Current Phase 4 atomization:
    - the induced common-heart epimorphism `K →> I_H`,
    - the unshifted identity `W(K) = W(K_err) + W(I_H)`,
    - a proof that `I_H` is nonzero.
-3. Next proof step for `#3`: pivot to the blueprint's Node 7.5 inclusion theorem
-   (interval-independence of `W`-semistability for thin enveloping categories). The
-   compiled common-heart / pullback / quotient lemmas are now support API for that proof,
-   not a complete contradiction by themselves.
+3. In progress: the blueprint's Node 7.5 inclusion machinery now has a real compiled
+   upper-endpoint transport theorem rather than only local support lemmas.
    - the direct thin-interval `W`-phase window for `K`,
    - compiled phase transport lemmas
      `wPhaseOf_le_of_mono_P_phi_semistable` and
@@ -143,20 +141,33 @@ Current Phase 4 atomization:
      `intervalProp_of_upper_boundary_triangle`, and
      `wPhaseOf_gt_of_upper_boundary_triangle`, which isolate the upper-boundary
      quotient step in the Node 7.5 inclusion argument.
-   - next live gap: package the pullback square into the two strict short exact
-     sequences `0 → K → pb(B₁) → B₁ → 0` and `0 → pb(B₁) → E → B₂ → 0`.
-3. Done: `abelianHN_to_intervalProp` is now closed. The proof uses
+   - newly compiled strict pullback packaging:
+     `interval_strictShortExact_pullback_left`,
+     `interval_strictShortExact_pullback_right`,
+     `interval_fIsKernel_of_strictShortExact`,
+     and the full theorem `semistable_of_upper_inclusion`.
+   - next live gap: add the dual lower-endpoint transport and package the full
+     interval-independence theorem, then replace the remaining ad hoc tail of `#3`
+     with that blueprint route.
+4. Done: `abelianHN_to_intervalProp` is now closed. The proof uses
    `Fin.induction` on the abelian HN chain in `P(φ)`, the compiled single-factor bridges
    `stabilityFunctionOnP_semistable_deformedPred` /
    `stabilityFunctionOnP_semistable_intervalProp`, the new local `stepTriangle`
    heart-admissibility bridge, and `intervalProp_of_triangle` to propagate interval
    containment up the chain.
-4. Return to the small-gap branch of `hom_eq_zero_of_deformedPred`, then finish
+5. Return to the small-gap branch of `hom_eq_zero_of_deformedPred`, then finish
    `deformedSlicing.hn_exists`.
    Current checkpoint: the small-gap branch now compiles through the shared-heart
    setup and the ambient heart image factorisation `E_H ↠ I_H ↪ F_H`; the next live
    step is to place `I_H`, its kernel, and its cokernel back into the original thin
    intervals so the phase inequalities can be applied.
+
+Current remaining sorry sites in `Deformation.lean`:
+
+- `#1` small-gap `hom_eq_zero_of_deformedPred`: line 5441
+- `#2` `deformedSlicing.hn_exists`: line 5680
+- `#3` `P_phi_wSemistable_is_deformedPred`: line 6694
+- `#5` Q(ψ)-subobject finiteness: line 6968
 
 ---
 

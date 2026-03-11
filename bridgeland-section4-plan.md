@@ -167,10 +167,10 @@ Optional cleanup left for later, not on the blocker path:
 
 | Order | Sorry | Line | Lines | Depends on |
 |-------|-------|------|-------|------------|
-| 1 | #3 Triangle test | 5328 | ~220 | Phase 2 (quasi-abelian strict subobjects) |
-| 2 | #1 Small-gap hom-vanishing | 4434 | ~150 | Phase 2 (two-heart factoring) |
-| 3 | #2 HN existence | 4779 | ~350 | Phase 3 + sorrys #1, #3 |
-| 4 | #5 Q(psi)-subobject finiteness | 6067 | ~80 | Sorrys #1-2 resolved first |
+| 1 | #3 Triangle test | 6694 | ~220 | Phase 2 (quasi-abelian strict subobjects) |
+| 2 | #1 Small-gap hom-vanishing | 5441 | ~150 | Phase 2 (two-heart factoring) |
+| 3 | #2 HN existence | 5680 | ~350 | Phase 3 + sorrys #1, #3 |
+| 4 | #5 Q(psi)-subobject finiteness | 6968 | ~80 | Sorrys #1-2 resolved first |
 
 ### Phase 4 atomization
 
@@ -205,10 +205,17 @@ Optional cleanup left for later, not on the blocker path:
      `wPhaseOf_gt_of_upper_boundary_triangle`.
      These isolate the paper's "`B₁` lies on the upper boundary strip, hence
      `phase(B₁) > ψ`" step in the inclusion-case proof.
-   - Next atom: package the pullback square for a strict subobject
-     `K ↪ E ↠ Q` and a boundary-strip strict subobject `B₁ ↪ Q` into the two strict
-     short exact sequences from Bridgeland Lemma 7.5:
+   - Done: the pullback square is now packaged into the two strict short exact
+     sequences from Bridgeland Lemma 7.5:
      `0 → K → pb(B₁) → B₁ → 0` and `0 → pb(B₁) → E → B₂ → 0`.
+   - Done: the compiled theorem `semistable_of_upper_inclusion` now closes the
+     upper-endpoint inclusion case `P((a, b₁)) ⊂ P((a, b₂))`.
+   - Done: `interval_fIsKernel_of_strictShortExact` packages the non-balanced kernel
+     recovery for strict short exact sequences in thin interval categories, which the
+     inclusion proof needed.
+   - Next atom: prove the dual lower-endpoint inclusion theorem and package the full
+     interval-independence statement. Then refactor blocker `#3` to use that theorem
+     instead of the current ad hoc tail.
    - Replaced plan: use the compiled common-heart / pullback / quotient infrastructure as
      support lemmas for the interval-independence proof. The previous "last contradiction"
      route is not strong enough on its own.
