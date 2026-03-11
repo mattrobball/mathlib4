@@ -139,21 +139,25 @@ Also added: `SkewedStabilityFunction` definition, `stabilityFunctionOnP` in Defo
 
 **Dependencies**: Phase 1.
 
-## Phase 3: Quasi-Abelian HN (~600 lines)
+## Phase 3: Quasi-Abelian HN (~600 lines) — COMPLETE
 
-### StabilityFunction.lean or new QuasiAbelianHN.lean (~400 lines)
+Implemented directly on the critical path in `Deformation.lean`, rather than first
+extracting a standalone quasi-abelian HN API in `StabilityFunction.lean`.
 
-Following Bridgeland Section 4.4, mirroring the existing `hasHN_of_finiteLength`:
+Completed deliverables:
 
-1. **mdq existence** in quasi-abelian finite-length categories
+1. **Thin-interval selection / quotient recursion**
+   - minimal-phase strict-kernel selection
+   - strict quotient phase increase
+   - strict SES `W`-additivity for HN concatenation
+2. **Lemma 7.7**
+   - `SkewedStabilityFunction.hn_exists_in_thin_interval`
+
+Optional cleanup left for later, not on the blocker path:
+
+1. Extract generic quasi-abelian finite-length lemmas
    - `exists_mdq_quasiAbelian`
-2. **HN filtration existence** via mdq iteration
    - `hasHN_quasiAbelian`
-
-### Deformation.lean: Lemma 7.7 (~200 lines)
-
-HN filtrations in thin interval categories:
-- `hn_exists_in_thin_interval`
 
 **Dependencies**: Phase 2.
 

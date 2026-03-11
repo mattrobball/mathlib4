@@ -92,11 +92,14 @@ These are the real blockers for completing the deformation theorem.
 - [x] `intervalCat_quasiAbelian`
 - [x] Strict SES ↔ triangles correspondence
 
-### Phase 3: Quasi-Abelian HN — not started
+### Phase 3: Quasi-Abelian HN — complete
 
-- [ ] mdq existence in quasi-abelian finite-length categories
-- [ ] HN filtration existence via mdq iteration
-- [ ] Lemma 7.7 (HN in thin interval categories)
+- [x] Thin-interval selection / quotient-recursion infrastructure in `Deformation.lean`
+- [x] Lemma 7.7 (HN in thin interval categories):
+  `SkewedStabilityFunction.hn_exists_in_thin_interval`
+- [x] Critical-path quasi-abelian HN step discharged directly in `Deformation.lean`
+  rather than via a separate extracted `exists_mdq_quasiAbelian` / `hasHN_quasiAbelian`
+  API
 
 ### Phase 4: Fill sorrys — not started
 
