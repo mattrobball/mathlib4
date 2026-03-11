@@ -5869,7 +5869,7 @@ private theorem stabilityFunctionOnP_semistable_intervalProp
   simpa [HNFiltration.single] using ⟨hψa, hψb⟩
 
 variable [IsTriangulated C] in
- /-- **Bridge: abelian HN in P(φ) → triangulated HN in C for Q**.
+/-- **Bridge: abelian HN in P(φ) → triangulated HN in C for Q**.
 Given an `AbelianHNFiltration` of `E` in `P(φ)` w.r.t. the W-stability function,
 produce an `HNFiltration` of `ι(E)` in `C` for the deformed slicing `Q`.
  Each abelian factor (a cokernel in P(φ)) maps to a Q-semistable factor via
@@ -5884,7 +5884,90 @@ private theorem abelianHN_to_intervalProp
     {a b : ℝ} (ha : a < φ - ε₀) (hb : φ + ε₀ < b) :
     (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hsin).intervalProp C a b
       ((σ.slicing.P φ).ι.obj E) := by
-  sorry
+  letI : Abelian (σ.slicing.P φ).FullSubcategory := σ.P_phi_abelian C φ
+  let Zφ := stabilityFunctionOnP C σ W hW hε₀ hε₀2 hsin φ
+  let Q := σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hsin
+  let ι := (σ.slicing.P φ).ι
+  obtain ⟨F⟩ := stabilityFunctionOnP_hasHN C σ W hW hε₀ hε₀2 hsin φ E hE
+  have stepTriangle
+      {X₁ X₂ : Subobject E} (h : X₁ < X₂) :
+      ∃ (δ : (ι.obj (cokernel (Subobject.ofLE X₁ X₂ h.le))) ⟶
+          ((ι.obj (X₁ : (σ.slicing.P φ).FullSubcategory))⟦(1 : ℤ)⟧)),
+        Triangle.mk (ι.map (Subobject.ofLE X₁ X₂ h.le))
+          (ι.map (cokernel.π (Subobject.ofLE X₁ X₂ h.le))) δ ∈ distTriang C := by
+    let f : (X₁ : (σ.slicing.P φ).FullSubcategory) ⟶
+        (X₂ : (σ.slicing.P φ).FullSubcategory) :=
+      Subobject.ofLE X₁ X₂ h.le
+    let q : (X₂ : (σ.slicing.P φ).FullSubcategory) ⟶ cokernel f := cokernel.π f
+    haveI : Epi q := inferInstance
+    obtain ⟨K, i, δ, hT⟩ :=
+      Triangulated.AbelianSubcategory.exists_distinguished_triangle_of_epi
+        (ι := ι) (hι := σ.P_phi_hom_vanishing C φ) (hA := σ.P_phi_admissible C φ) q
+    have hKer :
+        IsLimit (KernelFork.ofι i (show i ≫ q = 0 by
+          exact ι.map_injective (comp_distTriang_mor_zero₁₂ _ hT))) :=
+      Triangulated.AbelianSubcategory.isLimitKernelForkOfDistTriang
+        (σ.P_phi_hom_vanishing C φ) i q δ hT
+    let β : K ⟶ (X₁ : (σ.slicing.P φ).FullSubcategory) :=
+      Abelian.monoLift f i (show i ≫ q = 0 by
+        exact ι.map_injective (comp_distTriang_mor_zero₁₂ _ hT))
+    have hβf : β ≫ f = i := Abelian.monoLift_comp f i
+      (show i ≫ q = 0 by
+        exact ι.map_injective (comp_distTriang_mor_zero₁₂ _ hT))
+    let γ : (X₁ : (σ.slicing.P φ).FullSubcategory) ⟶ K :=
+      hKer.lift (KernelFork.ofι f (cokernel.condition _))
+    have hγi : γ ≫ i = f := Fork.IsLimit.lift_ι hKer
+    have hβγ : β ≫ γ = 𝟙 K :=
+      Fork.IsLimit.hom_ext hKer (by simp [hγi, hβf])
+    have hγβ : γ ≫ β = 𝟙 (X₁ : (σ.slicing.P φ).FullSubcategory) := by
+      haveI : Mono f := inferInstance
+      rw [← cancel_mono f, Category.assoc, hβf, hγi, Category.id_comp]
+    refine ⟨δ ≫ ((shiftFunctor C (1 : ℤ)).map (ι.map β)), ?_⟩
+    refine isomorphic_distinguished _ hT _
+      (Triangle.isoMk _ _ (ι.mapIso
+        ⟨γ, β, hγβ, hβγ⟩) (Iso.refl _) (Iso.refl _) ?_ ?_ ?_)
+    · simp only [Iso.refl_hom, Functor.mapIso_hom, Triangle.mk_mor₁]
+      change ι.map f ≫ 𝟙 _ = ι.map γ ≫ ι.map i
+      rw [Category.comp_id, ← Functor.map_comp, hγi]
+    · simp only [Iso.refl_hom, Triangle.mk_mor₂, Triangle.mk_obj₂, Triangle.mk_obj₃]
+      rw [Category.comp_id, Category.id_comp]
+    · simp only [Iso.refl_hom, Triangle.mk_mor₃, Functor.mapIso_hom]
+      change (δ ≫ (shiftFunctor C (1 : ℤ)).map (ι.map β)) ≫
+          (shiftFunctor C (1 : ℤ)).map (ι.map γ) = 𝟙 _ ≫ δ
+      rw [Category.assoc, ← (shiftFunctor C (1 : ℤ)).map_comp, ← ι.map_comp, hβγ,
+        ι.map_id, Functor.map_id]
+      simp
+  have hchain :
+      ∀ j : Fin (F.n + 1),
+        Q.intervalProp C a b (ι.obj (F.chain j : (σ.slicing.P φ).FullSubcategory)) := by
+    refine Fin.induction ?_ ?_
+    · have hZsub :
+          IsZero (((F.chain 0 : Subobject E) : (σ.slicing.P φ).FullSubcategory)) := by
+        exact (StabilityFunction.subobject_isZero_iff_eq_bot
+          (A := (σ.slicing.P φ).FullSubcategory)
+          (E := E) (B := F.chain 0)).2 F.chain_bot
+      exact Or.inl (ι.map_isZero hZsub)
+    · intro j hj
+      have hfactor :
+          Q.intervalProp C a b
+            (ι.obj
+              (cokernel
+                (Subobject.ofLE (F.chain j.castSucc) (F.chain j.succ)
+                  (le_of_lt (F.chain_strictMono j.castSucc_lt_succ))))) := by
+        exact stabilityFunctionOnP_semistable_intervalProp (C := C) (σ := σ) (W := W)
+          (hW := hW) hε₀ hε₀2 hsin ha hb (F.factor_semistable j)
+      obtain ⟨δ, hT⟩ := stepTriangle
+        (X₁ := F.chain j.castSucc) (X₂ := F.chain j.succ)
+        (F.chain_strictMono j.castSucc_lt_succ)
+      exact Q.intervalProp_of_triangle C hj hfactor hT
+  let topIdx : Fin (F.n + 1) := ⟨F.n, Nat.lt_succ_self _⟩
+  have htop :
+      Q.intervalProp C a b (ι.obj (F.chain topIdx : (σ.slicing.P φ).FullSubcategory)) :=
+    hchain topIdx
+  have htop' :
+      Q.intervalProp C a b (ι.obj ((⊤ : Subobject E) : (σ.slicing.P φ).FullSubcategory)) := by
+    simpa [topIdx, F.chain_top] using htop
+  exact (Q.intervalProp C a b).prop_of_iso (ι.mapIso (asIso ((⊤ : Subobject E).arrow))) htop'
 
 /-! #### Step A4: Main theorem -/
 

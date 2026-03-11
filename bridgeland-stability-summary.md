@@ -40,13 +40,13 @@ These are the real blockers for completing the deformation theorem.
 
 | # | Name | Line | Description | Depends on |
 |---|------|------|-------------|------------|
-| 1 | `hom_eq_zero_of_deformedPred` | 4384 | Lemma 7.6: small-gap hom-vanishing | Phase 2 (two-heart factoring) |
-| 2 | `deformedSlicing.hn_exists` | 4668 | Lemma 7.7: HN in deformed slicing | Phase 3 + sorrys #1, #3, #4 |
-| 3 | `P_phi_wSemistable_is_deformedPred` | 5034 | Triangle test for deformedPred | Phase 2 (quasi-abelian strict subobjects) |
-| 4 | `abelianHN_to_intervalProp` | 5250 | Abelian HN → interval containment | Sorry #3 + admissibility |
-| 5 | Q(ψ)-subobject finiteness | 5352 | In `bridgeland_7_1` | Sorrys #1-2 resolved first |
+| 1 | `hom_eq_zero_of_deformedPred` | 4434 | Lemma 7.6: small-gap hom-vanishing | Phase 2 (two-heart factoring) |
+| 2 | `deformedSlicing.hn_exists` | 4779 | Lemma 7.7: HN in deformed slicing | Phase 3 + sorrys #1, #3 |
+| 3 | `P_phi_wSemistable_is_deformedPred` | 5328 | Triangle test for deformedPred | Phase 2 (quasi-abelian strict subobjects) |
+| 4 | `abelianHN_to_intervalProp` | 5877 | Abelian HN → interval containment | closed on branch |
+| 5 | Q(ψ)-subobject finiteness | 6067 | In `bridgeland_7_1` | Sorrys #1-2 resolved first |
 
-**Dependency chain:** #3 → #4 → #1 → #2; #5 independent but depends on #1-2.
+**Dependency chain:** #3 → #1 → #2; #4 is now done, and #5 remains deferred until #1-2 land.
 
 ### Scaffolding sorrys
 
@@ -108,7 +108,7 @@ Depends on Phases 1-3.
 Current blocker order:
 
 - [ ] #3 `P_phi_wSemistable_is_deformedPred`
-- [ ] #4 `abelianHN_to_intervalProp`
+- [x] #4 `abelianHN_to_intervalProp`
 - [ ] #1 `hom_eq_zero_of_deformedPred`
 - [ ] #2 `deformedSlicing.hn_exists`
 - [ ] #5 Q(ψ)-subobject finiteness (deferred until #1-2 land)
@@ -134,12 +134,12 @@ Current Phase 4 atomization:
    - compiled phase transport lemmas
      `wPhaseOf_le_of_mono_P_phi_semistable` and
      `wPhaseOf_ge_of_epi_P_phi_semistable`.
-3. Feed that result into `abelianHN_to_intervalProp`, using `stabilityFunctionOnP_hasHN`
-   and admissibility of `P(φ)` to assemble the Postnikov tower.
-   Current checkpoint: the single-factor bridges
-   `stabilityFunctionOnP_semistable_deformedPred` and
-   `stabilityFunctionOnP_semistable_intervalProp` are compiled, so the remaining work
-   in blocker `#4` is only the abelian-HN/Postnikov assembly.
+3. Done: `abelianHN_to_intervalProp` is now closed. The proof uses
+   `Fin.induction` on the abelian HN chain in `P(φ)`, the compiled single-factor bridges
+   `stabilityFunctionOnP_semistable_deformedPred` /
+   `stabilityFunctionOnP_semistable_intervalProp`, the new local `stepTriangle`
+   heart-admissibility bridge, and `intervalProp_of_triangle` to propagate interval
+   containment up the chain.
 4. Return to the small-gap branch of `hom_eq_zero_of_deformedPred`, then finish
    `deformedSlicing.hn_exists`.
    Current checkpoint: the small-gap branch now compiles through the shared-heart

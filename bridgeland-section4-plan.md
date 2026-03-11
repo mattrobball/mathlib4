@@ -167,11 +167,10 @@ Optional cleanup left for later, not on the blocker path:
 
 | Order | Sorry | Line | Lines | Depends on |
 |-------|-------|------|-------|------------|
-| 1 | #3 Triangle test | 5034 | ~220 | Phase 2 (quasi-abelian strict subobjects) |
-| 2 | #4 abelianHN_to_intervalProp | 5250 | ~150 | Sorry #3 + admissibility |
-| 3 | #1 Small-gap hom-vanishing | 4384 | ~150 | Phase 2 (two-heart factoring) |
-| 4 | #2 HN existence | 4668 | ~350 | Phase 3 + sorrys #1, #3, #4 |
-| 5 | #5 Q(psi)-subobject finiteness | 5352 | ~80 | Sorrys #1-2 resolved first |
+| 1 | #3 Triangle test | 5328 | ~220 | Phase 2 (quasi-abelian strict subobjects) |
+| 2 | #1 Small-gap hom-vanishing | 4434 | ~150 | Phase 2 (two-heart factoring) |
+| 3 | #2 HN existence | 4779 | ~350 | Phase 3 + sorrys #1, #3 |
+| 4 | #5 Q(psi)-subobject finiteness | 6067 | ~80 | Sorrys #1-2 resolved first |
 
 ### Phase 4 atomization
 
@@ -200,14 +199,12 @@ Optional cleanup left for later, not on the blocker path:
      `K₀` identities with the residual-term phase bounds; this is now the only live
      mathematical gap in blocker `#3`.
 3. **#4 abelian HN bridge**
-   - Use `stabilityFunctionOnP_hasHN`.
-   - Done: the single-factor bridge is now compiled twice:
-     `stabilityFunctionOnP_semistable_deformedPred` and
-     `stabilityFunctionOnP_semistable_intervalProp` convert a `W`-semistable object
-     of `P(φ)` into an explicit `Q(ψ)` witness, respectively a one-factor
-     `Q.intervalProp` witness on any `(a,b)` containing `(φ - ε₀, φ + ε₀)`.
-   - Remaining: build the ambient Postnikov tower from an abelian HN filtration in
-     `P(φ)` via admissibility, then apply extension-closure of `intervalProp`.
+   - Done: `abelianHN_to_intervalProp` is now closed.
+   - The proof uses `stabilityFunctionOnP_hasHN`, the single-factor bridges
+     `stabilityFunctionOnP_semistable_deformedPred` /
+     `stabilityFunctionOnP_semistable_intervalProp`, a local heart-admissibility
+     `stepTriangle`, and `Fin.induction` on the abelian HN chain to propagate
+     `Q.intervalProp` up to the top object.
 4. **#1 small-gap hom-vanishing**
    - Done: the small-gap branch now has a compiled common-heart entry point:
      helper lemmas transport phase-confinement bounds into a shared heart
@@ -260,10 +257,7 @@ have OPPOSITE SIGNS, so sum = 0 does NOT force both to zero.
    - conclude `wPhaseOf(W(K), ψ) ≤ ψ` by the imaginary-part / see-saw argument.
 
 ### Sorry #4 (abelianHN_to_intervalProp):
-1. Get W-HN in P(phi) from stabilityFunctionOnP_hasHN
-2. Each factor satisfies deformedPred via sorry #3
-3. Build PostnikovTower from abelian chain via admissibility
-4. intervalProp from phase bounds
+Closed on the branch.
 
 ### Sorry #5 (Q(psi)-subobject finiteness) — NEEDS RETHINKING
 
@@ -283,14 +277,10 @@ Phase 1: Strict.lean + HeartEquivalence foundations
     |
     v
 Phase 2: IntervalCategory.lean two-heart theory (Lemma 4.3)
-    |  Items 1-7: DONE (triangle-level containment)
-    |  Items 8-10: TODO (second t-structure, Schneiders, strict SES)
+    |  COMPLETE
     |
     +---> Sorry #5 (finiteness, independent)
     +---> Sorry #3 (triangle test)
-    |         |
-    |         v
-    |     Sorry #4 (abelianHN_to_intervalProp)
     |
     +---> Sorry #1 (small-gap hom-vanishing)
     |
@@ -298,7 +288,7 @@ Phase 2: IntervalCategory.lean two-heart theory (Lemma 4.3)
 Phase 3: Quasi-abelian HN (Lemma 7.7)
     |
     v
-Sorry #2 (HN existence) [depends on #1, #3, #4 + Phase 3]
+Sorry #2 (HN existence) [depends on #1, #3 + Phase 3]
 ```
 
 ## What Does NOT Need Rewriting
