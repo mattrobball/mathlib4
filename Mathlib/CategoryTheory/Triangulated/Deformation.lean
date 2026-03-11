@@ -5223,6 +5223,8 @@ private theorem P_phi_wSemistable_is_deformedPred
                hQHZ hQH_le_heart hQH_gt_heart
        have hI_Pφ : σ.slicing.P φ I_H.obj := hI_QH_Pφ.1
        have hQH_Pφ : σ.slicing.P φ QH.obj := hI_QH_Pφ.2
+       have hT_I' : Triangle.mk i_I.hom πQH.hom δ_I ∈ distTriang C := by
+         simpa [ι] using hT_I
        have hKker1_gt : σ.slicing.gtProp C a (KkerH.obj⟦(1 : ℤ)⟧) := by
          have hφ_gt : σ.slicing.gtProp C φ (KkerH.obj⟦(1 : ℤ)⟧) := by
            simpa using σ.slicing.gtProp_shift C (φ - 1) KkerH.obj (1 : ℤ) (hHeart_gt KkerH)
@@ -5238,6 +5240,91 @@ private theorem P_phi_wSemistable_is_deformedPred
        have hKker1I : σ.slicing.intervalProp C a b (KkerH.obj⟦(1 : ℤ)⟧) :=
          σ.slicing.first_intervalProp_of_triangle C habI hQI hQH_le hKker1_gt (by
            simpa [hι_simp] using hT_adm')
+       have hKkerI : σ.slicing.intervalProp C (a - 1) (b - 1) KkerH.obj := by
+         rcases hKker1I with hZ | ⟨F', hF'⟩
+         · exact Or.inl (by
+             exact ((shiftFunctor C (-1 : ℤ)).map_isZero hZ).of_iso
+               ((shiftFunctorCompIsoId C (1 : ℤ) (-1 : ℤ) (by simp)).app KkerH.obj).symm)
+         · exact Or.inr ⟨(F'.shiftHN C σ.slicing (-1 : ℤ)).ofIso C
+               ((shiftFunctorCompIsoId C (1 : ℤ) (-1 : ℤ) (by simp)).app KkerH.obj), by
+             intro j
+             simpa [HNFiltration.ofIso, HNFiltration.shiftHN] using
+               (show a - 1 < F'.φ j + (-1 : ℝ) ∧ F'.φ j + (-1 : ℝ) < b - 1 from by
+                 have hj := hF' j
+                 constructor <;> linarith)⟩
+       have hW_F : W (K₀.of C F) = W (K₀.of C K) + W (K₀.of C Q) := by
+         simpa [map_add] using congrArg W
+           (K₀.of_triangle C (Triangle.mk f₁ f₂ f₃) hT)
+       have hW_Q :
+           W (K₀.of C Q) =
+             W (K₀.of C (KkerH.obj⟦(1 : ℤ)⟧)) + W (K₀.of C QH.obj) := by
+         simpa [map_add] using congrArg W
+           (K₀.of_triangle C (Triangle.mk α β γ) hT_adm')
+       have hW_I :
+           W (K₀.of C F) = W (K₀.of C I_H.obj) + W (K₀.of C QH.obj) := by
+         simpa [map_add] using congrArg W
+           (K₀.of_triangle C (Triangle.mk i_I.hom πQH.hom δ_I) hT_I')
+       have hW_KR :
+           W (K₀.of C K) + W (K₀.of C (KkerH.obj⟦(1 : ℤ)⟧)) =
+             W (K₀.of C I_H.obj) := by
+         have hsum :
+             W (K₀.of C K) +
+                 (W (K₀.of C (KkerH.obj⟦(1 : ℤ)⟧)) + W (K₀.of C QH.obj)) =
+               W (K₀.of C I_H.obj) + W (K₀.of C QH.obj) := by
+           calc
+             W (K₀.of C K) +
+                 (W (K₀.of C (KkerH.obj⟦(1 : ℤ)⟧)) + W (K₀.of C QH.obj))
+                 = W (K₀.of C K) + W (K₀.of C Q) := by rw [hW_Q]
+             _ = W (K₀.of C F) := by simpa [add_assoc] using hW_F.symm
+             _ = W (K₀.of C I_H.obj) + W (K₀.of C QH.obj) := hW_I
+         have hsum' :
+             (W (K₀.of C K) + W (K₀.of C (KkerH.obj⟦(1 : ℤ)⟧))) +
+                 W (K₀.of C QH.obj) =
+               W (K₀.of C I_H.obj) + W (K₀.of C QH.obj) := by
+           simpa [add_assoc] using hsum
+         exact add_right_cancel hsum'
+       have hthin_ab : b - a < 1 := by
+         dsimp [a, b]
+         linarith
+       have hW_ne_ab : ∀ (G : C) (θ : ℝ), σ.slicing.P θ G → ¬IsZero G →
+           a < θ → θ < b → W (K₀.of C G) ≠ 0 := by
+         intro G θ hG hGne _ _
+         exact σ.W_ne_zero_of_seminorm_lt_one C W hW hG hGne
+       have hpert_ab := hperturb_of_stabSeminorm C σ W hW hthin_ab hε₀ hε₀2 hsin
+       have hpert_ab_gt : ∀ (G : C) (θ : ℝ), σ.slicing.P θ G → ¬IsZero G →
+           a < θ → θ < b →
+           a - ε₀ < wPhaseOf (W (K₀.of C G)) ψ ∧
+             wPhaseOf (W (K₀.of C G)) ψ < a - ε₀ + 1 := by
+         intro G θ hG hGne haθ hθb
+         obtain ⟨hlo, hhi⟩ := hpert_ab G θ hG hGne haθ hθb
+         have hmid : ((a + b) / 2 : ℝ) = ψ := by
+           dsimp [a, b]
+           ring
+         rw [hmid] at hlo hhi
+         constructor <;> linarith
+       have hpert_ab_lt : ∀ (G : C) (θ : ℝ), σ.slicing.P θ G → ¬IsZero G →
+           a < θ → θ < b →
+           b + ε₀ - 1 < wPhaseOf (W (K₀.of C G)) ψ ∧
+             wPhaseOf (W (K₀.of C G)) ψ < b + ε₀ := by
+         intro G θ hG hGne haθ hθb
+         obtain ⟨hlo, hhi⟩ := hpert_ab G θ hG hGne haθ hθb
+         have hmid : ((a + b) / 2 : ℝ) = ψ := by
+           dsimp [a, b]
+           ring
+         rw [hmid] at hlo hhi
+         constructor <;> linarith
+       have hKker1_window (hKker1ne : ¬IsZero (KkerH.obj⟦(1 : ℤ)⟧)) :
+           ψ - 2 * ε₀ < wPhaseOf (W (K₀.of C (KkerH.obj⟦(1 : ℤ)⟧))) ψ ∧
+             wPhaseOf (W (K₀.of C (KkerH.obj⟦(1 : ℤ)⟧))) ψ < ψ + 2 * ε₀ := by
+         constructor
+         · simpa [a, two_mul, sub_eq_add_neg, add_assoc, add_left_comm, add_comm] using
+             wPhaseOf_gt_of_intervalProp C σ hKker1ne W (by
+               dsimp [a]
+               linarith) hKker1I hW_ne_ab hpert_ab_gt
+         · simpa [b, two_mul, sub_eq_add_neg, add_assoc, add_left_comm, add_comm] using
+             wPhaseOf_lt_of_intervalProp C σ hKker1ne W (by
+               dsimp [b]
+               linarith) hKker1I hW_ne_ab hpert_ab_lt
        clear hS hF_phase_phi
        sorry⟩⟩
 

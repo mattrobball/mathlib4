@@ -122,7 +122,9 @@ Current Phase 4 atomization:
    - heart quotient `F_H ↠ Q_H`,
    - image triangle `I_H → F → Q_H`,
    - proof that `I_H, Q_H ∈ P(φ)`,
-   - thin-interval containment for the shifted residual kernel piece.
+   - thin-interval containment for the shifted residual kernel piece,
+   - explicit `W(K) + W(K_err⟦1⟧) = W(I_H)` bookkeeping,
+   - compiled `W`-phase window for `K_err⟦1⟧`.
 3. Feed that result into `abelianHN_to_intervalProp`, using `stabilityFunctionOnP_hasHN`
    and admissibility of `P(φ)` to assemble the Postnikov tower.
 4. Return to the small-gap branch of `hom_eq_zero_of_deformedPred`, then finish

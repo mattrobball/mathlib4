@@ -184,8 +184,11 @@ Optional cleanup left for later, not on the blocker path:
    - Done: the common-heart factorization is now compiled through the heart quotient
      `F_H ↠ Q_H`, the image triangle `I_H → F → Q_H`, and the proof that
      `I_H, Q_H ∈ P(φ)`.
-   - Remaining: extract the K₀ relation `W(K) = W(I_H) + W(K_err)`, show the shifted
-     kernel error term has W-phase `< ψ`, and conclude `wPhaseOf(W(K), ψ) ≤ ψ`.
+   - Done: the proof now also contains the explicit `K₀`/`W` identity
+     `W(K) + W(K_err⟦1⟧) = W(I_H)` and the thin-interval `W`-phase window for the
+     shifted residual term `K_err⟦1⟧`.
+   - Remaining: transport the image-term semistability inequality cleanly into this
+     context, then close the final contradiction proving `wPhaseOf(W(K), ψ) ≤ ψ`.
 3. **#4 abelian HN bridge**
    - Use `stabilityFunctionOnP_hasHN`.
    - Send each abelian factor to `deformedPred` via #3.
