@@ -204,7 +204,12 @@ Optional cleanup left for later, not on the blocker path:
    - Send each abelian factor to `deformedPred` via #3.
    - Build the ambient Postnikov tower via admissibility / `appendFactor`.
 4. **#1 small-gap hom-vanishing**
-   - Reuse the common-heart factorization already outlined, now with #3/#4 available.
+   - Done: the small-gap branch now has a compiled common-heart entry point:
+     helper lemmas transport phase-confinement bounds into a shared heart
+     `P((c,c+1])`, and the branch now constructs the ambient heart image factorisation
+     `E_H ↠ I_H ↪ F_H`.
+   - Remaining: recover `I_H`, `ker(E_H ↠ I_H)`, and `coker(I_H ↪ F_H)` inside the
+     original thin intervals, then close the `ψ₁ ≤ phase(I_H) ≤ ψ₂` contradiction.
 5. **#2 deformed slicing HN**
    - Finish the `hn_exists` field from sigma-HN plus the Phase 3 thin-interval HN recursion.
 6. **#5 local finiteness**
@@ -214,6 +219,7 @@ Optional cleanup left for later, not on the blocker path:
 ### Sorry #1 (small-gap hom-vanishing) — correct strategy:
 1. E, F in common heart (eps0 < 1/4 ensures overlap)
 2. Factor f as E ->> im(f) --> F in the heart
+   Current checkpoint: this common-heart/image-factorisation setup now compiles.
 3. im(f) is strict subobject of F in P((a,b)) => W-phase <= psi2
 4. SES ker -> E -> im gives W(E) = W(ker) + W(im)
 5. E's W-semistability: W-phase of ker <= psi1

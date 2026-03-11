@@ -4361,6 +4361,56 @@ lemma StabilityCondition.deformedPred_zero (σ : StabilityCondition C)
     σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin ψ E :=
   Or.inl hE
 
+variable [IsTriangulated C] in
+private theorem gtProp_of_lt_phiMinus_smallGap
+    (s : Slicing C) {E : C} (hE : ¬IsZero E) {t : ℝ}
+    (h : t < s.phiMinus C E hE) :
+    s.gtProp C t E := by
+  obtain ⟨F, hn, hlast⟩ := HNFiltration.exists_nonzero_last C s hE
+  refine s.gtProp_of_hn C F t (fun j ↦ ?_) hn
+  calc
+    t < s.phiMinus C E hE := h
+    _ = F.φ ⟨F.n - 1, by omega⟩ := s.phiMinus_eq C E hE F hn hlast
+    _ ≤ F.φ j := F.hφ.antitone (Fin.mk_le_mk.mpr (by omega))
+
+variable [IsTriangulated C] in
+private theorem leProp_of_phiPlus_le_smallGap
+    (s : Slicing C) {E : C} (hE : ¬IsZero E) {t : ℝ}
+    (h : s.phiPlus C E hE ≤ t) :
+    s.leProp C t E := by
+  obtain ⟨F, hn, hfirst⟩ := HNFiltration.exists_nonzero_first C s hE
+  refine s.leProp_of_hn C F t (fun j ↦ ?_) hn
+  calc
+    F.φ j ≤ F.φ ⟨0, hn⟩ := F.hφ.antitone (Fin.mk_le_mk.mpr (Nat.zero_le j.val))
+    _ = s.phiPlus C E hE := (s.phiPlus_eq C E hE F hn hfirst).symm
+    _ ≤ t := h
+
+variable [IsTriangulated C] in
+private theorem mem_phaseShiftHeart_of_phaseBounds_smallGap
+    (s : Slicing C) {E : C} (hE : ¬IsZero E) {t : ℝ}
+    (hgt : t < s.phiMinus C E hE)
+    (hle : s.phiPlus C E hE ≤ t + 1) :
+    ((s.phaseShift C t).toTStructure).heart E := by
+  let ss := s.phaseShift C t
+  let u := ss.toTStructure
+  have cast_le : (-↑(0 : ℤ) : ℝ) = 0 := by simp
+  have cast_ge : (1 - ↑(0 : ℤ) : ℝ) = 1 := by simp
+  have hE_gt : s.gtProp C t E :=
+    gtProp_of_lt_phiMinus_smallGap (C := C) (s := s) hE hgt
+  have hE_le : s.leProp C (t + 1) E :=
+    leProp_of_phiPlus_le_smallGap (C := C) (s := s) hE hle
+  have hE_le' : s.leProp C (1 + t) E := by
+    simpa [add_comm] using hE_le
+  haveI : u.IsLE E 0 := ⟨by
+    change ss.gtProp C (-↑(0 : ℤ)) E
+    rw [cast_le]
+    simpa [ss] using (s.phaseShift_gtProp_zero C t E).mpr hE_gt⟩
+  haveI : u.IsGE E 0 := ⟨by
+    change ss.leProp C (1 - ↑(0 : ℤ)) E
+    rw [cast_ge]
+    simpa [ss] using (s.phaseShift_leProp C t 1 E).mpr hE_le'⟩
+  exact (u.mem_heart_iff E).mpr ⟨inferInstance, inferInstance⟩
+
 /-! ### Sharp hom-vanishing for Q (Node 7.6) -/
 
 variable [IsTriangulated C] in
@@ -4439,7 +4489,55 @@ theorem StabilityCondition.hom_eq_zero_of_deformedPred
     -- Blockers: heart-SES-to-triangle correspondence, P(φ) closure under
     -- subobjects/quotients in hearts, wPhaseOf see-saw lemma
     push_neg at hlargeGap
-    sorry
+    by_cases hf : f = 0
+    · exact hf
+    · set c : ℝ := ψ₂ + 3 * ε₀ - 1
+      set ss := σ.slicing.phaseShift C c
+      let t := ss.toTStructure
+      have hE_heart : t.heart E := by
+        apply mem_phaseShiftHeart_of_phaseBounds_smallGap (C := C) (s := σ.slicing) hSS₁.2.1
+        · dsimp [c]
+          linarith [hE_lo, hgap]
+        · dsimp [c]
+          linarith [hE_hi, hlargeGap, hε₀2]
+      have hF_heart : t.heart F := by
+        apply mem_phaseShiftHeart_of_phaseBounds_smallGap (C := C) (s := σ.slicing) hSS₂.2.1
+        · dsimp [c]
+          linarith [hF_lo, hε₀2]
+        · dsimp [c]
+          linarith [hF_hi, hε₀2]
+      letI := t.hasHeartFullSubcategory
+      letI : Abelian t.heart.FullSubcategory := t.heartFullSubcategoryAbelian
+      let EH : t.heart.FullSubcategory := ⟨E, hE_heart⟩
+      let FH : t.heart.FullSubcategory := ⟨F, hF_heart⟩
+      let fH : EH ⟶ FH := ObjectProperty.homMk f
+      let ι := t.ιHeart (H := t.heart.FullSubcategory)
+      have hι_simp : ∀ (X : t.heart.FullSubcategory), ι.obj X = X.obj := by
+        intro X
+        rfl
+      obtain ⟨X₃, f₂, f₃, hT_hom⟩ := distinguished_cocone_triangle (ι.map fH)
+      have hadm : AbelianSubcategory.admissibleMorphism
+          (t.ιHeart (H := t.heart.FullSubcategory)) fH := by
+        rw [TStructure.heart_admissible t]
+        trivial
+      obtain ⟨K, Q, α, β, γ, hT_adm⟩ := hadm f₂ f₃ hT_hom
+      obtain ⟨I_H, i_I, δ_I, pH, m₃, hT_I, hT_pH, hpH⟩ :=
+        Triangulated.AbelianSubcategory.exists_distinguished_triangle_of_image_factorisation
+          (ι := t.ιHeart (H := t.heart.FullSubcategory))
+          (hι := TStructure.heart_hι t) (hA := TStructure.heart_admissible t)
+          (X₁ := EH) (X₂ := FH) (f₁ := fH) (X₃ := X₃)
+          (K := K) (Q := Q) f₂ f₃ hT_hom α β hT_adm
+      let hCoker_p :=
+        Triangulated.AbelianSubcategory.isColimitCokernelCoforkOfDistTriang
+          (ι := t.ιHeart (H := t.heart.FullSubcategory))
+          (hι := TStructure.heart_hι t)
+          (Triangulated.AbelianSubcategory.ιK f₃ α) pH (-m₃) hT_pH
+      haveI : Epi pH := Cofork.IsColimit.epi hCoker_p
+      have hfH : fH ≠ 0 := by
+        intro h
+        apply hf
+        simpa [fH] using congrArg (fun g => g.hom) h
+      sorry
 
 /-! ### Extension-closed subcategories Q(> t), Q(≤ t) (Node 7.8a) -/
 
@@ -4906,6 +5004,42 @@ private theorem leProp_of_phiPlus_le
     F.φ j ≤ F.φ ⟨0, hn⟩ := F.hφ.antitone (Fin.mk_le_mk.mpr (Nat.zero_le j.val))
     _ = s.phiPlus C E hE := (s.phiPlus_eq C E hE F hn hfirst).symm
     _ ≤ t := h
+
+variable [IsTriangulated C] in
+private theorem gtProp_of_lt_phiMinus
+    (s : Slicing C) {E : C} (hE : ¬IsZero E) {t : ℝ}
+    (h : t < s.phiMinus C E hE) :
+    s.gtProp C t E := by
+  obtain ⟨F, hn, hlast⟩ := HNFiltration.exists_nonzero_last C s hE
+  refine s.gtProp_of_hn C F t (fun j ↦ ?_) hn
+  calc
+    t < s.phiMinus C E hE := h
+    _ = F.φ ⟨F.n - 1, by omega⟩ := s.phiMinus_eq C E hE F hn hlast
+    _ ≤ F.φ j := F.hφ.antitone (Fin.mk_le_mk.mpr (by omega))
+
+variable [IsTriangulated C] in
+private theorem mem_phaseShiftHeart_of_phaseBounds
+    (s : Slicing C) {E : C} (hE : ¬IsZero E) {t : ℝ}
+    (hgt : t < s.phiMinus C E hE)
+    (hle : s.phiPlus C E hE ≤ t + 1) :
+    ((s.phaseShift C t).toTStructure).heart E := by
+  let ss := s.phaseShift C t
+  let u := ss.toTStructure
+  have cast_le : (-↑(0 : ℤ) : ℝ) = 0 := by simp
+  have cast_ge : (1 - ↑(0 : ℤ) : ℝ) = 1 := by simp
+  have hE_gt : s.gtProp C t E := gtProp_of_lt_phiMinus (C := C) (s := s) hE hgt
+  have hE_le : s.leProp C (t + 1) E := leProp_of_phiPlus_le (C := C) (s := s) hE hle
+  have hE_le' : s.leProp C (1 + t) E := by
+    simpa [add_comm] using hE_le
+  haveI : u.IsLE E 0 := ⟨by
+    change ss.gtProp C (-↑(0 : ℤ)) E
+    rw [cast_le]
+    simpa [ss] using (s.phaseShift_gtProp_zero C t E).mpr hE_gt⟩
+  haveI : u.IsGE E 0 := ⟨by
+    change ss.leProp C (1 - ↑(0 : ℤ)) E
+    rw [cast_ge]
+    simpa [ss] using (s.phaseShift_leProp C t 1 E).mpr hE_le'⟩
+  exact (u.mem_heart_iff E).mpr ⟨inferInstance, inferInstance⟩
 
 variable [IsTriangulated C] in
 private theorem wPhaseOf_le_of_mono_P_phi_semistable

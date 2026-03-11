@@ -138,6 +138,10 @@ Current Phase 4 atomization:
    and admissibility of `P(φ)` to assemble the Postnikov tower.
 4. Return to the small-gap branch of `hom_eq_zero_of_deformedPred`, then finish
    `deformedSlicing.hn_exists`.
+   Current checkpoint: the small-gap branch now compiles through the shared-heart
+   setup and the ambient heart image factorisation `E_H ↠ I_H ↪ F_H`; the next live
+   step is to place `I_H`, its kernel, and its cokernel back into the original thin
+   intervals so the phase inequalities can be applied.
 
 ---
 
