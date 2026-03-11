@@ -5952,6 +5952,60 @@ private theorem mem_phaseShiftHeart_of_phaseBounds_smallGap
     simpa [ss] using (s.phaseShift_leProp C t 1 E).mpr hE_le'⟩
   exact (u.mem_heart_iff E).mpr ⟨inferInstance, inferInstance⟩
 
+private theorem midpoint_left_target_thin
+    {ψ₁ ψ₂ ε₀ : ℝ} (hsmall : ψ₁ ≤ ψ₂ + 2 * ε₀) (hε₀8 : ε₀ < 1 / 8) :
+    (ψ₁ + ε₀) - ((ψ₁ + ψ₂) / 2 - 1 / 2) + 2 * ε₀ < 1 := by
+  linarith
+
+private theorem midpoint_right_target_thin
+    {ψ₁ ψ₂ ε₀ : ℝ} (hsmall : ψ₁ ≤ ψ₂ + 2 * ε₀) (hε₀8 : ε₀ < 1 / 8) :
+    (((ψ₁ + ψ₂) / 2 - 1 / 2) + 1) - (ψ₂ - ε₀) + 2 * ε₀ < 1 := by
+  linarith
+
+private theorem midpoint_image_window_thin
+    {ψ₁ ψ₂ ε₀ : ℝ} (hgap : ψ₂ < ψ₁) (hsmall : ψ₁ ≤ ψ₂ + 2 * ε₀)
+    (hε₀8 : ε₀ < 1 / 8) :
+    (ψ₂ + ε₀) - (ψ₁ - ε₀) + 2 * ε₀ < 1 := by
+  linarith
+
+variable [IsTriangulated C] in
+private theorem mem_phaseShiftHeart_of_midpoint_left
+    (s : Slicing C) {E : C} (hE : ¬IsZero E) {ψ₁ ψ₂ ε₀ : ℝ}
+    (hlo : ψ₁ - ε₀ < s.phiMinus C E hE)
+    (hhi : s.phiPlus C E hE < ψ₁ + ε₀)
+    (hgap : ψ₂ < ψ₁) (hsmall : ψ₁ ≤ ψ₂ + 2 * ε₀) (hε₀4 : ε₀ < 1 / 4) :
+    (((s.phaseShift C ((ψ₁ + ψ₂) / 2 - 1 / 2)).toTStructure).heart E) := by
+  refine mem_phaseShiftHeart_of_phaseBounds_smallGap (C := C) (s := s) hE ?_ ?_
+  · have hmid : (ψ₁ + ψ₂) / 2 - 1 / 2 < s.phiMinus C E hE := by
+      have h' : (ψ₁ + ψ₂) / 2 - 1 / 2 < ψ₁ - ε₀ := by
+        linarith [hgap, hε₀4]
+      exact lt_trans h' hlo
+    exact hmid
+  · have hmid : s.phiPlus C E hE ≤ (ψ₁ + ψ₂) / 2 - 1 / 2 + 1 := by
+      have h' : ψ₁ + ε₀ ≤ (ψ₁ + ψ₂) / 2 - 1 / 2 + 1 := by
+        linarith [hsmall, hε₀4]
+      exact le_trans (le_of_lt hhi) h'
+    exact hmid
+
+variable [IsTriangulated C] in
+private theorem mem_phaseShiftHeart_of_midpoint_right
+    (s : Slicing C) {E : C} (hE : ¬IsZero E) {ψ₁ ψ₂ ε₀ : ℝ}
+    (hlo : ψ₂ - ε₀ < s.phiMinus C E hE)
+    (hhi : s.phiPlus C E hE < ψ₂ + ε₀)
+    (hgap : ψ₂ < ψ₁) (hsmall : ψ₁ ≤ ψ₂ + 2 * ε₀) (hε₀4 : ε₀ < 1 / 4) :
+    (((s.phaseShift C ((ψ₁ + ψ₂) / 2 - 1 / 2)).toTStructure).heart E) := by
+  refine mem_phaseShiftHeart_of_phaseBounds_smallGap (C := C) (s := s) hE ?_ ?_
+  · have hmid : (ψ₁ + ψ₂) / 2 - 1 / 2 < s.phiMinus C E hE := by
+      have h' : (ψ₁ + ψ₂) / 2 - 1 / 2 < ψ₂ - ε₀ := by
+        linarith [hsmall, hε₀4]
+      exact lt_trans h' hlo
+    exact hmid
+  · have hmid : s.phiPlus C E hE ≤ (ψ₁ + ψ₂) / 2 - 1 / 2 + 1 := by
+      have h' : ψ₂ + ε₀ ≤ (ψ₁ + ψ₂) / 2 - 1 / 2 + 1 := by
+        linarith [hgap, hε₀4]
+      exact le_trans (le_of_lt hhi) h'
+    exact hmid
+
 /-! ### Sharp hom-vanishing for Q (Node 7.6) -/
 
 variable [IsTriangulated C] in

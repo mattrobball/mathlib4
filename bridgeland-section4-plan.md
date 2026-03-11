@@ -253,16 +253,30 @@ Optional cleanup left for later, not on the blocker path:
      slicing, not through naive subobject injection.
 
 ### Sorry #1 (small-gap hom-vanishing) — correct strategy:
-1. Choose the paper's midpoint heart `A = P((a,a+1])`; `ε₀ < 1/4` is enough for the
-   common-heart entry step.
-2. Factor `f` in `A` as `E ↠ im_A(f) ↪ F`.
-3. Use the new general target-envelope transport to move `E` and `F` into the two thin
-   target windows from Lemma 7.6.
-4. Build the two strict short exact sequences from the heart triangles inside those thin
-   windows.
-5. Deduce `ψ₁ ≤ ψ(im_A(f)) ≤ ψ₂`, then contradict `ψ₁ > ψ₂`.
-6. Tighten the wrapper API to the paper's `ε₀ < 1/8`, because those target windows are
-   not thin under the weaker `1/4` bound.
+1. Assume `0 < ψ₁ - ψ₂ ≤ 2 ε₀` and set
+   `a := (ψ₁ + ψ₂) / 2 - 1 / 2`.
+   The common abelian heart is then `A = P((a, a + 1])`.
+2. Use phase confinement plus `ψ₁ - ψ₂ ≤ 2 ε₀` to place both `E` and `F` in `A`,
+   then factor `f` in `A` as
+   `E ↠ im_A(f) ↪ F`
+   with kernel `K_A` and cokernel `Q_A`.
+3. Prove the paper's exact interval statements from Lemma 3.4:
+   `K_A ∈ P((a, ψ₁ + ε₀))`,
+   `im_A(f) ∈ P((ψ₁ - ε₀, ψ₂ + ε₀))`,
+   `Q_A ∈ P((ψ₂ - ε₀, a + 1]))`.
+4. Transport `E` to the thin target envelope `P((a, ψ₁ + ε₀))` and `F` to the thin
+   target envelope `P((ψ₂ - ε₀, a + 1))` using the completed Node 7.5
+   interval-independence machinery.
+5. Apply semistability in those two target envelopes to the heart image triangles:
+   `K_A → E → im_A(f) → K_A[1]`
+   and
+   `im_A(f) → F → Q_A → im_A(f)[1]`.
+   This gives `ψ₁ ≤ ψ(im_A(f))` from the first triangle and `ψ(im_A(f)) ≤ ψ₂`
+   from the second.
+6. Tighten the wrapper API to the paper's `ε₀ < 1/8`.
+   This is not cosmetic: the two target windows have widths
+   `ψ₁ + ε₀ - a` and `a + 1 - (ψ₂ - ε₀)`, and their thinness condition
+   `width + 2 ε₀ < 1` is exactly where the `1 / 8` bound is used.
 
 ### Sorry #2 (HN existence) — correct strategy (Bridgeland 7.7-7.9):
 1. Take sigma-HN filtration of E

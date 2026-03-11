@@ -169,14 +169,21 @@ Current Phase 4 atomization:
    Current checkpoint: the shared-heart/image-factorisation setup is still compiled,
    and the interval-independence layer now has the general target-envelope transport
    theorem needed for the paper-faithful rewrite.
-   New constraint discovered during the audit: the natural Lemma 7.6 thin-envelope
-   argument uses target windows whose thinness needs `ε₀ < 1/8`, while the current
-   deformed-slicing wrapper API still advertises only `ε₀ < 1/4`.
-   The next live step is therefore:
-   first rewrite small-gap `#1` with the midpoint-heart plus two target envelopes
-   argument under the paper's `1/8` slack, then propagate that stronger bound through
-   `deformedSlicing` / `bridgeland_7_1` instead of forcing a non-blueprint proof under
-   the wider `1/4` signature.
+   The faithful Lemma 7.6 shape is now explicit:
+   for `a := (ψ₁ + ψ₂) / 2 - 1 / 2`, work in the heart `A = P((a, a + 1])`,
+   factor `f` as `E ↠ im_A(f) ↪ F`, then prove
+   `ker_A(f) ∈ P((a, ψ₁ + ε₀))`,
+   `im_A(f) ∈ P((ψ₁ - ε₀, ψ₂ + ε₀))`,
+   `coker_A(f) ∈ P((ψ₂ - ε₀, a + 1]))`.
+   The two target envelopes are therefore
+   `P((a, ψ₁ + ε₀))` for `E` and
+   `P((ψ₂ - ε₀, a + 1))` for `F`,
+   and the image comparison is made in the overlap
+   `P((ψ₁ - ε₀, ψ₂ + ε₀))`.
+   New constraint discovered during the audit:
+   those target windows are thin only when `ε₀ < 1 / 8`,
+   so the deformed-slicing wrapper API has to be tightened from `1 / 4` to `1 / 8`
+   instead of continuing with a non-paper workaround.
 
 Current remaining sorry sites in `Deformation.lean`:
 
