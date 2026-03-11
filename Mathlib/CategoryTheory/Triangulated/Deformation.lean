@@ -5505,7 +5505,9 @@ private theorem P_phi_wSemistable_is_deformedPred
          exact (t.mem_heart_iff X.obj).mpr ⟨inferInstance, inferInstance⟩
        let Iφ : (σ.slicing.P φ).FullSubcategory := ⟨I_H.obj, hI_Pφ⟩
        let Fφ : (σ.slicing.P φ).FullSubcategory := ⟨F, hPφ⟩
+       let Qφ : (σ.slicing.P φ).FullSubcategory := ⟨QH.obj, hQH_Pφ⟩
        let iφ : Iφ ⟶ Fφ := ObjectProperty.homMk i_I.hom
+       let πφ : Fφ ⟶ Qφ := ObjectProperty.homMk πQH.hom
        haveI : Mono iφ := by
          refine ⟨?_⟩
          intro Z g h hgh
@@ -5516,6 +5518,18 @@ private theorem P_phi_wSemistable_is_deformedPred
            apply ObjectProperty.hom_ext
            simpa [ZH, gH, hH, iφ] using congrArg (fun f => f.hom) hgh
          have : gH = hH := (cancel_mono i_I).1 hghH
+         apply ObjectProperty.hom_ext
+         simpa [ZH, gH, hH] using congrArg (fun f => f.hom) this
+       haveI : Epi πφ := by
+         refine ⟨?_⟩
+         intro Z g h hgh
+         let ZH : t.heart.FullSubcategory := ⟨Z.obj, hP_phi_heart Z⟩
+         let gH : QH ⟶ ZH := ObjectProperty.homMk g.hom
+         let hH : QH ⟶ ZH := ObjectProperty.homMk h.hom
+         have hghH : πQH ≫ gH = πQH ≫ hH := by
+           apply ObjectProperty.hom_ext
+           simpa [ZH, gH, hH, πφ] using congrArg (fun f => f.hom) hgh
+         have : gH = hH := (cancel_epi πQH).1 hghH
          apply ObjectProperty.hom_ext
          simpa [ZH, gH, hH] using congrArg (fun f => f.hom) this
        have hI_phase_le :
@@ -5539,6 +5553,46 @@ private theorem P_phi_wSemistable_is_deformedPred
            exact wPhaseOf_eq_at_phi_of_mem_P_phi C σ W hW hε₀ hε₀2 hsin
              hI_Pφ hIne hψ_lo hψ_hi
          linarith
+       have hQH_phase_ge :
+           ∀ (hQHne : ¬IsZero QH.obj),
+             ψ ≤ wPhaseOf (W (K₀.of C QH.obj)) ψ := by
+         intro hQHne
+         have hQHneφ : ¬IsZero Qφ := by
+           intro hZ
+           exact hQHne (by simpa [Qφ] using ((σ.slicing.P φ).ι).map_isZero hZ)
+         have hFneφ : ¬IsZero Fφ := by
+           intro hZ
+           exact hFne (by simpa [Fφ] using ((σ.slicing.P φ).ι).map_isZero hZ)
+         have hQH_phase_geφ :
+             ψ ≤ wPhaseOf (W (K₀.of C QH.obj)) φ := by
+           simpa [Qφ, Fφ] using
+             (wPhaseOf_ge_of_epi_P_phi_semistable C σ W hW hε₀ hε₀2 hsin
+               (φ := φ) (ψ := ψ) (F := Fφ) hFneφ hss hF_phase_phi (Q := Qφ) πφ hQHneφ)
+         have hQH_phase_eq :
+             wPhaseOf (W (K₀.of C QH.obj)) φ =
+               wPhaseOf (W (K₀.of C QH.obj)) ψ := by
+           exact wPhaseOf_eq_at_phi_of_mem_P_phi C σ W hW hε₀ hε₀2 hsin
+             hQH_Pφ hQHne hψ_lo hψ_hi
+         linarith
+       obtain ⟨I_img, i_img, δ_img, mKI_img, m3_img, hT_img, hT_mKI_img, hmKI_img⟩ :=
+         Triangulated.AbelianSubcategory.exists_distinguished_triangle_of_image_factorisation
+           (ι := t.ιHeart (H := t.heart.FullSubcategory))
+           (hι := TStructure.heart_hι t) (hA := TStructure.heart_admissible t)
+           (X₁ := KH) (X₂ := FH) (f₁ := iH) (X₃ := Q)
+           (K := KkerH) (Q := QH) f₂ f₃ hT_hom α β hT_adm
+       let hKerImg :=
+         Triangulated.AbelianSubcategory.isLimitKernelForkOfDistTriang
+           (TStructure.heart_hι t) i_img πQH δ_img hT_img
+       let eI_img : I_img ≅ I_H := IsLimit.conePointUniqueUpToIso hKerImg hKerI
+       let mKI_H : KH ⟶ I_H := mKI_img ≫ eI_img.hom
+       have hmKI_H : mKI_H ≫ i_I = iH := by
+         dsimp [mKI_H]
+         rw [Category.assoc]
+         have heI_img : eI_img.hom ≫ i_I = i_img := by
+           simpa [eI_img, KernelFork.ofι] using
+             IsLimit.conePointUniqueUpToIso_hom_comp hKerImg hKerI
+               Limits.WalkingParallelPair.zero
+         rw [heI_img, hmKI_img]
        sorry⟩⟩
 
 variable [IsTriangulated C] in
