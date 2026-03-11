@@ -2033,6 +2033,235 @@ private theorem SkewedStabilityFunction.semistable_of_maxPhase_strictSubobject
   simpa [phaseObj, KI]
     using hPhaseB
 
+/-! ### Thin-interval pullback infrastructure -/
+
+private theorem interval_pullbackπ_strictEpi_of_strictEpi
+    {s : Slicing C} [IsTriangulated C] {a b : ℝ}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X Y : s.IntervalCat C a b} (p : X ⟶ Y) (hp : IsStrictEpi p)
+    (B : Subobject Y) :
+    IsStrictEpi (Subobject.pullbackπ p B) := by
+  letI := s.intervalCat_quasiAbelian (C := C) (a := a) (b := b)
+  let e := (Subobject.isPullback p B).isoPullback
+  have hpb : IsStrictEpi (pullback.fst B.arrow p) :=
+    QuasiAbelian.pullback_strictEpi B.arrow p hp
+  have he : e.hom ≫ pullback.fst B.arrow p = Subobject.pullbackπ p B := by
+    simpa [e] using (Subobject.isPullback p B).isoPullback_hom_fst
+  have hcomp : IsStrictEpi (e.hom ≫ pullback.fst B.arrow p) :=
+    Slicing.IntervalCat.comp_strictEpi
+      (C := C) (s := s) (a := a) (b := b) e.hom (pullback.fst B.arrow p)
+      isStrictEpi_of_isIso hpb
+  simpa [he] using hcomp
+
+private theorem interval_pullback_arrow_strictMono_of_strictMono
+    {s : Slicing C} [IsTriangulated C] {a b : ℝ}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X Y : s.IntervalCat C a b} (p : X ⟶ Y)
+    (B : Subobject Y) (hB : IsStrictMono B.arrow) :
+    IsStrictMono (((Subobject.pullback p).obj B).arrow) := by
+  let pb := (Subobject.pullback p).obj B
+  let sq := Subobject.isPullback p B
+  let hKerB := hB.isLimitKernelFork
+  letI : NormalMono pb.arrow :=
+    { Z := cokernel B.arrow
+      g := p ≫ cokernel.π B.arrow
+      w := by
+        calc
+          pb.arrow ≫ (p ≫ cokernel.π B.arrow)
+              = (pb.arrow ≫ p) ≫ cokernel.π B.arrow := by simp [Category.assoc]
+          _ = (Subobject.pullbackπ p B ≫ B.arrow) ≫ cokernel.π B.arrow := by
+              rw [sq.w]
+          _ = Subobject.pullbackπ p B ≫ (B.arrow ≫ cokernel.π B.arrow) := by
+              simp [Category.assoc]
+          _ = 0 := by simp
+      isLimit := KernelFork.IsLimit.ofι' pb.arrow
+        (by
+          calc
+            pb.arrow ≫ (p ≫ cokernel.π B.arrow)
+                = (pb.arrow ≫ p) ≫ cokernel.π B.arrow := by simp [Category.assoc]
+            _ = (Subobject.pullbackπ p B ≫ B.arrow) ≫ cokernel.π B.arrow := by
+                rw [sq.w]
+            _ = Subobject.pullbackπ p B ≫ (B.arrow ≫ cokernel.π B.arrow) := by
+                simp [Category.assoc]
+            _ = 0 := by simp)
+        (fun {W} g hg ↦ by
+          let u : W ⟶ (B : s.IntervalCat C a b) :=
+            hKerB.lift (KernelFork.ofι (g ≫ p) (by simpa [Category.assoc] using hg))
+          have hu : u ≫ B.arrow = g ≫ p := by
+            exact hKerB.fac _ Limits.WalkingParallelPair.zero
+          exact ⟨sq.lift u g hu, by simpa [pb] using sq.lift_snd u g hu⟩) }
+  exact isStrictMono_of_normalMono
+
+private lemma interval_le_pullback_cokernel
+    {s : Slicing C} [IsTriangulated C] {a b : ℝ}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X : s.IntervalCat C a b} (M : Subobject X)
+    (B : Subobject (cokernel M.arrow)) :
+    M ≤ (Subobject.pullback (cokernel.π M.arrow)).obj B := by
+  let q := cokernel.π M.arrow
+  let pbB := (Subobject.pullback q).obj B
+  let sq := Subobject.isPullback q B
+  refine Subobject.le_of_comm (sq.lift 0 M.arrow (by simpa [q] using cokernel.condition M.arrow)) ?_
+  simpa [pbB] using sq.lift_snd 0 M.arrow (by simpa [q] using cokernel.condition M.arrow)
+
+private lemma interval_ofLE_pullbackπ_eq_zero
+    {s : Slicing C} [IsTriangulated C] {a b : ℝ}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X : s.IntervalCat C a b} (M : Subobject X)
+    (B : Subobject (cokernel M.arrow)) :
+    Subobject.ofLE M _ (interval_le_pullback_cokernel (C := C) (s := s) (a := a) (b := b) M B) ≫
+      Subobject.pullbackπ (cokernel.π M.arrow) B = 0 := by
+  let q := cokernel.π M.arrow
+  let pbB := (Subobject.pullback q).obj B
+  let hle := interval_le_pullback_cokernel (C := C) (s := s) (a := a) (b := b) M B
+  let sq := Subobject.isPullback q B
+  apply (cancel_mono B.arrow).mp
+  calc
+    (Subobject.ofLE M pbB hle ≫ Subobject.pullbackπ q B) ≫ B.arrow
+        = Subobject.ofLE M pbB hle ≫ (pbB.arrow ≫ q) := by
+            rw [Category.assoc, sq.w]
+    _ = (Subobject.ofLE M pbB hle ≫ pbB.arrow) ≫ q := by simp [Category.assoc]
+    _ = M.arrow ≫ q := by rw [Subobject.ofLE_arrow]
+    _ = 0 ≫ B.arrow := by
+          rw [show M.arrow ≫ q = 0 by simpa [q] using cokernel.condition M.arrow]
+          simp
+
+private theorem interval_strictShortExact_ofLE_pullbackπ_cokernel
+    {s : Slicing C} [IsTriangulated C] {a b : ℝ}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X : s.IntervalCat C a b} (M : Subobject X) (hM : IsStrictMono M.arrow)
+    (B : Subobject (cokernel M.arrow)) :
+    let pbB := (Subobject.pullback (cokernel.π M.arrow)).obj B
+    let hle := interval_le_pullback_cokernel (C := C) (s := s) (a := a) (b := b) M B
+    StrictShortExact
+      (ShortComplex.mk
+        (Subobject.ofLE M pbB hle)
+        (Subobject.pullbackπ (cokernel.π M.arrow) B)
+        (interval_ofLE_pullbackπ_eq_zero (C := C) (s := s) (a := a) (b := b) M B)) := by
+  let q := cokernel.π M.arrow
+  let pbB := (Subobject.pullback q).obj B
+  let hle := interval_le_pullback_cokernel (C := C) (s := s) (a := a) (b := b) M B
+  let hcomp := interval_ofLE_pullbackπ_eq_zero (C := C) (s := s) (a := a) (b := b) M B
+  let i := Subobject.ofLE M pbB hle
+  let π := Subobject.pullbackπ q B
+  have hq : IsStrictEpi q := isStrictEpi_cokernel M.arrow
+  have hπ : IsStrictEpi π :=
+    interval_pullbackπ_strictEpi_of_strictEpi
+      (C := C) (s := s) (a := a) (b := b) q hq B
+  have hkey : ∀ {W : s.IntervalCat C a b} (g : W ⟶ pbB), g ≫ π = 0 →
+      (g ≫ pbB.arrow) ≫ q = 0 := by
+    intro W g hg
+    calc
+      (g ≫ pbB.arrow) ≫ q = g ≫ (pbB.arrow ≫ q) := by simp [Category.assoc]
+      _ = g ≫ (π ≫ B.arrow) := by rw [(Subobject.isPullback q B).w]
+      _ = (g ≫ π) ≫ B.arrow := by simp [Category.assoc]
+      _ = 0 := by simp [hg]
+  have hKer : IsLimit (KernelFork.ofι i hcomp) := by
+    refine KernelFork.IsLimit.ofι' i hcomp (fun {W} g hg ↦ ?_)
+    let k : W ⟶ (M : s.IntervalCat C a b) :=
+      hM.isLimitKernelFork.lift (KernelFork.ofι (g ≫ pbB.arrow) (hkey g hg))
+    have hk : k ≫ M.arrow = g ≫ pbB.arrow := by
+      exact hM.isLimitKernelFork.fac _ Limits.WalkingParallelPair.zero
+    refine ⟨k, ?_⟩
+    apply (cancel_mono pbB.arrow).1
+    simpa [i, Category.assoc, Subobject.ofLE_arrow] using hk
+  let S : ShortComplex (s.IntervalCat C a b) := ShortComplex.mk i π hcomp
+  let t := (s.phaseShift C a).toTStructure
+  letI := t.hasHeartFullSubcategory
+  letI : Abelian t.heart.FullSubcategory := t.heartFullSubcategoryAbelian
+  letI : CategoryWithHomology t.heart.FullSubcategory :=
+    CategoryTheory.categoryWithHomology_of_abelian (C := t.heart.FullSubcategory)
+  let FL := Slicing.IntervalCat.toLeftHeart (C := C) (s := s) a b (Fact.out : b - a ≤ 1)
+  have hKerL :
+      IsLimit (KernelFork.ofι ((S.map FL).f) (S.map FL).zero) :=
+    isLimitForkMapOfIsLimit' FL S.zero hKer
+  have hEpiL : Epi ((S.map FL).g) := by
+    simpa [S, FL] using
+      Slicing.IntervalCat.epi_toLeftHeart_of_strictEpi
+        (C := C) (s := s) (a := a) (b := b) π hπ
+  letI : (S.map FL).HasHomology :=
+    ShortComplex.HasHomology.mk' (ShortComplex.HomologyData.ofAbelian (S := S.map FL))
+  have hExactL : (S.map FL).Exact := ShortComplex.exact_of_f_is_kernel (S := S.map FL) hKerL
+  have hShortExactL : (S.map FL).ShortExact :=
+    ShortComplex.ShortExact.mk' hExactL (Fork.IsLimit.mono hKerL) hEpiL
+  obtain ⟨δ, hT⟩ := Slicing.IntervalCat.exists_distTriang_of_shortExact_toLeftHeart
+    (C := C) (s := s) (a := a) (b := b) hShortExactL
+  exact Slicing.IntervalCat.strictShortExact_of_distTriang
+    (C := C) (s := s) (a := a) (b := b) hT
+
+private theorem SkewedStabilityFunction.semistable_of_iso
+    {s : Slicing C} [IsTriangulated C] {a b : ℝ}
+    {ssf : SkewedStabilityFunction C s a b}
+    {E E' : C} (e : E ≅ E') {ψ : ℝ} (h : ssf.Semistable C E ψ) :
+    ssf.Semistable C E' ψ := by
+  refine ⟨(s.intervalProp C a b).prop_of_iso e h.1, ?_, ?_, ?_, ?_⟩
+  · exact fun hE' ↦ h.2.1 ((Iso.isZero_iff e).mpr hE')
+  · rw [show K₀.of C E' = K₀.of C E from (K₀.of_iso C e).symm]
+    exact h.2.2.1
+  · rw [show K₀.of C E' = K₀.of C E from (K₀.of_iso C e).symm]
+    exact h.2.2.2.1
+  · intro K Q f₁ f₂ f₃ hT hK hQ hKne
+    have hT' : Triangle.mk (f₁ ≫ e.inv) (e.hom ≫ f₂) f₃ ∈ distTriang C :=
+      isomorphic_distinguished _ hT _
+        (Triangle.isoMk _ _ (Iso.refl _) e (Iso.refl _)
+          (by simp) (by simp) (by simp))
+    exact h.2.2.2.2 hT' hK hQ hKne
+
+private lemma interval_pullback_cokernel_bot_eq
+    {s : Slicing C} [IsTriangulated C] {a b : ℝ}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X : s.IntervalCat C a b} (M : Subobject X) (hM : IsStrictMono M.arrow) :
+    (Subobject.pullback (cokernel.π M.arrow)).obj ⊥ = M := by
+  apply le_antisymm
+  · set P := (Subobject.pullback (cokernel.π M.arrow)).obj ⊥
+    have hP : P.arrow ≫ cokernel.π M.arrow = 0 := by
+      have := (Subobject.isPullback (cokernel.π M.arrow)
+        (⊥ : Subobject (cokernel M.arrow))).w
+      simp only [Subobject.bot_arrow, comp_zero] at this
+      rw [this]
+    exact Subobject.le_of_comm
+      (hM.isLimitKernelFork.lift (KernelFork.ofι P.arrow hP))
+      (hM.isLimitKernelFork.fac _ Limits.WalkingParallelPair.zero)
+  · exact interval_le_pullback_cokernel
+      (C := C) (s := s) (a := a) (b := b) M ⊥
+
+private lemma interval_cokernel_nonzero_of_ne_top
+    {s : Slicing C} [IsTriangulated C] {a b : ℝ}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X : s.IntervalCat C a b} {M : Subobject X} (hM : M ≠ ⊤)
+    (hM_strict : IsStrictMono M.arrow) :
+    ¬IsZero (cokernel M.arrow) := by
+  intro hZ
+  haveI : Epi M.arrow := Preadditive.epi_of_isZero_cokernel M.arrow hZ
+  haveI : IsIso M.arrow := hM_strict.isIso
+  exact hM (Subobject.eq_top_of_isIso_arrow M)
+
+private lemma interval_pullback_ofLE_comm
+    {s : Slicing C} [IsTriangulated C] {a b : ℝ}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X : s.IntervalCat C a b} {M : Subobject X}
+    {A' B' : Subobject (cokernel M.arrow)} (h : A' ≤ B') :
+    let q := cokernel.π M.arrow
+    let pbA := (Subobject.pullback q).obj A'
+    let pbB := (Subobject.pullback q).obj B'
+    let hpb : pbA ≤ pbB := (Subobject.pullback q).monotone h
+    Subobject.ofLE pbA pbB hpb ≫ Subobject.pullbackπ q B' =
+      Subobject.pullbackπ q A' ≫ Subobject.ofLE A' B' h := by
+  let q := cokernel.π M.arrow
+  let pbA := (Subobject.pullback q).obj A'
+  let pbB := (Subobject.pullback q).obj B'
+  let hpb : pbA ≤ pbB := (Subobject.pullback q).monotone h
+  apply (cancel_mono B'.arrow).mp
+  simp only [Category.assoc, Subobject.ofLE_arrow]
+  calc
+    Subobject.ofLE pbA pbB hpb ≫ (Subobject.pullbackπ q B' ≫ B'.arrow)
+        = Subobject.ofLE pbA pbB hpb ≫ (pbB.arrow ≫ q) := by
+            rw [(Subobject.isPullback q B').w]
+    _ = (Subobject.ofLE pbA pbB hpb ≫ pbB.arrow) ≫ q := by
+          rw [Category.assoc]
+    _ = pbA.arrow ≫ q := by rw [Subobject.ofLE_arrow]
+    _ = Subobject.pullbackπ q A' ≫ A'.arrow := (Subobject.isPullback q A').w.symm
+
 /-! ### Extension-closure of `intervalProp` over Postnikov towers -/
 
 /-- Extension-closure of `intervalProp` over Postnikov towers: if all factors of a
