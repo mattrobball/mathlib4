@@ -130,8 +130,8 @@ Current Phase 4 atomization:
    - the induced common-heart epimorphism `K →> I_H`,
    - the unshifted identity `W(K) = W(K_err) + W(I_H)`,
    - a proof that `I_H` is nonzero.
-3. In progress: the blueprint's Node 7.5 inclusion machinery now has a real compiled
-   upper-endpoint transport theorem rather than only local support lemmas.
+3. In progress: the blueprint's Node 7.5 inclusion machinery now has the full compiled
+   inclusion transport package, not just local support lemmas.
    - the direct thin-interval `W`-phase window for `K`,
    - compiled phase transport lemmas
      `wPhaseOf_le_of_mono_P_phi_semistable` and
@@ -146,9 +146,12 @@ Current Phase 4 atomization:
      `interval_strictShortExact_pullback_right`,
      `interval_fIsKernel_of_strictShortExact`,
      and the full theorem `semistable_of_upper_inclusion`.
-   - next live gap: add the dual lower-endpoint transport and package the full
-     interval-independence theorem, then replace the remaining ad hoc tail of `#3`
-     with that blueprint route.
+   - newly compiled dual lower-endpoint transport:
+     `semistable_of_lower_inclusion`.
+   - newly compiled full inclusion-case transport:
+     `semistable_of_interval_inclusion`.
+   - next live gap: use that compiled inclusion transport to replace the remaining ad
+     hoc tails in `#3` and the small-gap branch of `#1`.
 4. Done: `abelianHN_to_intervalProp` is now closed. The proof uses
    `Fin.induction` on the abelian HN chain in `P(φ)`, the compiled single-factor bridges
    `stabilityFunctionOnP_semistable_deformedPred` /
@@ -159,8 +162,9 @@ Current Phase 4 atomization:
    `deformedSlicing.hn_exists`.
    Current checkpoint: the small-gap branch now compiles through the shared-heart
    setup and the ambient heart image factorisation `E_H ↠ I_H ↪ F_H`; the next live
-   step is to place `I_H`, its kernel, and its cokernel back into the original thin
-   intervals so the phase inequalities can be applied.
+   step is to use the new interval-independence transport to place `I_H`, its kernel,
+   and its cokernel back into the original thin intervals so the phase inequalities can
+   be applied.
 
 Current remaining sorry sites in `Deformation.lean`:
 

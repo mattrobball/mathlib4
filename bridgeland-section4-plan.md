@@ -213,9 +213,11 @@ Optional cleanup left for later, not on the blocker path:
    - Done: `interval_fIsKernel_of_strictShortExact` packages the non-balanced kernel
      recovery for strict short exact sequences in thin interval categories, which the
      inclusion proof needed.
-   - Next atom: prove the dual lower-endpoint inclusion theorem and package the full
-     interval-independence statement. Then refactor blocker `#3` to use that theorem
-     instead of the current ad hoc tail.
+   - Done: the dual lower-endpoint transport is now compiled as
+     `semistable_of_lower_inclusion`, and the full inclusion-case Node 7.5 transport is
+     packaged as `semistable_of_interval_inclusion`.
+   - Next atom: use the compiled inclusion theorem to replace the remaining ad hoc tails
+     in blockers `#3` and `#1`.
    - Replaced plan: use the compiled common-heart / pullback / quotient infrastructure as
      support lemmas for the interval-independence proof. The previous "last contradiction"
      route is not strong enough on its own.
@@ -231,8 +233,9 @@ Optional cleanup left for later, not on the blocker path:
      helper lemmas transport phase-confinement bounds into a shared heart
      `P((c,c+1])`, and the branch now constructs the ambient heart image factorisation
      `E_H ↠ I_H ↪ F_H`.
-   - Remaining: recover `I_H`, `ker(E_H ↠ I_H)`, and `coker(I_H ↪ F_H)` inside the
-     original thin intervals, then close the `ψ₁ ≤ phase(I_H) ≤ ψ₂` contradiction.
+   - Remaining: apply the new interval-independence transport to the common-heart image
+     factorisation so `I_H`, `ker(E_H ↠ I_H)`, and `coker(I_H ↪ F_H)` can be compared in
+     the relevant thin intervals, then close the `ψ₁ ≤ phase(I_H) ≤ ψ₂` contradiction.
 5. **#2 deformed slicing HN**
    - Finish the `hn_exists` field from sigma-HN plus the Phase 3 thin-interval HN recursion.
 6. **#5 local finiteness**

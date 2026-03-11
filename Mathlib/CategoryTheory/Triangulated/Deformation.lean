@@ -1179,6 +1179,50 @@ theorem wPhaseOf_seesaw_dual {w w₁ w₂ : ℂ} {α ψ : ℝ}
     rw [← hsum, add_mul, Complex.add_im]
   linarith
 
+theorem wPhaseOf_lt_of_add_le_lt {w w₁ w₂ : ℂ} {α ψ : ℝ}
+    (hsum : w₁ + w₂ = w)
+    (hw₁_range : wPhaseOf w₁ α ∈ Set.Ioc (ψ - 1) ψ)
+    (hw₂_lt : wPhaseOf w₂ α < ψ)
+    (hw₂_ne : w₂ ≠ 0)
+    (hw₂_range : wPhaseOf w₂ α ∈ Set.Ioo (ψ - 1) (ψ + 1))
+    (hw_range : wPhaseOf w α ∈ Set.Ioo (ψ - 1) (ψ + 1)) :
+    wPhaseOf w α < ψ := by
+  set rot := Complex.exp (-(↑(Real.pi * ψ) * Complex.I))
+  have him_w₁ : (w₁ * rot).im ≤ 0 := by
+    have hw₁_compat := wPhaseOf_compat w₁ α
+    rw [hw₁_compat, mul_assoc, ← Complex.exp_add]
+    have harg : ↑(Real.pi * wPhaseOf w₁ α) * Complex.I +
+        -(↑(Real.pi * ψ) * Complex.I) =
+        ↑(Real.pi * (wPhaseOf w₁ α - ψ)) * Complex.I := by
+      push_cast
+      ring
+    rw [harg, Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im,
+      Complex.exp_ofReal_mul_I_re, Complex.exp_ofReal_mul_I_im,
+      zero_mul, add_zero]
+    exact mul_nonpos_of_nonneg_of_nonpos (norm_nonneg w₁)
+      (Real.sin_nonpos_of_nonpos_of_neg_pi_le
+        (by nlinarith [Real.pi_pos, hw₁_range.2])
+        (by nlinarith [Real.pi_pos, hw₁_range.1]))
+  have him_w₂ : (w₂ * rot).im < 0 := by
+    have hw₂_compat := wPhaseOf_compat w₂ α
+    rw [hw₂_compat, mul_assoc, ← Complex.exp_add]
+    have harg : ↑(Real.pi * wPhaseOf w₂ α) * Complex.I +
+        -(↑(Real.pi * ψ) * Complex.I) =
+        ↑(Real.pi * (wPhaseOf w₂ α - ψ)) * Complex.I := by
+      push_cast
+      ring
+    rw [harg, Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im,
+      Complex.exp_ofReal_mul_I_re, Complex.exp_ofReal_mul_I_im,
+      zero_mul, add_zero]
+    exact mul_neg_of_pos_of_neg (norm_pos_iff.mpr hw₂_ne)
+      (Real.sin_neg_of_neg_of_neg_pi_lt
+        (by nlinarith [Real.pi_pos, hw₂_lt])
+        (by nlinarith [Real.pi_pos, hw₂_range.1]))
+  have him_w : (w * rot).im < 0 := by
+    rw [← hsum, add_mul, Complex.add_im]
+    linarith
+  exact wPhaseOf_lt_of_im_neg him_w hw_range
+
 /-! ### K₀ decomposition of imaginary parts -/
 
 /-- **Im positivity from HN factors.** If `E ∈ P((a, b))` is nonzero and every nonzero
@@ -2014,6 +2058,64 @@ private theorem wPhaseOf_eq_of_intervalProp_upper_inclusion
     exact σ.W_ne_zero_of_intervalProp C W hthin₁'
       (stabSeminorm_lt_cos_of_hsin_hthin
         (C := C) (σ := σ) (W := W) hab₁ hε₀ hε₀2 hthin₁ hsin) hEne hI
+  exact wPhaseOf_indep hWneE _ _ hbranch
+
+private theorem wPhaseOf_eq_of_intervalProp_lower_inclusion
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    [IsTriangulated C]
+    {a₁ a₂ b ε₀ : ℝ} (ha₁ : a₁ < b) (ha₂ : a₂ < b) (ha : a₂ ≤ a₁)
+    {E : C} (hI : σ.slicing.intervalProp C a₁ b E) (hEne : ¬IsZero E)
+    (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hthin₂ : b - a₂ + 2 * ε₀ < 1)
+    (hsin : stabSeminorm C σ (W - σ.Z) <
+      ENNReal.ofReal (Real.sin (Real.pi * ε₀))) :
+    wPhaseOf (W (K₀.of C E)) ((a₁ + b) / 2) =
+      wPhaseOf (W (K₀.of C E)) ((a₂ + b) / 2) := by
+  have hthin₁ : b - a₁ + 2 * ε₀ < 1 := by
+    linarith
+  have hthin₁' : b - a₁ < 1 := by
+    linarith
+  let hpert := hperturb_of_stabSeminorm C σ W hW hthin₁' hε₀ hε₀2 hsin
+  have hW_ne :
+      ∀ (F : C) (φ : ℝ), (σ.slicing.P φ) F → ¬IsZero F →
+        a₁ < φ → φ < b → W (K₀.of C F) ≠ 0 := by
+    intro F φ hP hFne _ _
+    exact σ.W_ne_zero_of_seminorm_lt_one C W hW hP hFne
+  have hpert_lo :
+      ∀ (F : C) (φ : ℝ), (σ.slicing.P φ) F → ¬IsZero F →
+        a₁ < φ → φ < b →
+        a₁ - ε₀ < wPhaseOf (W (K₀.of C F)) ((a₁ + b) / 2) ∧
+          wPhaseOf (W (K₀.of C F)) ((a₁ + b) / 2) < a₁ - ε₀ + 1 := by
+    intro F φ hP hFne haφ hφb
+    obtain ⟨hlo, hhi⟩ := hpert F φ hP hFne haφ hφb
+    exact ⟨by linarith, by linarith⟩
+  have hpert_hi :
+      ∀ (F : C) (φ : ℝ), (σ.slicing.P φ) F → ¬IsZero F →
+        a₁ < φ → φ < b →
+        b + ε₀ - 1 < wPhaseOf (W (K₀.of C F)) ((a₁ + b) / 2) ∧
+          wPhaseOf (W (K₀.of C F)) ((a₁ + b) / 2) < b + ε₀ := by
+    intro F φ hP hFne haφ hφb
+    obtain ⟨hlo, hhi⟩ := hpert F φ hP hFne haφ hφb
+    exact ⟨by linarith, by linarith⟩
+  have hlo :
+      a₁ - ε₀ < wPhaseOf (W (K₀.of C E)) ((a₁ + b) / 2) :=
+    wPhaseOf_gt_of_intervalProp C σ hEne W
+      (by linarith) hI hW_ne hpert_lo
+  have hhi :
+      wPhaseOf (W (K₀.of C E)) ((a₁ + b) / 2) < b + ε₀ :=
+    wPhaseOf_lt_of_intervalProp C σ hEne W
+      (by linarith) hI hW_ne hpert_hi
+  have hbranch :
+      wPhaseOf (W (K₀.of C E)) ((a₁ + b) / 2) ∈
+        Set.Ioc (((a₂ + b) / 2) - 1) (((a₂ + b) / 2) + 1) := by
+    constructor
+    · linarith [hlo, ha, hthin₂]
+    · linarith [hhi, hthin₂]
+  have hWneE : W (K₀.of C E) ≠ 0 := by
+    exact σ.W_ne_zero_of_intervalProp C W hthin₁'
+      (stabSeminorm_lt_cos_of_hsin_hthin
+        (C := C) (σ := σ) (W := W) ha₁ hε₀ hε₀2 hthin₁ hsin) hEne hI
   exact wPhaseOf_indep hWneE _ _ hbranch
 
 private theorem wPhaseOf_mem_Ioo_of_intervalProp_target_envelope
@@ -4191,6 +4293,203 @@ private theorem SkewedStabilityFunction.semistable_cokernel_of_minPhase_strictKe
       wPhaseOf (ssf.W (K₀.of C (cokernel B.arrow).obj)) ssf.α < ψY := by
     exact wPhaseOf_seesaw_dual haddY.symm rfl hB_phase_gt hB_Wne hB_range hcokB_range
   linarith
+
+private theorem semistable_of_lower_inclusion
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    [IsTriangulated C]
+    {a₁ a₂ b ψ ε₀ : ℝ} (ha₁ : a₁ < b) (ha₂ : a₂ < b) (ha : a₂ ≤ a₁)
+    {E : C}
+    (hSS : (σ.skewedStabilityFunction_of_near C W hW ha₁).Semistable C E ψ)
+    (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (henv_lo : a₁ + ε₀ ≤ ψ) (henv_hi : ψ ≤ b - ε₀)
+    (hthin₂ : b - a₂ + 2 * ε₀ < 1)
+    (hsin : stabSeminorm C σ (W - σ.Z) <
+      ENNReal.ofReal (Real.sin (Real.pi * ε₀))) :
+    (σ.skewedStabilityFunction_of_near C W hW ha₂).Semistable C E ψ := by
+  have hEI₂ : σ.slicing.intervalProp C a₂ b E :=
+    σ.slicing.intervalProp_mono C ha (show b ≤ b by linarith) hSS.1
+  have henv_lo₂ : a₂ + ε₀ ≤ ψ := by
+    linarith
+  have hthin₂' : b - a₂ < 1 := by
+    linarith
+  refine semistable_of_target_envelope_triangleTest
+    (C := C) (σ := σ) (W := W) (hW := hW) ha₁ hSS ha₂ hEI₂ hε₀ henv_lo₂ henv_hi
+    hthin₂ ?_
+  intro K Q f₁ f₂ f₃ hT hKI hQI hKne
+  letI : Fact (a₂ < b) := ⟨ha₂⟩
+  letI : Fact (b - a₂ ≤ 1) := ⟨by linarith⟩
+  letI : Fact (a₁ < b) := ⟨ha₁⟩
+  letI : Fact (b - a₁ ≤ 1) := ⟨by linarith⟩
+  let KI₂ : σ.slicing.IntervalCat C a₂ b := ⟨K, hKI⟩
+  let EI₂ : σ.slicing.IntervalCat C a₂ b := ⟨E, hEI₂⟩
+  let QI₂ : σ.slicing.IntervalCat C a₂ b := ⟨Q, hQI⟩
+  let iK : KI₂ ⟶ EI₂ := ObjectProperty.homMk f₁
+  let qE : EI₂ ⟶ QI₂ := ObjectProperty.homMk f₂
+  let S₀ : ShortComplex (σ.slicing.IntervalCat C a₂ b) :=
+    ShortComplex.mk iK qE (by
+      ext
+      simpa [iK, qE] using comp_distTriang_mor_zero₁₂ _ hT)
+  have hT₂ : Triangle.mk iK.hom qE.hom f₃ ∈ distTriang C := by
+    simpa [iK, qE] using hT
+  have hiK_strict : IsStrictMono iK :=
+    (Slicing.IntervalCat.strictMono_strictEpi_of_distTriang
+      (C := C) (s := σ.slicing) (a := a₂) (b := b) (S := S₀) hT₂).1
+  obtain ⟨X, Y, fX, gY, δY, hTK, hX₁, hY_le⟩ :=
+    exists_lower_boundary_triangle (C := C) (s := σ.slicing) ha₁ ha₂ ha hKI
+  have hX₂ : σ.slicing.intervalProp C a₂ b X :=
+    σ.slicing.intervalProp_mono C ha (show b ≤ b by linarith) hX₁
+  have hY₂ : σ.slicing.intervalProp C a₂ b Y :=
+    intervalProp_of_lower_boundary_triangle (C := C) (s := σ.slicing)
+      ha₂ ha₁ ha hKI hX₁ hY_le hTK
+  let XI₁ : σ.slicing.IntervalCat C a₁ b := ⟨X, hX₁⟩
+  let XI₂ : σ.slicing.IntervalCat C a₂ b := ⟨X, hX₂⟩
+  let YI₂ : σ.slicing.IntervalCat C a₂ b := ⟨Y, hY₂⟩
+  let EI₁ : σ.slicing.IntervalCat C a₁ b := ⟨E, hSS.1⟩
+  let xK : XI₂ ⟶ KI₂ := ObjectProperty.homMk fX
+  let kY : KI₂ ⟶ YI₂ := ObjectProperty.homMk gY
+  let S₁ : ShortComplex (σ.slicing.IntervalCat C a₂ b) :=
+    ShortComplex.mk xK kY (by
+      ext
+      simpa [xK, kY] using comp_distTriang_mor_zero₁₂ _ hTK)
+  have hTK₂ : Triangle.mk xK.hom kY.hom δY ∈ distTriang C := by
+    simpa [xK, kY] using hTK
+  have hxK_strict : IsStrictMono xK :=
+    (Slicing.IntervalCat.strictMono_strictEpi_of_distTriang
+      (C := C) (s := σ.slicing) (a := a₂) (b := b) (S := S₁) hTK₂).1
+  by_cases hYZ : IsZero Y
+  · have hK₁ : σ.slicing.intervalProp C a₁ b K :=
+      σ.slicing.intervalProp_of_triangle C hX₁ (Or.inl hYZ) hTK
+    have hK_ge₁ : σ.slicing.geProp C (b - 1) K :=
+      (σ.slicing.intervalProp_implies_rightWindow
+        (C := C) (a := a₁) (b := b) (by linarith) hK₁).1
+    have hQ_lt : σ.slicing.ltProp C b Q :=
+      (σ.slicing.intervalProp_implies_rightWindow
+        (C := C) (a := a₂) (b := b) (by linarith) hQI).2
+    have hQ₁ : σ.slicing.intervalProp C a₁ b Q :=
+      σ.slicing.third_intervalProp_of_triangle C ha₁ hSS.1 hK_ge₁ hQ_lt hT
+    have hK_phase₁ :
+        wPhaseOf (W (K₀.of C K)) ((a₁ + b) / 2) ≤ ψ :=
+      hSS.2.2.2.2 hT hK₁ hQ₁ hKne
+    have hK_eq :
+        wPhaseOf (W (K₀.of C K)) ((a₁ + b) / 2) =
+          wPhaseOf (W (K₀.of C K)) ((a₂ + b) / 2) :=
+      wPhaseOf_eq_of_intervalProp_lower_inclusion
+        (C := C) (σ := σ) (W := W) (hW := hW) ha₁ ha₂ ha hK₁ hKne
+        hε₀ hε₀2 hthin₂ hsin
+    rw [← hK_eq]
+    exact hK_phase₁
+  · by_cases hXZ : IsZero X
+    · have hY_phase_lt :
+          wPhaseOf (W (K₀.of C Y)) ((a₂ + b) / 2) < ψ :=
+        wPhaseOf_lt_of_lower_boundary_triangle
+          (C := C) (σ := σ) (W := W) (hW := hW) ha₁ ha₂ ha
+          hKI hX₁ hY_le hYZ hε₀ hε₀2 henv_lo henv_hi hthin₂ hsin hTK
+      haveI : IsIso gY :=
+        (Triangle.isZero₁_iff_isIso₂ (Triangle.mk fX gY δY) hTK).mp hXZ
+      have hKY : W (K₀.of C K) = W (K₀.of C Y) := by
+        simpa using congrArg W (K₀.of_iso C (asIso gY))
+      rw [hKY]
+      exact le_of_lt hY_phase_lt
+    · let xE₂ : XI₂ ⟶ EI₂ := xK ≫ iK
+      have hxE₂_strict : IsStrictMono xE₂ :=
+        Slicing.IntervalCat.comp_strictMono
+          (C := C) (s := σ.slicing) (a := a₂) (b := b) xK iK hxK_strict hiK_strict
+      let xE₁ : XI₁ ⟶ EI₁ := ObjectProperty.homMk (fX ≫ f₁)
+      have hmonoRH :
+          Mono ((Slicing.IntervalCat.toRightHeart (C := C) (s := σ.slicing) a₁ b
+            (Fact.out : b - a₁ ≤ 1)).map xE₁) := by
+        simpa [Slicing.IntervalCat.toRightHeart, xE₁, xE₂] using
+          (Slicing.IntervalCat.mono_toRightHeart_of_strictMono
+            (C := C) (s := σ.slicing) (a := a₂) (b := b) xE₂ hxE₂_strict)
+      have hxE₁_strict : IsStrictMono xE₁ := by
+        letI :
+            Mono ((Slicing.IntervalCat.toRightHeart (C := C) (s := σ.slicing) a₁ b
+              (Fact.out : b - a₁ ≤ 1)).map xE₁) := hmonoRH
+        exact Slicing.IntervalCat.strictMono_of_mono_toRightHeart
+          (C := C) (s := σ.slicing) (a := a₁) (b := b) xE₁
+      let SX : ShortComplex (σ.slicing.IntervalCat C a₁ b) :=
+        ShortComplex.mk xE₁ (cokernel.π xE₁) (cokernel.condition xE₁)
+      have hSX : StrictShortExact SX :=
+        interval_strictShortExact_cokernel_of_strictMono
+          (C := C) (s := σ.slicing) (a := a₁) (b := b) xE₁ hxE₁_strict
+      obtain ⟨δX, hTX⟩ := Slicing.IntervalCat.exists_distTriang_of_strictShortExact
+        (C := C) (s := σ.slicing) (a := a₁) (b := b) hSX
+      have hX_phase₁ :
+          wPhaseOf (W (K₀.of C X)) ((a₁ + b) / 2) ≤ ψ :=
+        hSS.2.2.2.2 hTX hX₁ (cokernel xE₁).property hXZ
+      have hX_eq :
+          wPhaseOf (W (K₀.of C X)) ((a₁ + b) / 2) =
+            wPhaseOf (W (K₀.of C X)) ((a₂ + b) / 2) :=
+        wPhaseOf_eq_of_intervalProp_lower_inclusion
+          (C := C) (σ := σ) (W := W) (hW := hW) ha₁ ha₂ ha hX₁ hXZ
+          hε₀ hε₀2 hthin₂ hsin
+      have hX_phase_le :
+          wPhaseOf (W (K₀.of C X)) ((a₂ + b) / 2) ≤ ψ := by
+        rw [← hX_eq]
+        exact hX_phase₁
+      have hY_phase_lt :
+          wPhaseOf (W (K₀.of C Y)) ((a₂ + b) / 2) < ψ :=
+        wPhaseOf_lt_of_lower_boundary_triangle
+          (C := C) (σ := σ) (W := W) (hW := hW) ha₁ ha₂ ha
+          hKI hX₁ hY_le hYZ hε₀ hε₀2 henv_lo henv_hi hthin₂ hsin hTK
+      have hsum :
+          W (K₀.of C K) = W (K₀.of C X) + W (K₀.of C Y) := by
+        simpa [map_add] using congrArg W
+          (K₀.of_triangle C (Triangle.mk fX gY δY) hTK)
+      have hX_range :
+          wPhaseOf (W (K₀.of C X)) ((a₂ + b) / 2) ∈ Set.Ioo (ψ - 1) (ψ + 1) :=
+        wPhaseOf_mem_Ioo_of_intervalProp_target_envelope
+          (C := C) (σ := σ) (W := W) (hW := hW) hX₂ hXZ hε₀ hε₀2 henv_lo₂ henv_hi
+          hthin₂ hsin
+      have hY_range :
+          wPhaseOf (W (K₀.of C Y)) ((a₂ + b) / 2) ∈ Set.Ioo (ψ - 1) (ψ + 1) :=
+        wPhaseOf_mem_Ioo_of_intervalProp_target_envelope
+          (C := C) (σ := σ) (W := W) (hW := hW) hY₂ hYZ hε₀ hε₀2 henv_lo₂ henv_hi
+          hthin₂ hsin
+      have hK_range :
+          wPhaseOf (W (K₀.of C K)) ((a₂ + b) / 2) ∈ Set.Ioo (ψ - 1) (ψ + 1) :=
+        wPhaseOf_mem_Ioo_of_intervalProp_target_envelope
+          (C := C) (σ := σ) (W := W) (hW := hW) hKI hKne hε₀ hε₀2 henv_lo₂ henv_hi
+          hthin₂ hsin
+      have hX_range' :
+          wPhaseOf (W (K₀.of C X)) ((a₂ + b) / 2) ∈ Set.Ioc (ψ - 1) ψ := by
+        exact ⟨hX_range.1, hX_phase_le⟩
+      have hYW_ne : W (K₀.of C Y) ≠ 0 := by
+        exact σ.W_ne_zero_of_intervalProp C W hthin₂'
+          (stabSeminorm_lt_cos_of_hsin_hthin
+            (C := C) (σ := σ) (W := W) ha₂ hε₀ hε₀2 hthin₂ hsin) hYZ hY₂
+      have hK_phase_lt :
+          wPhaseOf (W (K₀.of C K)) ((a₂ + b) / 2) < ψ :=
+        wPhaseOf_lt_of_add_le_lt hsum.symm hX_range' hY_phase_lt hYW_ne hY_range hK_range
+      exact le_of_lt hK_phase_lt
+
+private theorem semistable_of_interval_inclusion
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    [IsTriangulated C]
+    {a₁ a₂ b₁ b₂ ψ ε₀ : ℝ}
+    (hab₁ : a₁ < b₁) (hab₂ : a₂ < b₂) (ha : a₂ ≤ a₁) (hb : b₁ ≤ b₂)
+    {E : C}
+    (hSS : (σ.skewedStabilityFunction_of_near C W hW hab₁).Semistable C E ψ)
+    (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (henv_lo : a₁ + ε₀ ≤ ψ) (henv_hi : ψ ≤ b₁ - ε₀)
+    (hthin₂ : b₂ - a₂ + 2 * ε₀ < 1)
+  (hsin : stabSeminorm C σ (W - σ.Z) <
+      ENNReal.ofReal (Real.sin (Real.pi * ε₀))) :
+    (σ.skewedStabilityFunction_of_near C W hW hab₂).Semistable C E ψ := by
+  have hthin_mid : b₂ - a₁ + 2 * ε₀ < 1 := by
+    linarith
+  have hab_mid : a₁ < b₂ := by
+    linarith
+  have hmid :
+      (σ.skewedStabilityFunction_of_near C W hW hab_mid).Semistable C E ψ :=
+    semistable_of_upper_inclusion
+      (C := C) (σ := σ) (W := W) (hW := hW) hab₁ hab_mid hb hSS
+      hε₀ hε₀2 henv_lo henv_hi hthin_mid hsin
+  exact semistable_of_lower_inclusion
+    (C := C) (σ := σ) (W := W) (hW := hW) (ha₁ := by linarith) hab₂ ha hmid
+    hε₀ hε₀2 (by linarith) (by linarith [henv_hi, hb]) hthin₂ hsin
 
 variable [IsTriangulated C] in
 /-- A minimal-phase strict kernel has semistable strict quotient. This is the mdq step used
