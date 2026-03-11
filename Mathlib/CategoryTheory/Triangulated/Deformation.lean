@@ -4491,6 +4491,54 @@ private theorem semistable_of_interval_inclusion
     (C := C) (σ := σ) (W := W) (hW := hW) (ha₁ := by linarith) hab₂ ha hmid
     hε₀ hε₀2 (by linarith) (by linarith [henv_hi, hb]) hthin₂ hsin
 
+private theorem semistable_of_target_subinterval
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    [IsTriangulated C]
+    {a₁ a₂ b₂ b₁ ψ ε₀ : ℝ}
+    (hab₁ : a₁ < b₁) (hab₂ : a₂ < b₂) (ha : a₁ ≤ a₂) (hb : b₂ ≤ b₁)
+    {E : C}
+    (hSS : (σ.skewedStabilityFunction_of_near C W hW hab₁).Semistable C E ψ)
+    (hI₂ : σ.slicing.intervalProp C a₂ b₂ E)
+    (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (henv₂_lo : a₂ + ε₀ ≤ ψ) (henv₂_hi : ψ ≤ b₂ - ε₀)
+    (hthin₁ : b₁ - a₁ + 2 * ε₀ < 1)
+    (hthin₂ : b₂ - a₂ + 2 * ε₀ < 1)
+    (hsin : stabSeminorm C σ (W - σ.Z) <
+      ENNReal.ofReal (Real.sin (Real.pi * ε₀))) :
+    (σ.skewedStabilityFunction_of_near C W hW hab₂).Semistable C E ψ := by
+  refine semistable_of_target_envelope_triangleTest
+    (C := C) (σ := σ) (W := W) (hW := hW) hab₁ hSS hab₂ hI₂ hε₀ henv₂_lo henv₂_hi
+    hthin₂ ?_
+  intro K Q f₁ f₂ f₃ hT hKI hQI hKne
+  have ha₂b₁ : a₂ < b₁ := by
+    linarith
+  have hthin_mid : b₁ - a₂ + 2 * ε₀ < 1 := by
+    linarith
+  have hKI₁ : σ.slicing.intervalProp C a₁ b₁ K :=
+    σ.slicing.intervalProp_mono C ha hb hKI
+  have hQI₁ : σ.slicing.intervalProp C a₁ b₁ Q :=
+    σ.slicing.intervalProp_mono C ha hb hQI
+  have hKI_mid : σ.slicing.intervalProp C a₂ b₁ K :=
+    σ.slicing.intervalProp_mono C (show a₂ ≤ a₂ by linarith) hb hKI
+  have hK_phase₁ :
+      wPhaseOf (W (K₀.of C K)) ((a₁ + b₁) / 2) ≤ ψ :=
+    hSS.2.2.2.2 hT hKI₁ hQI₁ hKne
+  have hK_eq_lower :
+      wPhaseOf (W (K₀.of C K)) ((a₂ + b₁) / 2) =
+        wPhaseOf (W (K₀.of C K)) ((a₁ + b₁) / 2) :=
+    wPhaseOf_eq_of_intervalProp_lower_inclusion
+      (C := C) (σ := σ) (W := W) (hW := hW) ha₂b₁ hab₁ ha hKI_mid hKne
+      hε₀ hε₀2 hthin₁ hsin
+  have hK_eq_upper :
+      wPhaseOf (W (K₀.of C K)) ((a₂ + b₂) / 2) =
+        wPhaseOf (W (K₀.of C K)) ((a₂ + b₁) / 2) :=
+    wPhaseOf_eq_of_intervalProp_upper_inclusion
+      (C := C) (σ := σ) (W := W) (hW := hW) hab₂ hb hKI hKne
+      hε₀ hε₀2 hthin_mid hsin
+  rw [hK_eq_upper, hK_eq_lower]
+  exact hK_phase₁
+
 variable [IsTriangulated C] in
 /-- A minimal-phase strict kernel has semistable strict quotient. This is the mdq step used
 for the thin-interval HN recursion. The only quotient-side hypothesis needed is plain
