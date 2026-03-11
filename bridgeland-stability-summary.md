@@ -127,6 +127,10 @@ Current Phase 4 atomization:
    - compiled `W`-phase window for `K_err⟦1⟧`,
    - exposed octahedral image-factorisation helper plus the explicit heart morphism
      `K → I_H`,
+   - the induced common-heart epimorphism `K →> I_H`,
+   - the unshifted identity `W(K) = W(K_err) + W(I_H)`,
+   - a proof that `I_H` is nonzero, and
+   - the direct thin-interval `W`-phase window for `K`,
    - compiled phase transport lemmas
      `wPhaseOf_le_of_mono_P_phi_semistable` and
      `wPhaseOf_ge_of_epi_P_phi_semistable`.

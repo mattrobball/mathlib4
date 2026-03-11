@@ -5593,6 +5593,69 @@ private theorem P_phi_wSemistable_is_deformedPred
              IsLimit.conePointUniqueUpToIso_hom_comp hKerImg hKerI
                Limits.WalkingParallelPair.zero
          rw [heI_img, hmKI_img]
+       have hT_mKI_img' :
+           Triangle.mk
+               (Triangulated.AbelianSubcategory.ιK f₃ α).hom
+               mKI_img.hom (-m3_img) ∈ distTriang C := by
+         simpa [ι] using hT_mKI_img
+       let hCoker_mKI :=
+         Triangulated.AbelianSubcategory.isColimitCokernelCoforkOfDistTriang
+           (ι := t.ιHeart (H := t.heart.FullSubcategory))
+           (hι := TStructure.heart_hι t)
+           (Triangulated.AbelianSubcategory.ιK f₃ α) mKI_img (-m3_img) hT_mKI_img
+       haveI : Epi mKI_img := Cofork.IsColimit.epi hCoker_mKI
+       haveI : Epi mKI_H := by
+         dsimp [mKI_H]
+         letI : IsIso eI_img.hom := ⟨⟨eI_img.inv, eI_img.hom_inv_id, eI_img.inv_hom_id⟩⟩
+         exact epi_comp _ _
+       have hW_Kker_img :
+           W (K₀.of C K) =
+             W (K₀.of C KkerH.obj) + W (K₀.of C I_img.obj) := by
+         simpa [map_add] using congrArg W
+           (K₀.of_triangle C
+             (Triangle.mk (Triangulated.AbelianSubcategory.ιK f₃ α).hom
+               mKI_img.hom (-m3_img)) hT_mKI_img')
+       have hW_Kker :
+           W (K₀.of C K) =
+             W (K₀.of C KkerH.obj) + W (K₀.of C I_H.obj) := by
+         let eI_C : I_img.obj ≅ I_H.obj := ι.mapIso eI_img
+         have hWI : W (K₀.of C I_img.obj) = W (K₀.of C I_H.obj) := by
+           simpa using congrArg W (K₀.of_iso C eI_C)
+         rw [hW_Kker_img, hWI]
+       have hIne : ¬IsZero I_H.obj := by
+         intro hIZ
+         have hIZH : IsZero I_H := by
+           exact IsZero.of_full_of_faithful_of_isZero ι I_H (by simpa [hι_simp] using hIZ)
+         have hiI_zero : i_I = 0 := zero_of_source_iso_zero _ hIZH.isoZero
+         have hiH_zero : iH = 0 := by
+           rw [← hmKI_H, hiI_zero]
+           simp
+         have hf1_zero : f₁ = 0 := by
+           simpa [iH] using congrArg (fun f => f.hom) hiH_zero
+         have hiK_zero : iK = 0 := by
+           apply ObjectProperty.hom_ext
+           simpa [iK] using hf1_zero
+         haveI := hS.shortExact.mono_f
+         have hId : 𝟙 KI = 0 := by
+           apply (cancel_mono iK).1
+           simpa [hiK_zero]
+         have hKZ : IsZero KI := (IsZero.iff_id_eq_zero KI).mpr hId
+         exact hKne (by
+           simpa [KI] using ((σ.slicing.intervalProp C a b).ι).map_isZero hKZ)
+       have hI_phase_le' : wPhaseOf (W (K₀.of C I_H.obj)) ψ ≤ ψ :=
+         hI_phase_le hIne
+       have hK_window :
+           ψ - 2 * ε₀ < wPhaseOf (W (K₀.of C K)) ψ ∧
+             wPhaseOf (W (K₀.of C K)) ψ < ψ + 2 * ε₀ := by
+         constructor
+         · simpa [a, two_mul, sub_eq_add_neg, add_assoc, add_left_comm, add_comm] using
+             wPhaseOf_gt_of_intervalProp C σ hKne W (by
+               show (ψ - ε₀) - ε₀ ≤ ψ
+               linarith) hKI hW_ne_ab hpert_ab_gt
+         · simpa [b, two_mul, sub_eq_add_neg, add_assoc, add_left_comm, add_comm] using
+             wPhaseOf_lt_of_intervalProp C σ hKne W (by
+               show ψ ≤ (ψ + ε₀) + ε₀
+               linarith) hKI hW_ne_ab hpert_ab_lt
        sorry⟩⟩
 
 variable [IsTriangulated C] in

@@ -193,9 +193,12 @@ Optional cleanup left for later, not on the blocker path:
    - Done: the octahedral image-factorisation helper is now exposed in
      `AbelianSubcategory`, and blocker `#3` now contains the explicit heart
      factorisation morphism `K → I_H` rather than only the derived `K₀` relation.
-   - Remaining: use those inequalities to place the residual kernel term on the
-     correct side of `ψ`, then close the final contradiction proving
-     `wPhaseOf(W(K), ψ) ≤ ψ`.
+   - Done: the same octahedral package now gives the actual common-heart epi
+     `K →> I_H`, the unshifted identity `W(K) = W(K_err) + W(I_H)`, a proof that
+     `I_H` is nonzero, and the direct thin-interval `W`-phase window for `K`.
+   - Remaining: close the last contradiction by combining the shifted and unshifted
+     `K₀` identities with the residual-term phase bounds; this is now the only live
+     mathematical gap in blocker `#3`.
 3. **#4 abelian HN bridge**
    - Use `stabilityFunctionOnP_hasHN`.
    - Send each abelian factor to `deformedPred` via #3.
