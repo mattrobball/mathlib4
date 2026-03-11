@@ -163,15 +163,40 @@ Optional cleanup left for later, not on the blocker path:
 
 ## Phase 4: Fill the 5 Sorrys (~830 lines)
 
-### Order (respecting dependencies):
+### Actual blocker order (current file state, March 11, 2026):
 
 | Order | Sorry | Line | Lines | Depends on |
 |-------|-------|------|-------|------------|
-| 1 | #5 Q(psi)-subobject finiteness | 3283 | ~80 | Phase 1 (finiteness transfer) |
-| 2 | #3 Triangle test | 3168 | ~100 | Phase 2 (quasi-abelian strict subobjects) |
-| 3 | #4 abelianHN_to_intervalProp | 3186 | ~150 | Sorry #3 + admissibility |
-| 4 | #1 Small-gap hom-vanishing | 2669 | ~150 | Phase 2 (two-heart factoring) |
-| 5 | #2 HN existence | 2908 | ~350 | Phase 3 + sorrys #1, #3, #4 |
+| 1 | #3 Triangle test | 5034 | ~220 | Phase 2 (quasi-abelian strict subobjects) |
+| 2 | #4 abelianHN_to_intervalProp | 5250 | ~150 | Sorry #3 + admissibility |
+| 3 | #1 Small-gap hom-vanishing | 4384 | ~150 | Phase 2 (two-heart factoring) |
+| 4 | #2 HN existence | 4668 | ~350 | Phase 3 + sorrys #1, #3, #4 |
+| 5 | #5 Q(psi)-subobject finiteness | 5352 | ~80 | Sorrys #1-2 resolved first |
+
+### Phase 4 atomization
+
+1. **#3 statement cleanup**
+   - Done: `P_phi_wSemistable_is_deformedPred` now carries the actual abelian
+     `stabilityFunctionOnP` semistability hypothesis in `P(φ)`.
+2. **#3 triangle test via strict interval subobjects**
+   - Work in the thin interval `(ψ - ε₀, ψ + ε₀)`.
+   - Use Phase 2: distinguished triangle `↔` strict SES in `P((a,b))`.
+   - Done: the common-heart factorization is now compiled through the heart quotient
+     `F_H ↠ Q_H`, the image triangle `I_H → F → Q_H`, and the proof that
+     `I_H, Q_H ∈ P(φ)`.
+   - Remaining: extract the K₀ relation `W(K) = W(I_H) + W(K_err)`, show the shifted
+     kernel error term has W-phase `< ψ`, and conclude `wPhaseOf(W(K), ψ) ≤ ψ`.
+3. **#4 abelian HN bridge**
+   - Use `stabilityFunctionOnP_hasHN`.
+   - Send each abelian factor to `deformedPred` via #3.
+   - Build the ambient Postnikov tower via admissibility / `appendFactor`.
+4. **#1 small-gap hom-vanishing**
+   - Reuse the common-heart factorization already outlined, now with #3/#4 available.
+5. **#2 deformed slicing HN**
+   - Finish the `hn_exists` field from sigma-HN plus the Phase 3 thin-interval HN recursion.
+6. **#5 local finiteness**
+   - Leave until #1-2 are done; the correct route goes through the constructed deformed
+     slicing, not through naive subobject injection.
 
 ### Sorry #1 (small-gap hom-vanishing) — correct strategy:
 1. E, F in common heart (eps0 < 1/4 ensures overlap)
@@ -187,7 +212,7 @@ Optional cleanup left for later, not on the blocker path:
 3. Apply quasi-abelian HN (Phase 3) in thin interval — NOT per-slice abelian HN
 4. Assemble via PostnikovTower concatenation
 
-### Sorry #3 (triangle test) — STRATEGY INVALIDATED
+### Sorry #3 (triangle test) — updated plan
 
 **THE PREVIOUS STRATEGY IS WRONG.** Step 3 ("P(φ) closure under subobjects
 ⟹ K ∈ P(φ)") is **mathematically false**. Counterexample: on an elliptic
@@ -196,10 +221,18 @@ curve, O_E ∈ P(1/2) is a heart-subobject of a semistable F ∈ P(3/4).
 The see-saw argument fails because Im(Z(K)·rot) ≤ 0 and Im(Z(Q)·rot) ≥ 0
 have OPPOSITE SIGNS, so sum = 0 does NOT force both to zero.
 
-**Correct approach**: Use quasi-abelian STRICT subobjects in P((a,b)).
-Strict subobjects stay in P((a,b)) by construction. Bridgeland's triangle
-test follows from W-semistability in the quasi-abelian category, not from
-P(φ)-closure.
+**Current plan**:
+1. The theorem statement fix is done: the hypothesis is the abelian
+   `stabilityFunctionOnP` semistability in `P(φ)`.
+2. The thin-interval/common-heart bridge is partially done: the proof now constructs
+   the heart quotient `F_H ↠ Q_H`, the image triangle `I_H → F → Q_H`, and proves
+   `I_H, Q_H ∈ P(φ)`.
+3. The remaining step is the actual W-phase inequality:
+   - get `W(K) = W(I_H) + W(K_err)` from the original triangle plus the heart triangles,
+   - show `wPhaseOf(W(I_H), ψ) ≤ ψ` from abelian semistability,
+   - show the shifted kernel piece `K_err⟦1⟧` stays in the thin interval, hence
+     `wPhaseOf(W(K_err), ψ) < ψ`,
+   - conclude `wPhaseOf(W(K), ψ) ≤ ψ` by the imaginary-part / see-saw argument.
 
 ### Sorry #4 (abelianHN_to_intervalProp):
 1. Get W-HN in P(phi) from stabilityFunctionOnP_hasHN

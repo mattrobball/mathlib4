@@ -4844,6 +4844,128 @@ private noncomputable def stabilityFunctionOnP
           (by have := Real.pi_pos; nlinarith [hψ_lo])
           (by have := Real.pi_pos; nlinarith [hψ_hi])) }
 
+variable [IsTriangulated C] in
+private theorem stabilityFunctionOnP_phase_eq_wPhaseOf
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    (φ : ℝ) (E : (σ.slicing.P φ).FullSubcategory) :
+    @StabilityFunction.phase (σ.slicing.P φ).FullSubcategory _ (σ.P_phi_abelian C φ)
+      (stabilityFunctionOnP C σ W hW hε₀ hε₀2 hsin φ) E =
+      wPhaseOf (W (K₀.of C ((σ.slicing.P φ).ι.obj E))) (φ - 1 / 2) - (φ - 1 / 2) := by
+  unfold StabilityFunction.phase wPhaseOf stabilityFunctionOnP phaseRotation
+  simp
+  ring
+
+variable [IsTriangulated C] in
+private theorem wPhaseOf_eq_at_phi_of_mem_P_phi
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    {φ ψ : ℝ} {E : C} (hPφ : σ.slicing.P φ E) (hEne : ¬IsZero E)
+    (hψ_lo : φ - ε₀ < ψ) (hψ_hi : ψ < φ + ε₀) :
+    wPhaseOf (W (K₀.of C E)) φ = wPhaseOf (W (K₀.of C E)) ψ := by
+  have hWne : W (K₀.of C E) ≠ 0 := σ.W_ne_zero_of_seminorm_lt_one C W hW hPφ hEne
+  have hpert := hperturb_of_stabSeminorm C σ W hW
+    (show ((φ + ε₀ : ℝ) - (φ - ε₀)) < 1 by linarith)
+    hε₀ hε₀2 hsin E φ hPφ hEne (by linarith) (by linarith)
+  have hpert' : φ - ε₀ < wPhaseOf (W (K₀.of C E)) φ ∧
+      wPhaseOf (W (K₀.of C E)) φ < φ + ε₀ := by
+    simpa [show ((φ - ε₀ + (φ + ε₀)) / 2 : ℝ) = φ by ring] using hpert
+  exact wPhaseOf_indep hWne φ ψ <| by
+    constructor <;> linarith
+
+variable [IsTriangulated C] in
+private theorem wPhaseOf_eq_at_phi_sub_half_of_mem_P_phi
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    {φ : ℝ} {E : C} (hPφ : σ.slicing.P φ E) (hEne : ¬IsZero E) :
+    wPhaseOf (W (K₀.of C E)) φ = wPhaseOf (W (K₀.of C E)) (φ - 1 / 2) := by
+  have hWne : W (K₀.of C E) ≠ 0 := σ.W_ne_zero_of_seminorm_lt_one C W hW hPφ hEne
+  have hpert := hperturb_of_stabSeminorm C σ W hW
+    (show ((φ + ε₀ : ℝ) - (φ - ε₀)) < 1 by linarith)
+    hε₀ hε₀2 hsin E φ hPφ hEne (by linarith) (by linarith)
+  have hpert' : φ - ε₀ < wPhaseOf (W (K₀.of C E)) φ ∧
+      wPhaseOf (W (K₀.of C E)) φ < φ + ε₀ := by
+    simpa [show ((φ - ε₀ + (φ + ε₀)) / 2 : ℝ) = φ by ring] using hpert
+  exact wPhaseOf_indep hWne φ (φ - 1 / 2) <| by
+    constructor <;> linarith
+
+variable [IsTriangulated C] in
+private theorem leProp_of_phiPlus_le
+    (s : Slicing C) {E : C} (hE : ¬IsZero E) {t : ℝ}
+    (h : s.phiPlus C E hE ≤ t) :
+    s.leProp C t E := by
+  obtain ⟨F, hn, hfirst⟩ := HNFiltration.exists_nonzero_first C s hE
+  refine s.leProp_of_hn C F t (fun j ↦ ?_) hn
+  calc
+    F.φ j ≤ F.φ ⟨0, hn⟩ := F.hφ.antitone (Fin.mk_le_mk.mpr (Nat.zero_le j.val))
+    _ = s.phiPlus C E hE := (s.phiPlus_eq C E hE F hn hfirst).symm
+    _ ≤ t := h
+
+variable [IsTriangulated C] in
+private theorem wPhaseOf_le_of_mono_P_phi_semistable
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    {φ ψ : ℝ} {F : (σ.slicing.P φ).FullSubcategory}
+    (hFne : ¬IsZero F)
+    (hss : @StabilityFunction.IsSemistable (σ.slicing.P φ).FullSubcategory _
+      (σ.P_phi_abelian C φ) (stabilityFunctionOnP C σ W hW hε₀ hε₀2 hsin φ) F)
+    (hψ : wPhaseOf (W (K₀.of C ((σ.slicing.P φ).ι.obj F))) φ = ψ)
+    {B : (σ.slicing.P φ).FullSubcategory} (i : B ⟶ F) [Mono i]
+    (hBne : ¬IsZero B) :
+    wPhaseOf (W (K₀.of C ((σ.slicing.P φ).ι.obj B))) φ ≤ ψ := by
+  letI := σ.P_phi_abelian C φ
+  let Zφ := stabilityFunctionOnP C σ W hW hε₀ hε₀2 hsin φ
+  let Bsub : Subobject F := Subobject.mk i
+  have hBsub_ne : ¬IsZero (Bsub : (σ.slicing.P φ).FullSubcategory) := by
+    intro hZ
+    exact hBne (hZ.of_iso (Subobject.underlyingIso i).symm)
+  have hphase_le_sub : StabilityFunction.phase Zφ (Bsub : (σ.slicing.P φ).FullSubcategory) ≤
+      StabilityFunction.phase Zφ F := hss.2 Bsub hBsub_ne
+  have hphase_eq_sub :
+      StabilityFunction.phase Zφ (Bsub : (σ.slicing.P φ).FullSubcategory) =
+        StabilityFunction.phase Zφ B := by
+    simpa [Zφ] using
+      (StabilityFunction.phase_eq_of_iso Zφ (Subobject.underlyingIso i))
+  have hphase_le : StabilityFunction.phase Zφ B ≤ StabilityFunction.phase Zφ F := by
+    rw [← hphase_eq_sub]
+    exact hphase_le_sub
+  have hBobj_ne : ¬IsZero ((σ.slicing.P φ).ι.obj B) := by
+    intro hZ
+    exact hBne (IsZero.of_full_of_faithful_of_isZero ((σ.slicing.P φ).ι) B hZ)
+  have hFobj_ne : ¬IsZero ((σ.slicing.P φ).ι.obj F) := by
+    intro hZ
+    exact hFne (IsZero.of_full_of_faithful_of_isZero ((σ.slicing.P φ).ι) F hZ)
+  have hB_shift :
+      wPhaseOf (W (K₀.of C ((σ.slicing.P φ).ι.obj B))) (φ - 1 / 2) =
+        wPhaseOf (W (K₀.of C ((σ.slicing.P φ).ι.obj B))) φ := by
+    simpa using
+      (wPhaseOf_eq_at_phi_sub_half_of_mem_P_phi C σ W hW hε₀ hε₀2 hsin B.property hBobj_ne).symm
+  have hF_shift :
+      wPhaseOf (W (K₀.of C ((σ.slicing.P φ).ι.obj F))) (φ - 1 / 2) =
+        wPhaseOf (W (K₀.of C ((σ.slicing.P φ).ι.obj F))) φ := by
+    simpa using
+      (wPhaseOf_eq_at_phi_sub_half_of_mem_P_phi C σ W hW hε₀ hε₀2 hsin F.property hFobj_ne).symm
+  have hphase_B :
+      StabilityFunction.phase Zφ B =
+        wPhaseOf (W (K₀.of C ((σ.slicing.P φ).ι.obj B))) φ - (φ - 1 / 2) := by
+    rw [stabilityFunctionOnP_phase_eq_wPhaseOf C σ W hW hε₀ hε₀2 hsin φ B]
+    rw [hB_shift]
+  have hphase_F :
+      StabilityFunction.phase Zφ F = ψ - (φ - 1 / 2) := by
+    rw [stabilityFunctionOnP_phase_eq_wPhaseOf C σ W hW hε₀ hε₀2 hsin φ F]
+    rw [hF_shift]
+    simpa using hψ
+  rw [hphase_B, hphase_F] at hphase_le
+  linarith
+
 /-! #### Step A2: Finite subobject lattice in P(φ) and HN existence -/
 
 variable [IsTriangulated C] in
@@ -4915,6 +5037,8 @@ private theorem P_phi_wSemistable_is_deformedPred
     {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     {φ : ℝ} {F : C} (hPφ : σ.slicing.P φ F) (hFne : ¬IsZero F)
+    (hss : @StabilityFunction.IsSemistable (σ.slicing.P φ).FullSubcategory _ (σ.P_phi_abelian C φ)
+      (stabilityFunctionOnP C σ W hW hε₀ hε₀2 hsin φ) ⟨F, hPφ⟩)
     {ψ : ℝ} (hψ_lo : φ - ε₀ < ψ) (hψ_hi : ψ < φ + ε₀)
     (hWne : W (K₀.of C F) ≠ 0)
     (hψ_eq : wPhaseOf (W (K₀.of C F)) ((ψ - ε₀ + (ψ + ε₀)) / 2) = ψ) :
@@ -4938,6 +5062,183 @@ private theorem P_phi_wSemistable_is_deformedPred
      -- 5. Triangle test: for K → F → Q → K[1] with K, Q ∈ P((ψ-ε₀, ψ+ε₀)),
      --    K nonzero, show wPhaseOf(W(K), ψ) ≤ ψ
      fun {K Q f₁ f₂ f₃} hT hKI hQI hKne => by
+       let a : ℝ := ψ - ε₀
+       let b : ℝ := ψ + ε₀
+       have habI : a < b := by
+         dsimp [a, b]
+         linarith
+       have hwidth : b - a ≤ 1 := by
+         dsimp [a, b]
+         linarith
+       letI : Fact (a < b) := ⟨habI⟩
+       letI : Fact (b - a ≤ 1) := ⟨hwidth⟩
+       let KI : σ.slicing.IntervalCat C a b := ⟨K, by
+         simpa [a, b] using hKI⟩
+       let FI : σ.slicing.IntervalCat C a b := ⟨F, by
+         simpa [a, b] using
+           (σ.slicing.intervalProp_of_semistable C hPφ (by linarith) (by linarith))⟩
+       let QI : σ.slicing.IntervalCat C a b := ⟨Q, by
+         simpa [a, b] using hQI⟩
+       let iK : KI ⟶ FI := ObjectProperty.homMk f₁
+       let gQ : FI ⟶ QI := ObjectProperty.homMk f₂
+       let S : ShortComplex (σ.slicing.IntervalCat C a b) :=
+         ShortComplex.mk iK gQ (by
+           ext
+           simpa [iK, gQ] using comp_distTriang_mor_zero₁₂ _ hT)
+       have hT' : Triangle.mk S.f.hom S.g.hom f₃ ∈ distTriang C := by
+         simpa [S, iK, gQ] using hT
+       have hS : StrictShortExact S :=
+         Slicing.IntervalCat.strictShortExact_of_distTriang
+           (C := C) (s := σ.slicing) (a := a) (b := b) hT'
+       have hF_phase_phi : wPhaseOf (W (K₀.of C F)) φ = ψ := by
+         rw [wPhaseOf_eq_at_phi_of_mem_P_phi C σ W hW hε₀ hε₀2 hsin hPφ hFne hψ_lo hψ_hi]
+         simpa [show ((ψ - ε₀ + (ψ + ε₀)) / 2 : ℝ) = ψ by ring] using hψ_eq
+       set ss := σ.slicing.phaseShift C (φ - 1)
+       let t := ss.toTStructure
+       letI := t.hasHeartFullSubcategory
+       letI : Abelian t.heart.FullSubcategory := t.heartFullSubcategoryAbelian
+       have hK_phi_le : σ.slicing.phiPlus C K hKne ≤ φ :=
+         σ.slicing.phiPlus_le_of_semistable_triangle C hT hPφ hFne hKne
+           (by linarith) hKI hQI
+       have hK_gt_t : σ.slicing.gtProp C (φ - 1) K := by
+         by_cases hKZ : IsZero K
+         · exact Or.inl hKZ
+         · obtain ⟨FK, hFK⟩ := hKI.resolve_left hKZ
+           have hKn : 0 < FK.n := FK.n_pos C hKZ
+           exact σ.slicing.gtProp_of_hn C FK (φ - 1) (fun j ↦ by
+             have hj := (hFK j).1
+             linarith) hKn
+       have hK_le_t : σ.slicing.leProp C φ K := by
+         by_cases hKZ : IsZero K
+         · exact Or.inl hKZ
+         · exact leProp_of_phiPlus_le (C := C) (s := σ.slicing) hKZ hK_phi_le
+       have cast_le : (-↑(0 : ℤ) : ℝ) = 0 := by simp
+       have cast_ge : (1 - ↑(0 : ℤ) : ℝ) = 1 := by simp
+       have hF_gt_t : σ.slicing.gtProp C (φ - 1) F := by
+         exact σ.slicing.gtProp_of_semistable C φ (φ - 1) F hPφ (by linarith)
+       have hF_le_t : σ.slicing.leProp C φ F := by
+         exact σ.slicing.leProp_of_semistable C φ φ F hPφ le_rfl
+       haveI hK_t_le : t.IsLE K 0 := ⟨by
+         change ss.gtProp C (-↑(0 : ℤ)) K
+         rw [cast_le]
+         simpa [ss] using (σ.slicing.phaseShift_gtProp_zero C (φ - 1) K).mpr hK_gt_t⟩
+       haveI hK_t_ge : t.IsGE K 0 := by
+         refine ⟨?_⟩
+         change ss.leProp C (1 - ↑(0 : ℤ)) K
+         rw [cast_ge]
+         have hK_le_t' : σ.slicing.leProp C (1 + (φ - 1)) K := by
+           simpa [show (1 + (φ - 1) : ℝ) = φ by ring] using hK_le_t
+         simpa [ss] using (σ.slicing.phaseShift_leProp C (φ - 1) 1 K).mpr hK_le_t'
+       haveI hF_t_le : t.IsLE F 0 := ⟨by
+         change ss.gtProp C (-↑(0 : ℤ)) F
+         rw [cast_le]
+         simpa [ss] using (σ.slicing.phaseShift_gtProp_zero C (φ - 1) F).mpr hF_gt_t⟩
+       haveI hF_t_ge : t.IsGE F 0 := by
+         refine ⟨?_⟩
+         change ss.leProp C (1 - ↑(0 : ℤ)) F
+         rw [cast_ge]
+         have hF_le_t' : σ.slicing.leProp C (1 + (φ - 1)) F := by
+           simpa [show (1 + (φ - 1) : ℝ) = φ by ring] using hF_le_t
+         simpa [ss] using (σ.slicing.phaseShift_leProp C (φ - 1) 1 F).mpr hF_le_t'
+       have hK_heart : t.heart K := (t.mem_heart_iff K).mpr ⟨hK_t_le, hK_t_ge⟩
+       have hF_heart : t.heart F := (t.mem_heart_iff F).mpr ⟨hF_t_le, hF_t_ge⟩
+       let KH : t.heart.FullSubcategory := ⟨K, hK_heart⟩
+       let FH : t.heart.FullSubcategory := ⟨F, hF_heart⟩
+       let iH : KH ⟶ FH := ObjectProperty.homMk f₁
+       let ι := t.ιHeart (H := t.heart.FullSubcategory)
+       have hι_simp : ∀ (X : t.heart.FullSubcategory), ι.obj X = X.obj := by
+         intro X
+         rfl
+       have hT_hom : Triangle.mk (ι.map iH) f₂ f₃ ∈ distTriang C := by
+         simpa [iH, ι] using hT
+       have hadm : AbelianSubcategory.admissibleMorphism (t.ιHeart (H := t.heart.FullSubcategory))
+           iH := by
+         rw [TStructure.heart_admissible t]
+         trivial
+       obtain ⟨KkerH, QH, α, β, γ, hT_adm⟩ := hadm f₂ f₃ hT_hom
+       let πQH : FH ⟶ QH := Triangulated.AbelianSubcategory.πQ f₂ β
+       haveI : Epi πQH :=
+         Triangulated.AbelianSubcategory.epi_πQ (TStructure.heart_hι t) hT_hom hT_adm
+       obtain ⟨I_H, i_I, δ_I, hT_I⟩ :=
+         Triangulated.AbelianSubcategory.exists_distinguished_triangle_of_epi
+           (TStructure.heart_hι t) (TStructure.heart_admissible t) πQH
+       have hzero_iπQH : i_I ≫ πQH = 0 := by
+         exact ι.map_injective (by
+           simpa [πQH, ι] using comp_distTriang_mor_zero₁₂ _ hT_I)
+       let hKerI := Triangulated.AbelianSubcategory.isLimitKernelForkOfDistTriang
+         (TStructure.heart_hι t) i_I πQH δ_I hT_I
+       letI : Mono i_I := mono_of_isLimit_fork hKerI
+       have hHeart_gt :
+           ∀ (X : t.heart.FullSubcategory), σ.slicing.gtProp C (φ - 1) X.obj := by
+         intro X
+         have hX_le : t.IsLE X.obj 0 := ((t.mem_heart_iff X.obj).mp X.property).1
+         exact (σ.slicing.phaseShift_gtProp_zero C (φ - 1) X.obj).mp (by
+           have h := hX_le.le
+           change ss.gtProp C (-↑(0 : ℤ)) X.obj at h
+           rwa [cast_le] at h)
+       have hHeart_le :
+           ∀ (X : t.heart.FullSubcategory), σ.slicing.leProp C φ X.obj := by
+         intro X
+         have hX_ge : t.IsGE X.obj 0 := ((t.mem_heart_iff X.obj).mp X.property).2
+         have h : ss.leProp C 1 X.obj := by
+           have h := hX_ge.ge
+           change ss.leProp C (1 - ↑(0 : ℤ)) X.obj at h
+           rwa [cast_ge] at h
+         have h' : σ.slicing.leProp C (1 + (φ - 1)) X.obj := by
+           simpa [ss] using (σ.slicing.phaseShift_leProp C (φ - 1) 1 X.obj).mp h
+         simpa [show (1 + (φ - 1) : ℝ) = φ by ring] using h'
+       have hI_QH_Pφ : σ.slicing.P φ I_H.obj ∧ σ.slicing.P φ QH.obj := by
+         by_cases hIZ : IsZero I_H.obj
+         · have hI_Pφ : σ.slicing.P φ I_H.obj := σ.slicing.zero_mem' C φ _ hIZ
+           by_cases hQHZ : IsZero QH.obj
+           · exact ⟨hI_Pφ, σ.slicing.zero_mem' C φ _ hQHZ⟩
+           · have hI_zero : IsZero (ι.obj I_H) := by simpa [hι_simp] using hIZ
+             haveI : IsIso (ι.map πQH) :=
+               (Triangle.isZero₁_iff_isIso₂ (Triangle.mk (ι.map i_I) (ι.map πQH) δ_I) hT_I).mp
+                 hI_zero
+             exact ⟨hI_Pφ,
+               (σ.slicing.P φ).prop_of_iso
+                 ((eqToIso (hι_simp FH)).symm ≪≫ asIso (ι.map πQH) ≪≫ eqToIso (hι_simp QH)) hPφ⟩
+         · by_cases hQHZ : IsZero QH.obj
+           · have hQH_Pφ : σ.slicing.P φ QH.obj := σ.slicing.zero_mem' C φ _ hQHZ
+             have hQH_zero : IsZero (ι.obj QH) := by simpa [hι_simp] using hQHZ
+             haveI : IsIso (ι.map i_I) :=
+               (Triangle.isZero₃_iff_isIso₁ (Triangle.mk (ι.map i_I) (ι.map πQH) δ_I) hT_I).mp
+                 hQH_zero
+             exact ⟨(σ.slicing.P φ).prop_of_iso
+                 (((eqToIso (hι_simp I_H)).symm ≪≫ asIso (ι.map i_I) ≪≫ eqToIso (hι_simp FH)).symm)
+                   hPφ,
+               hQH_Pφ⟩
+           · have hI_le_heart : σ.slicing.phiPlus C I_H.obj hIZ ≤ φ :=
+               σ.slicing.phiPlus_le_of_leProp C hIZ (hHeart_le I_H)
+             have hI_gt_heart : φ - 1 < σ.slicing.phiMinus C I_H.obj hIZ :=
+               σ.slicing.phiMinus_gt_of_gtProp C hIZ (hHeart_gt I_H)
+             have hQH_le_heart : σ.slicing.phiPlus C QH.obj hQHZ ≤ φ :=
+               σ.slicing.phiPlus_le_of_leProp C hQHZ (hHeart_le QH)
+             have hQH_gt_heart : φ - 1 < σ.slicing.phiMinus C QH.obj hQHZ :=
+               σ.slicing.phiMinus_gt_of_gtProp C hQHZ (hHeart_gt QH)
+             have hT_I' : Triangle.mk i_I.hom πQH.hom δ_I ∈ distTriang C := by
+               simpa [ι] using hT_I
+             exact P_phi_of_heart_triangle C σ hT_I' hPφ hFne hIZ hI_le_heart hI_gt_heart
+               hQHZ hQH_le_heart hQH_gt_heart
+       have hI_Pφ : σ.slicing.P φ I_H.obj := hI_QH_Pφ.1
+       have hQH_Pφ : σ.slicing.P φ QH.obj := hI_QH_Pφ.2
+       have hKker1_gt : σ.slicing.gtProp C a (KkerH.obj⟦(1 : ℤ)⟧) := by
+         have hφ_gt : σ.slicing.gtProp C φ (KkerH.obj⟦(1 : ℤ)⟧) := by
+           simpa using σ.slicing.gtProp_shift C (φ - 1) KkerH.obj (1 : ℤ) (hHeart_gt KkerH)
+         have ha_le_φ : a ≤ φ := by
+           dsimp [a]
+           linarith
+         exact ((σ.slicing.gtProp_anti (C := C) (t₁ := a) (t₂ := φ) ha_le_φ)
+           (KkerH.obj⟦(1 : ℤ)⟧)) hφ_gt
+       have hQH_le : σ.slicing.leProp C (a + 1) QH.obj := by
+         dsimp [a]
+         exact σ.slicing.leProp_of_semistable C φ (a + 1) QH.obj hQH_Pφ (by linarith)
+       have hT_adm' : Triangle.mk α β γ ∈ distTriang C := hT_adm
+       have hKker1I : σ.slicing.intervalProp C a b (KkerH.obj⟦(1 : ℤ)⟧) :=
+         σ.slicing.first_intervalProp_of_triangle C habI hQI hQH_le hKker1_gt (by
+           simpa [hι_simp] using hT_adm')
+       clear hS hF_phase_phi
        sorry⟩⟩
 
 variable [IsTriangulated C] in

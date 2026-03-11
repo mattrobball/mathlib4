@@ -40,11 +40,11 @@ These are the real blockers for completing the deformation theorem.
 
 | # | Name | Line | Description | Depends on |
 |---|------|------|-------------|------------|
-| 1 | `hom_eq_zero_of_deformedPred` | 2669 | Lemma 7.6: small-gap hom-vanishing | Phase 2 (two-heart factoring) |
-| 2 | `deformedSlicing.hn_exists` | 2908 | Lemma 7.7: HN in deformed slicing | Phase 3 + sorrys #1, #3, #4 |
-| 3 | `P_phi_wSemistable_is_deformedPred` | 3168 | Triangle test for deformedPred | Phase 2 (quasi-abelian strict subobjects) |
-| 4 | `abelianHN_to_intervalProp` | 3186 | Abelian HN → interval containment | Sorry #3 + admissibility |
-| 5 | Q(ψ)-subobject finiteness | 3283 | In `bridgeland_7_1` | Sorrys #1-2 resolved first |
+| 1 | `hom_eq_zero_of_deformedPred` | 4384 | Lemma 7.6: small-gap hom-vanishing | Phase 2 (two-heart factoring) |
+| 2 | `deformedSlicing.hn_exists` | 4668 | Lemma 7.7: HN in deformed slicing | Phase 3 + sorrys #1, #3, #4 |
+| 3 | `P_phi_wSemistable_is_deformedPred` | 5034 | Triangle test for deformedPred | Phase 2 (quasi-abelian strict subobjects) |
+| 4 | `abelianHN_to_intervalProp` | 5250 | Abelian HN → interval containment | Sorry #3 + admissibility |
+| 5 | Q(ψ)-subobject finiteness | 5352 | In `bridgeland_7_1` | Sorrys #1-2 resolved first |
 
 **Dependency chain:** #3 → #4 → #1 → #2; #5 independent but depends on #1-2.
 
@@ -101,9 +101,32 @@ These are the real blockers for completing the deformation theorem.
   rather than via a separate extracted `exists_mdq_quasiAbelian` / `hasHN_quasiAbelian`
   API
 
-### Phase 4: Fill sorrys — not started
+### Phase 4: Fill sorrys — in progress
 
 Depends on Phases 1-3.
+
+Current blocker order:
+
+- [ ] #3 `P_phi_wSemistable_is_deformedPred`
+- [ ] #4 `abelianHN_to_intervalProp`
+- [ ] #1 `hom_eq_zero_of_deformedPred`
+- [ ] #2 `deformedSlicing.hn_exists`
+- [ ] #5 Q(ψ)-subobject finiteness (deferred until #1-2 land)
+
+Current Phase 4 atomization:
+
+1. Done: `P_phi_wSemistable_is_deformedPred` now takes the intended abelian
+   `W`-semistability in `P(φ)` from `stabilityFunctionOnP`.
+2. In progress: the Phase 2 strict-mono / strict-epi interval machinery now yields a
+   compiled common-heart decomposition for blocker `#3`:
+   - heart quotient `F_H ↠ Q_H`,
+   - image triangle `I_H → F → Q_H`,
+   - proof that `I_H, Q_H ∈ P(φ)`,
+   - thin-interval containment for the shifted residual kernel piece.
+3. Feed that result into `abelianHN_to_intervalProp`, using `stabilityFunctionOnP_hasHN`
+   and admissibility of `P(φ)` to assemble the Postnikov tower.
+4. Return to the small-gap branch of `hom_eq_zero_of_deformedPred`, then finish
+   `deformedSlicing.hn_exists`.
 
 ---
 
