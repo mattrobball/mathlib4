@@ -1921,6 +1921,48 @@ private lemma intervalSubobject_arrow_strictMono_of_strictMono
   rw [← harr]
   exact hcomp
 
+private theorem interval_strictShortExact_cokernel_of_strictMono
+    {s : Slicing C} [IsTriangulated C] {a b : ℝ}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X Y : s.IntervalCat C a b} (f : Y ⟶ X) (hf : IsStrictMono f) :
+    StrictShortExact (ShortComplex.mk f (cokernel.π f) (cokernel.condition f)) := by
+  let S : ShortComplex (s.IntervalCat C a b) :=
+    ShortComplex.mk f (cokernel.π f) (cokernel.condition f)
+  let t := (s.phaseShift C a).toTStructure
+  letI := t.hasHeartFullSubcategory
+  letI : Abelian t.heart.FullSubcategory := t.heartFullSubcategoryAbelian
+  let FL := Slicing.IntervalCat.toLeftHeart (C := C) (s := s) a b
+    (Fact.out : b - a ≤ 1)
+  have hKerBase : IsLimit (KernelFork.ofι S.f S.zero) := by
+    simpa [S, KernelFork.ofι] using hf.isLimitKernelFork
+  have hEpi : Epi ((S.map FL).g) := by
+    simpa [S, FL] using
+      Slicing.IntervalCat.epi_toLeftHeart_of_strictEpi
+        (C := C) (s := s) (a := a) (b := b) (cokernel.π f) (isStrictEpi_cokernel f)
+  have hKer :
+      IsLimit (KernelFork.ofι ((S.map FL).f) (S.map FL).zero) :=
+    isLimitForkMapOfIsLimit' FL S.zero hKerBase
+  letI : (S.map FL).HasHomology :=
+    ShortComplex.HasHomology.mk' (ShortComplex.HomologyData.ofAbelian (S := S.map FL))
+  have hExact : (S.map FL).Exact :=
+    ShortComplex.exact_of_f_is_kernel (S := S.map FL) hKer
+  have hL : (S.map FL).ShortExact :=
+    ShortComplex.ShortExact.mk' hExact (Fork.IsLimit.mono hKer) hEpi
+  obtain ⟨δ, hT⟩ := Slicing.IntervalCat.exists_distTriang_of_shortExact_toLeftHeart
+    (C := C) (s := s) (a := a) (b := b) hL
+  exact Slicing.IntervalCat.strictShortExact_of_distTriang
+    (C := C) (s := s) (a := a) (b := b) hT
+
+private theorem interval_K0_of_strictMono
+    {s : Slicing C} [IsTriangulated C] {a b : ℝ}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X Y : s.IntervalCat C a b} (f : Y ⟶ X) (hf : IsStrictMono f) :
+    K₀.of C X.obj = K₀.of C Y.obj + K₀.of C (cokernel f).obj := by
+  simpa using
+    Slicing.IntervalCat.K0_of_strictShortExact (C := C) (s := s) (a := a) (b := b)
+      (interval_strictShortExact_cokernel_of_strictMono
+        (C := C) (s := s) (a := a) (b := b) f hf)
+
 private lemma interval_card_subobject_lt_of_ne_top
     {s : Slicing C} {a b : ℝ} {X : s.IntervalCat C a b} {M : Subobject X}
     (hM : M ≠ ⊤) [Finite (Subobject X)] :
@@ -2056,6 +2098,51 @@ private theorem SkewedStabilityFunction.exists_minPhase_maximal_strictKernel
       exact hM₀min B hBT
     exact lt_of_le_of_ne hle (fun hEq ↦
       absurd (hM_max ⟨hBT, hEq.symm.trans hM_phase⟩ hMB.le) (not_le_of_gt hMB))
+
+variable [IsTriangulated C] in
+/-- Among the proper strict kernels of a non-semistable interval object, there is one whose
+strict quotient has minimal `W`-phase, and among the kernels achieving that minimal quotient
+phase we may choose one that is minimal for inclusion. This is the mdq-oriented selection
+step needed to force strict phase drop in the kernel recursion. -/
+private theorem SkewedStabilityFunction.exists_minPhase_minimal_strictKernel
+    (σ : StabilityCondition C) {a b : ℝ}
+    {ssf : SkewedStabilityFunction C σ.slicing a b}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X : σ.slicing.IntervalCat C a b} (hX : ¬IsZero X)
+    (hW_interval : ∀ {F : C}, σ.slicing.intervalProp C a b F → ¬IsZero F →
+      ssf.W (K₀.of C F) ≠ 0)
+    (hns : ¬ ssf.Semistable C X.obj
+      (wPhaseOf (ssf.W (K₀.of C X.obj)) ssf.α))
+    [Finite (Subobject X)] :
+    ∃ M : Subobject X, M ≠ ⊤ ∧ IsStrictMono M.arrow ∧
+      (∀ B : Subobject X, B ≠ ⊤ → IsStrictMono B.arrow →
+        wPhaseOf (ssf.W (K₀.of C (cokernel M.arrow).obj)) ssf.α ≤
+          wPhaseOf (ssf.W (K₀.of C (cokernel B.arrow).obj)) ssf.α) ∧
+      (∀ B : Subobject X, B ≠ ⊤ → IsStrictMono B.arrow → B < M →
+        wPhaseOf (ssf.W (K₀.of C (cokernel M.arrow).obj)) ssf.α <
+          wPhaseOf (ssf.W (K₀.of C (cokernel B.arrow).obj)) ssf.α) := by
+  let phaseQ : Subobject X → ℝ := fun B ↦
+    wPhaseOf (ssf.W (K₀.of C (cokernel B.arrow).obj)) ssf.α
+  obtain ⟨M₀, hM₀_top, hM₀_strict, hM₀_min, _⟩ :=
+    ssf.exists_minPhase_maximal_strictKernel
+      (C := C) (σ := σ) (a := a) (b := b) hX hW_interval hns
+  let T : Set (Subobject X) := {B | B ≠ ⊤ ∧ IsStrictMono B.arrow}
+  let S : Set (Subobject X) := {B | B ∈ T ∧ phaseQ B = phaseQ M₀}
+  have hS_ne : S.Nonempty := ⟨M₀, ⟨hM₀_top, hM₀_strict⟩, rfl⟩
+  have hS_fin : S.Finite := Set.toFinite _
+  obtain ⟨M, ⟨hMT, hM_phase⟩, hM_min⟩ := hS_fin.exists_minimal hS_ne
+  refine ⟨M, hMT.1, hMT.2, ?_, ?_⟩
+  · intro B hB hB_strict
+    change phaseQ M ≤ phaseQ B
+    rw [hM_phase]
+    exact hM₀_min B hB hB_strict
+  · intro B hB hB_strict hBM
+    have hBT : B ∈ T := ⟨hB, hB_strict⟩
+    have hle : phaseQ M ≤ phaseQ B := by
+      rw [hM_phase]
+      exact hM₀_min B hB hB_strict
+    exact lt_of_le_of_ne hle (fun hEq ↦
+      absurd (hM_min ⟨hBT, hEq.symm.trans hM_phase⟩ hBM.le) (not_le_of_gt hBM))
 
 variable [IsTriangulated C] in
 /-- Among the nonzero strict subobjects of a thin-interval object, there is one with maximal
@@ -2456,6 +2543,64 @@ private lemma interval_pullback_ofLE_comm
     _ = pbA.arrow ≫ q := by rw [Subobject.ofLE_arrow]
     _ = Subobject.pullbackπ q A' ≫ A'.arrow := (Subobject.isPullback q A').w.symm
 
+private lemma SkewedStabilityFunction.Wobj_pullback_eq_add
+    {s : Slicing C} [IsTriangulated C] {a b : ℝ}
+    {ssf : SkewedStabilityFunction C s a b}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X : s.IntervalCat C a b} (M : Subobject X) (hM : IsStrictMono M.arrow)
+    (B : Subobject (cokernel M.arrow)) :
+    ssf.W (K₀.of C (((Subobject.pullback (cokernel.π M.arrow)).obj B : Subobject X) :
+      s.IntervalCat C a b).obj) =
+      ssf.W (K₀.of C (M : s.IntervalCat C a b).obj) +
+        ssf.W (K₀.of C (B : s.IntervalCat C a b).obj) := by
+  let S : ShortComplex (s.IntervalCat C a b) :=
+    ShortComplex.mk
+      (Subobject.ofLE M _ (interval_le_pullback_cokernel
+        (C := C) (s := s) (a := a) (b := b) M B))
+      (Subobject.pullbackπ (cokernel.π M.arrow) B)
+      (interval_ofLE_pullbackπ_eq_zero (C := C) (s := s) (a := a) (b := b) M B)
+  have hS :
+      StrictShortExact S :=
+    interval_strictShortExact_ofLE_pullbackπ_cokernel
+      (C := C) (s := s) (a := a) (b := b) M hM B
+  simpa [S] using ssf.strict_additive (C := C) (s := s) (a := a) (b := b) hS
+
+private lemma interval_lt_pullback_cokernel_of_ne_bot
+    {s : Slicing C} [IsTriangulated C] {a b : ℝ}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X : s.IntervalCat C a b} {M : Subobject X} (hM : IsStrictMono M.arrow)
+    {B : Subobject (cokernel M.arrow)} (hB : B ≠ ⊥) :
+    M < (Subobject.pullback (cokernel.π M.arrow)).obj B := by
+  let q := cokernel.π M.arrow
+  let pbB := (Subobject.pullback q).obj B
+  have hle : M ≤ pbB :=
+    interval_le_pullback_cokernel (C := C) (s := s) (a := a) (b := b) M B
+  have hne : M ≠ pbB := by
+    intro hEq
+    let heqObj : Subobject.underlying.obj M = Subobject.underlying.obj pbB :=
+      congrArg Subobject.underlying.obj hEq
+    have hi : Subobject.ofLE M pbB hle = eqToHom heqObj := by
+      apply (cancel_mono pbB.arrow).1
+      calc
+        Subobject.ofLE M pbB hle ≫ pbB.arrow = M.arrow := Subobject.ofLE_arrow hle
+        _ = eqToHom heqObj ≫ pbB.arrow := (Subobject.arrow_congr M pbB hEq).symm
+    have hzero :
+        Subobject.pullbackπ q B = 0 := by
+      have hcomp := interval_ofLE_pullbackπ_eq_zero
+        (C := C) (s := s) (a := a) (b := b) M B
+      rw [hi] at hcomp
+      letI : Epi (eqToHom heqObj) := by infer_instance
+      exact (cancel_epi (eqToHom heqObj)).1 (by simpa using hcomp)
+    have hπ : IsStrictEpi (Subobject.pullbackπ q B) :=
+      interval_pullbackπ_strictEpi_of_strictEpi
+        (C := C) (s := s) (a := a) (b := b) q (isStrictEpi_cokernel M.arrow) B
+    haveI : Epi (Subobject.pullbackπ q B) := hπ.epi
+    have hBZ : IsZero (B : s.IntervalCat C a b) :=
+      (IsZero.iff_id_eq_zero _).mpr <|
+        (cancel_epi (Subobject.pullbackπ q B)).1 (by simpa [hzero])
+    exact hB ((intervalSubobject_isZero_iff_eq_bot
+      (C := C) (s := s) (a := a) (b := b) (X := cokernel M.arrow) B).mp hBZ)
+  exact lt_of_le_of_ne hle hne
 /-! ### Extension-closure of `intervalProp` over Postnikov towers -/
 
 /-- Extension-closure of `intervalProp` over Postnikov towers: if all factors of a
