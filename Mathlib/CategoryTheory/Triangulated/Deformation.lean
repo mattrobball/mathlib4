@@ -1875,6 +1875,67 @@ theorem phase_confinement_from_stabSeminorm
   exact phase_confinement_of_wSemistable C σ hSS hε₀ hthin
     (hperturb_of_stabSeminorm C σ W hW hthin1 hε₀ hε₀2 hsin)
 
+private theorem wPhaseOf_eq_of_semistable_of_target_envelope
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {E : C} {a₁ b₁ : ℝ} (hab₁ : a₁ < b₁)
+    {ψ : ℝ}
+    (hSS : (σ.skewedStabilityFunction_of_near C W hW hab₁).Semistable C E ψ)
+    {a₂ b₂ ε₀ : ℝ} (hε₀ : 0 < ε₀) (henv₂_lo : a₂ + ε₀ ≤ ψ) (henv₂_hi : ψ ≤ b₂ - ε₀)
+    (hthin₂ : b₂ - a₂ + 2 * ε₀ < 1) :
+    wPhaseOf (W (K₀.of C E)) ((a₂ + b₂) / 2) = ψ := by
+  have hbranch :
+      wPhaseOf (W (K₀.of C E)) ((a₁ + b₁) / 2) ∈
+        Set.Ioc (((a₂ + b₂) / 2) - 1) (((a₂ + b₂) / 2) + 1) := by
+    have hpsi_branch : ψ ∈ Set.Ioc (((a₂ + b₂) / 2) - 1) (((a₂ + b₂) / 2) + 1) := by
+      constructor
+      · have hlo : ((a₂ + b₂) / 2) - 1 < a₂ + ε₀ := by
+          by_contra h
+          push_neg at h
+          have hwidth : b₂ - a₂ < 1 - 2 * ε₀ := by
+            linarith
+          nlinarith
+        exact lt_of_lt_of_le hlo henv₂_lo
+      · have hhi : b₂ - ε₀ ≤ ((a₂ + b₂) / 2) + 1 := by
+          by_contra h
+          push_neg at h
+          have hwidth : b₂ - a₂ < 1 - 2 * ε₀ := by
+            linarith
+          nlinarith
+        exact le_trans henv₂_hi hhi
+    have hwphase_eq :
+        wPhaseOf (W (K₀.of C E)) ((a₁ + b₁) / 2) = ψ := by
+      simpa [StabilityCondition.skewedStabilityFunction_of_near] using hSS.2.2.2.1
+    simpa [hwphase_eq] using hpsi_branch
+  have hEq :
+      wPhaseOf (W (K₀.of C E)) ((a₁ + b₁) / 2) =
+        wPhaseOf (W (K₀.of C E)) ((a₂ + b₂) / 2) :=
+    wPhaseOf_indep hSS.2.2.1 _ _ hbranch
+  calc
+    wPhaseOf (W (K₀.of C E)) ((a₂ + b₂) / 2)
+        = wPhaseOf (W (K₀.of C E)) ((a₁ + b₁) / 2) := hEq.symm
+    _ = ψ := by
+      simpa [StabilityCondition.skewedStabilityFunction_of_near] using hSS.2.2.2.1
+
+private theorem semistable_of_target_envelope_triangleTest
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {E : C} {a₁ b₁ : ℝ} (hab₁ : a₁ < b₁)
+    {ψ : ℝ}
+    (hSS : (σ.skewedStabilityFunction_of_near C W hW hab₁).Semistable C E ψ)
+    {a₂ b₂ : ℝ} (hab₂ : a₂ < b₂) (hI₂ : σ.slicing.intervalProp C a₂ b₂ E)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (henv₂_lo : a₂ + ε₀ ≤ ψ) (henv₂_hi : ψ ≤ b₂ - ε₀)
+    (hthin₂ : b₂ - a₂ + 2 * ε₀ < 1)
+    (htri : ∀ ⦃K Q : C⦄ ⦃f₁ : K ⟶ E⦄ ⦃f₂ : E ⟶ Q⦄ ⦃f₃ : Q ⟶ K⟦(1 : ℤ)⟧⦄,
+      Triangle.mk f₁ f₂ f₃ ∈ distTriang C →
+      σ.slicing.intervalProp C a₂ b₂ K → σ.slicing.intervalProp C a₂ b₂ Q →
+      ¬IsZero K →
+      wPhaseOf (W (K₀.of C K)) ((a₂ + b₂) / 2) ≤ ψ) :
+    (σ.skewedStabilityFunction_of_near C W hW hab₂).Semistable C E ψ := by
+  refine ⟨hI₂, hSS.2.1, hSS.2.2.1, ?_, htri⟩
+  exact wPhaseOf_eq_of_semistable_of_target_envelope
+    (C := C) (σ := σ) (W := W) (hW := hW) hab₁ hSS hε₀ henv₂_lo henv₂_hi hthin₂
+
 /-! ### Thin-interval Phase 3 selection infrastructure -/
 
 private lemma intervalSubobject_isZero_iff_eq_bot

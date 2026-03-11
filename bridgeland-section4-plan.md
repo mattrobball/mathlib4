@@ -178,8 +178,11 @@ Optional cleanup left for later, not on the blocker path:
    - Done: `P_phi_wSemistable_is_deformedPred` now carries the actual abelian
      `stabilityFunctionOnP` semistability hypothesis in `P(φ)`.
 2. **#3 triangle test via strict interval subobjects**
-   - Work in the thin interval `(ψ - ε₀, ψ + ε₀)`.
-   - Use Phase 2: distinguished triangle `↔` strict SES in `P((a,b))`.
+   - Work in the blueprint's Node 7.5 inclusion shape, not a terminal `K₀` sign chase:
+     prove interval-independence of `W`-semistability for thin enveloping categories
+     and then use that to finish the deformed-predicate triangle test.
+   - Immediate target theorem: `Semistable_interval_indep_enveloped` for
+     `(a₁, b₁) ⊂ (a₂, b₂)` with `aᵢ + ε₀ ≤ ψ ≤ bᵢ - ε₀`.
    - Done: the common-heart factorization is now compiled through the heart quotient
      `F_H ↠ Q_H`, the image triangle `I_H → F → Q_H`, and the proof that
      `I_H, Q_H ∈ P(φ)`.
@@ -195,9 +198,9 @@ Optional cleanup left for later, not on the blocker path:
    - Done: the same octahedral package now gives the actual common-heart epi
      `K →> I_H`, the unshifted identity `W(K) = W(K_err) + W(I_H)`, a proof that
      `I_H` is nonzero, and the direct thin-interval `W`-phase window for `K`.
-   - Remaining: close the last contradiction by combining the shifted and unshifted
-     `K₀` identities with the residual-term phase bounds; this is now the only live
-     mathematical gap in blocker `#3`.
+   - Replaced plan: use the compiled common-heart / pullback / quotient infrastructure as
+     support lemmas for the interval-independence proof. The previous "last contradiction"
+     route is not strong enough on its own.
 3. **#4 abelian HN bridge**
    - Done: `abelianHN_to_intervalProp` is now closed.
    - The proof uses `stabilityFunctionOnP_hasHN`, the single-factor bridges

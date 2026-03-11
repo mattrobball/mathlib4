@@ -129,7 +129,11 @@ Current Phase 4 atomization:
      `K → I_H`,
    - the induced common-heart epimorphism `K →> I_H`,
    - the unshifted identity `W(K) = W(K_err) + W(I_H)`,
-   - a proof that `I_H` is nonzero, and
+   - a proof that `I_H` is nonzero.
+3. Next proof step for `#3`: pivot to the blueprint's Node 7.5 inclusion theorem
+   (interval-independence of `W`-semistability for thin enveloping categories). The
+   compiled common-heart / pullback / quotient lemmas are now support API for that proof,
+   not a complete contradiction by themselves.
    - the direct thin-interval `W`-phase window for `K`,
    - compiled phase transport lemmas
      `wPhaseOf_le_of_mono_P_phi_semistable` and
