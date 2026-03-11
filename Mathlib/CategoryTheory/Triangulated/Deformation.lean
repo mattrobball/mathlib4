@@ -5798,6 +5798,82 @@ Given an `AbelianHNFiltration` of `E` in `P(φ)` w.r.t. the W-stability function
 produce an `HNFiltration` of `ι(E)` in `C` for the deformed slicing `Q`.
 Each abelian factor (a cokernel in P(φ)) maps to a Q-semistable factor via
 admissibility + phase confinement. The tower is built by iterating `appendFactor`. -/
+private theorem stabilityFunctionOnP_semistable_deformedPred
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    {φ : ℝ} {a b : ℝ} (ha : a < φ - ε₀) (hb : φ + ε₀ < b)
+    {E : (σ.slicing.P φ).FullSubcategory}
+    (hss : @StabilityFunction.IsSemistable (σ.slicing.P φ).FullSubcategory _
+      (σ.P_phi_abelian C φ) (stabilityFunctionOnP C σ W hW hε₀ hε₀2 hsin φ) E) :
+    ∃ ψ, a < ψ ∧ ψ < b ∧ σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin ψ E.obj := by
+  letI := σ.P_phi_abelian C φ
+  let Zφ := stabilityFunctionOnP C σ W hW hε₀ hε₀2 hsin φ
+  let ψ : ℝ := StabilityFunction.phase Zφ E + (φ - 1 / 2)
+  have hEne : ¬IsZero E := hss.1
+  have hEobj_ne : ¬IsZero E.obj := by
+    intro hZ
+    exact hEne (IsZero.of_full_of_faithful_of_isZero ((σ.slicing.P φ).ι) E hZ)
+  have hphase_eq :
+      StabilityFunction.phase Zφ E =
+        wPhaseOf (W (K₀.of C E.obj)) φ - (φ - 1 / 2) := by
+    rw [stabilityFunctionOnP_phase_eq_wPhaseOf C σ W hW hε₀ hε₀2 hsin φ E]
+    simpa using
+      (wPhaseOf_eq_at_phi_sub_half_of_mem_P_phi C σ W hW hε₀ hε₀2 hsin
+        E.property hEobj_ne).symm
+  have hψ_eq_phi : wPhaseOf (W (K₀.of C E.obj)) φ = ψ := by
+    dsimp [ψ]
+    linarith [hphase_eq]
+  have hψ_lo : φ - ε₀ < ψ := by
+    let hpert := hperturb_of_stabSeminorm C σ W hW (by linarith : (φ + ε₀) - (φ - ε₀) < 1)
+      hε₀ hε₀2 hsin
+    have h := hpert E.obj φ E.property hEobj_ne (by linarith) (by linarith)
+    rw [show ((φ - ε₀ + (φ + ε₀)) / 2 : ℝ) = φ by ring] at h
+    linarith [h.1, hψ_eq_phi]
+  have hψ_hi : ψ < φ + ε₀ := by
+    let hpert := hperturb_of_stabSeminorm C σ W hW (by linarith : (φ + ε₀) - (φ - ε₀) < 1)
+      hε₀ hε₀2 hsin
+    have h := hpert E.obj φ E.property hEobj_ne (by linarith) (by linarith)
+    rw [show ((φ - ε₀ + (φ + ε₀)) / 2 : ℝ) = φ by ring] at h
+    linarith [h.2, hψ_eq_phi]
+  have hWne : W (K₀.of C E.obj) ≠ 0 := by
+    exact σ.W_ne_zero_of_seminorm_lt_one C W hW E.property hEobj_ne
+  have hψ_eq :
+      wPhaseOf (W (K₀.of C E.obj)) ((ψ - ε₀ + (ψ + ε₀)) / 2) = ψ := by
+    rw [show ((ψ - ε₀ + (ψ + ε₀)) / 2 : ℝ) = ψ by ring]
+    exact
+      (wPhaseOf_eq_at_phi_of_mem_P_phi (C := C) (σ := σ) (W := W) (hW := hW)
+        hε₀ hε₀2 hsin (φ := φ) (ψ := ψ) E.property hEobj_ne hψ_lo hψ_hi).symm.trans
+        hψ_eq_phi
+  refine ⟨ψ, lt_trans ha hψ_lo, lt_trans hψ_hi hb, ?_⟩
+  exact P_phi_wSemistable_is_deformedPred (C := C) (σ := σ) (W := W) (hW := hW)
+    hε₀ hε₀2 hsin E.property hEobj_ne hss hψ_lo hψ_hi hWne hψ_eq
+
+variable [IsTriangulated C] in
+private theorem stabilityFunctionOnP_semistable_intervalProp
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    {φ : ℝ} {a b : ℝ} (ha : a < φ - ε₀) (hb : φ + ε₀ < b)
+    {E : (σ.slicing.P φ).FullSubcategory}
+    (hss : @StabilityFunction.IsSemistable (σ.slicing.P φ).FullSubcategory _
+      (σ.P_phi_abelian C φ) (stabilityFunctionOnP C σ W hW hε₀ hε₀2 hsin φ) E) :
+    (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hsin).intervalProp C a b E.obj := by
+  rcases stabilityFunctionOnP_semistable_deformedPred (C := C) (σ := σ) (W := W) (hW := hW)
+    hε₀ hε₀2 hsin ha hb hss with ⟨ψ, hψa, hψb, hQ⟩
+  refine Or.inr ⟨HNFiltration.single C E.obj ψ hQ, ?_⟩
+  intro j
+  fin_cases j
+  simpa [HNFiltration.single] using ⟨hψa, hψb⟩
+
+variable [IsTriangulated C] in
+ /-- **Bridge: abelian HN in P(φ) → triangulated HN in C for Q**.
+Given an `AbelianHNFiltration` of `E` in `P(φ)` w.r.t. the W-stability function,
+produce an `HNFiltration` of `ι(E)` in `C` for the deformed slicing `Q`.
+ Each abelian factor (a cokernel in P(φ)) maps to a Q-semistable factor via
+ admissibility + phase confinement. The tower is built by iterating `appendFactor`. -/
 private theorem abelianHN_to_intervalProp
     (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)

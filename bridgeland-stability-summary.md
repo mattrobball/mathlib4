@@ -136,6 +136,10 @@ Current Phase 4 atomization:
      `wPhaseOf_ge_of_epi_P_phi_semistable`.
 3. Feed that result into `abelianHN_to_intervalProp`, using `stabilityFunctionOnP_hasHN`
    and admissibility of `P(φ)` to assemble the Postnikov tower.
+   Current checkpoint: the single-factor bridges
+   `stabilityFunctionOnP_semistable_deformedPred` and
+   `stabilityFunctionOnP_semistable_intervalProp` are compiled, so the remaining work
+   in blocker `#4` is only the abelian-HN/Postnikov assembly.
 4. Return to the small-gap branch of `hom_eq_zero_of_deformedPred`, then finish
    `deformedSlicing.hn_exists`.
    Current checkpoint: the small-gap branch now compiles through the shared-heart

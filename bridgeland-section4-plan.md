@@ -201,8 +201,13 @@ Optional cleanup left for later, not on the blocker path:
      mathematical gap in blocker `#3`.
 3. **#4 abelian HN bridge**
    - Use `stabilityFunctionOnP_hasHN`.
-   - Send each abelian factor to `deformedPred` via #3.
-   - Build the ambient Postnikov tower via admissibility / `appendFactor`.
+   - Done: the single-factor bridge is now compiled twice:
+     `stabilityFunctionOnP_semistable_deformedPred` and
+     `stabilityFunctionOnP_semistable_intervalProp` convert a `W`-semistable object
+     of `P(φ)` into an explicit `Q(ψ)` witness, respectively a one-factor
+     `Q.intervalProp` witness on any `(a,b)` containing `(φ - ε₀, φ + ε₀)`.
+   - Remaining: build the ambient Postnikov tower from an abelian HN filtration in
+     `P(φ)` via admissibility, then apply extension-closure of `intervalProp`.
 4. **#1 small-gap hom-vanishing**
    - Done: the small-gap branch now has a compiled common-heart entry point:
      helper lemmas transport phase-confinement bounds into a shared heart
