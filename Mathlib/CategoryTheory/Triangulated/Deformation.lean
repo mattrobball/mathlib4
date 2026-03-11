@@ -4966,6 +4966,166 @@ private theorem wPhaseOf_le_of_mono_P_phi_semistable
   rw [hphase_B, hphase_F] at hphase_le
   linarith
 
+private lemma cross_eq_norm_mul_sin' (z₁ z₂ : ℂ) :
+    z₁.re * z₂.im - z₁.im * z₂.re =
+      ‖z₁‖ * ‖z₂‖ * Real.sin (Complex.arg z₂ - Complex.arg z₁) := by
+  rw [← Complex.norm_mul_cos_arg z₁, ← Complex.norm_mul_sin_arg z₁,
+    ← Complex.norm_mul_cos_arg z₂, ← Complex.norm_mul_sin_arg z₂, Real.sin_sub]
+  ring
+
+private lemma cross_pos_of_arg_lt' {z₁ z₂ : ℂ}
+    (harg₁ : 0 < Complex.arg z₁) (hz₁ : z₁ ≠ 0) (hz₂ : z₂ ≠ 0)
+    (h : Complex.arg z₁ < Complex.arg z₂) :
+    0 < z₁.re * z₂.im - z₁.im * z₂.re := by
+  have hnn : 0 < ‖z₁‖ * ‖z₂‖ := mul_pos (norm_pos_iff.mpr hz₁) (norm_pos_iff.mpr hz₂)
+  rw [cross_eq_norm_mul_sin']
+  exact mul_pos hnn (Real.sin_pos_of_pos_of_lt_pi (sub_pos.mpr h)
+    (by linarith [Complex.arg_le_pi z₂]))
+
+private lemma arg_lt_of_cross_pos' {z₁ z₂ : ℂ}
+    (hz₁ : z₁ ≠ 0) (hz₂ : z₂ ≠ 0) (harg₂ : 0 < Complex.arg z₂)
+    (hcross : 0 < z₁.re * z₂.im - z₁.im * z₂.re) :
+    Complex.arg z₁ < Complex.arg z₂ := by
+  have hnn : 0 < ‖z₁‖ * ‖z₂‖ := mul_pos (norm_pos_iff.mpr hz₁) (norm_pos_iff.mpr hz₂)
+  rw [cross_eq_norm_mul_sin'] at hcross
+  have hsin : 0 < Real.sin (Complex.arg z₂ - Complex.arg z₁) := by
+    rcases (mul_pos_iff.mp hcross).elim id
+      (fun ⟨h1, h2⟩ ↦ absurd h1 (not_lt.mpr hnn.le)) with ⟨_, h⟩
+    exact h
+  by_contra h
+  push_neg at h
+  rcases h.eq_or_lt with heq | hlt
+  · rw [heq, sub_self, Real.sin_zero] at hsin
+    exact lt_irrefl _ hsin
+  · have : Real.sin (Complex.arg z₂ - Complex.arg z₁) < 0 :=
+      Real.sin_neg_of_neg_of_neg_pi_lt
+        (sub_neg.mpr hlt) (by linarith [Complex.arg_le_pi z₁])
+    linarith
+
+private lemma arg_add_lt_max' {z₁ z₂ : ℂ}
+    (h₁ : z₁ ∈ upperHalfPlaneUnion) (h₂ : z₂ ∈ upperHalfPlaneUnion)
+    (hne : Complex.arg z₁ ≠ Complex.arg z₂) :
+    Complex.arg (z₁ + z₂) < max (Complex.arg z₁) (Complex.arg z₂) := by
+  have hz₁ := CategoryTheory.upperHalfPlaneUnion_ne_zero h₁
+  have hz₂ := CategoryTheory.upperHalfPlaneUnion_ne_zero h₂
+  have hs_mem := CategoryTheory.mem_upperHalfPlaneUnion_of_add h₁ h₂
+  have hs_ne := CategoryTheory.upperHalfPlaneUnion_ne_zero hs_mem
+  have harg₁ := CategoryTheory.arg_pos_of_mem_upperHalfPlaneUnion h₁
+  have harg₂ := CategoryTheory.arg_pos_of_mem_upperHalfPlaneUnion h₂
+  set cp := z₁.re * z₂.im - z₁.im * z₂.re
+  rcases hne.lt_or_gt with h | h
+  · rw [max_eq_right h.le]
+    apply arg_lt_of_cross_pos' hs_ne hz₂ harg₂
+    show 0 < (z₁ + z₂).re * z₂.im - (z₁ + z₂).im * z₂.re
+    have : (z₁ + z₂).re * z₂.im - (z₁ + z₂).im * z₂.re = cp := by
+      simp only [Complex.add_re, Complex.add_im, cp]
+      ring
+    rw [this]
+    exact cross_pos_of_arg_lt' harg₁ hz₁ hz₂ h
+  · rw [max_eq_left h.le]
+    apply arg_lt_of_cross_pos' hs_ne hz₁ harg₁
+    show 0 < (z₁ + z₂).re * z₁.im - (z₁ + z₂).im * z₁.re
+    have : (z₁ + z₂).re * z₁.im - (z₁ + z₂).im * z₁.re = -cp := by
+      simp only [Complex.add_re, Complex.add_im, cp]
+      ring
+    rw [this]
+    have : 0 < z₂.re * z₁.im - z₂.im * z₁.re :=
+      cross_pos_of_arg_lt' harg₂ hz₂ hz₁ h
+    linarith
+
+variable [IsTriangulated C] in
+private theorem wPhaseOf_ge_of_epi_P_phi_semistable
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    {φ ψ : ℝ} {F : (σ.slicing.P φ).FullSubcategory}
+    (hFne : ¬IsZero F)
+    (hss : @StabilityFunction.IsSemistable (σ.slicing.P φ).FullSubcategory _
+      (σ.P_phi_abelian C φ) (stabilityFunctionOnP C σ W hW hε₀ hε₀2 hsin φ) F)
+    (hψ : wPhaseOf (W (K₀.of C ((σ.slicing.P φ).ι.obj F))) φ = ψ)
+    {Q : (σ.slicing.P φ).FullSubcategory} (p : F ⟶ Q) [Epi p]
+    (hQne : ¬IsZero Q) :
+    ψ ≤ wPhaseOf (W (K₀.of C ((σ.slicing.P φ).ι.obj Q))) φ := by
+  letI := σ.P_phi_abelian C φ
+  let Zφ := stabilityFunctionOnP C σ W hW hε₀ hε₀2 hsin φ
+  have hphase_ge : StabilityFunction.phase Zφ F ≤ StabilityFunction.phase Zφ Q := by
+    by_cases hker : IsZero (kernel p)
+    · haveI : Mono p := Preadditive.mono_of_kernel_zero
+        (zero_of_source_iso_zero _ hker.isoZero)
+      have hadd : Zφ.Zobj F = Zφ.Zobj (kernel p) + Zφ.Zobj Q :=
+        Zφ.additive _
+          (ShortComplex.ShortExact.mk' (ShortComplex.exact_kernel p) inferInstance inferInstance)
+      have hZker : Zφ.Zobj (kernel p) = 0 := Zφ.map_zero' _ hker
+      have hphase_eq : StabilityFunction.phase Zφ F = StabilityFunction.phase Zφ Q := by
+        unfold StabilityFunction.phase
+        rw [hadd, hZker, zero_add]
+      exact le_of_eq hphase_eq
+    · have hK_sub : StabilityFunction.phase Zφ (kernel p) ≤ StabilityFunction.phase Zφ F := by
+        calc
+          StabilityFunction.phase Zφ (kernel p)
+              = StabilityFunction.phase Zφ (kernelSubobject p : (σ.slicing.P φ).FullSubcategory) :=
+                StabilityFunction.phase_eq_of_iso Zφ (kernelSubobjectIso p).symm
+          _ ≤ StabilityFunction.phase Zφ F := by
+              exact hss.2 _ (by
+                intro hZ
+                exact hker (hZ.of_iso (kernelSubobjectIso p).symm))
+      by_contra hlt
+      push_neg at hlt
+      have hadd : Zφ.Zobj F = Zφ.Zobj (kernel p) + Zφ.Zobj Q :=
+        Zφ.additive _
+          (ShortComplex.ShortExact.mk' (ShortComplex.exact_kernel p) inferInstance inferInstance)
+      have hK_mem := Zφ.upper (kernel p) hker
+      have hQ_mem := Zφ.upper Q hQne
+      have pi_pos := Real.pi_pos
+      have hargK : Complex.arg (Zφ.Zobj (kernel p)) ≤ Complex.arg (Zφ.Zobj F) := by
+        unfold StabilityFunction.phase at hK_sub
+        exact le_of_mul_le_mul_left (by linarith) (div_pos one_pos pi_pos)
+      have hargQ : Complex.arg (Zφ.Zobj Q) < Complex.arg (Zφ.Zobj F) := by
+        unfold StabilityFunction.phase at hlt
+        exact lt_of_mul_lt_mul_left (by linarith) (div_pos one_pos pi_pos).le
+      rw [hadd] at hargK hargQ
+      have hub := arg_add_le_max hK_mem hQ_mem
+      have hQ_lt_max : Complex.arg (Zφ.Zobj Q) <
+          max (Complex.arg (Zφ.Zobj (kernel p))) (Complex.arg (Zφ.Zobj Q)) :=
+        lt_of_lt_of_le hargQ hub
+      have hK_gt_Q : Complex.arg (Zφ.Zobj Q) < Complex.arg (Zφ.Zobj (kernel p)) := by
+        rcases lt_max_iff.mp hQ_lt_max with h | h
+        · exact h
+        · exact absurd h (lt_irrefl _)
+      have hne : Complex.arg (Zφ.Zobj (kernel p)) ≠ Complex.arg (Zφ.Zobj Q) := ne_of_gt hK_gt_Q
+      have hstrict := arg_add_lt_max' hK_mem hQ_mem hne
+      rw [max_eq_left hK_gt_Q.le] at hstrict
+      linarith
+  have hQobj_ne : ¬IsZero ((σ.slicing.P φ).ι.obj Q) := by
+    intro hZ
+    exact hQne (IsZero.of_full_of_faithful_of_isZero ((σ.slicing.P φ).ι) Q hZ)
+  have hFobj_ne : ¬IsZero ((σ.slicing.P φ).ι.obj F) := by
+    intro hZ
+    exact hFne (IsZero.of_full_of_faithful_of_isZero ((σ.slicing.P φ).ι) F hZ)
+  have hQ_shift :
+      wPhaseOf (W (K₀.of C ((σ.slicing.P φ).ι.obj Q))) (φ - 1 / 2) =
+        wPhaseOf (W (K₀.of C ((σ.slicing.P φ).ι.obj Q))) φ := by
+    simpa using
+      (wPhaseOf_eq_at_phi_sub_half_of_mem_P_phi C σ W hW hε₀ hε₀2 hsin Q.property hQobj_ne).symm
+  have hF_shift :
+      wPhaseOf (W (K₀.of C ((σ.slicing.P φ).ι.obj F))) (φ - 1 / 2) =
+        wPhaseOf (W (K₀.of C ((σ.slicing.P φ).ι.obj F))) φ := by
+    simpa using
+      (wPhaseOf_eq_at_phi_sub_half_of_mem_P_phi C σ W hW hε₀ hε₀2 hsin F.property hFobj_ne).symm
+  have hphase_Q :
+      StabilityFunction.phase Zφ Q =
+        wPhaseOf (W (K₀.of C ((σ.slicing.P φ).ι.obj Q))) φ - (φ - 1 / 2) := by
+    rw [stabilityFunctionOnP_phase_eq_wPhaseOf C σ W hW hε₀ hε₀2 hsin φ Q]
+    rw [hQ_shift]
+  have hphase_F :
+      StabilityFunction.phase Zφ F = ψ - (φ - 1 / 2) := by
+    rw [stabilityFunctionOnP_phase_eq_wPhaseOf C σ W hW hε₀ hε₀2 hsin φ F]
+    rw [hF_shift]
+    simpa using hψ
+  rw [hphase_Q, hphase_F] at hphase_ge
+  linarith
+
 /-! #### Step A2: Finite subobject lattice in P(φ) and HN existence -/
 
 variable [IsTriangulated C] in
@@ -5325,7 +5485,60 @@ private theorem P_phi_wSemistable_is_deformedPred
              wPhaseOf_lt_of_intervalProp C σ hKker1ne W (by
                dsimp [b]
                linarith) hKker1I hW_ne_ab hpert_ab_lt
-       clear hS hF_phase_phi
+       have hP_phi_heart :
+           ∀ (X : (σ.slicing.P φ).FullSubcategory), t.heart X.obj := by
+         intro X
+         have hX_gt : σ.slicing.gtProp C (φ - 1) X.obj :=
+           σ.slicing.gtProp_of_semistable C φ (φ - 1) X.obj X.property (by linarith)
+         have hX_le : σ.slicing.leProp C φ X.obj :=
+           σ.slicing.leProp_of_semistable C φ φ X.obj X.property le_rfl
+         haveI : t.IsLE X.obj 0 := ⟨by
+           change ss.gtProp C (-↑(0 : ℤ)) X.obj
+           rw [cast_le]
+           simpa [ss] using (σ.slicing.phaseShift_gtProp_zero C (φ - 1) X.obj).mpr hX_gt⟩
+         haveI : t.IsGE X.obj 0 := ⟨by
+           change ss.leProp C (1 - ↑(0 : ℤ)) X.obj
+           rw [cast_ge]
+           have hX_le' : σ.slicing.leProp C (1 + (φ - 1)) X.obj := by
+             simpa [show (1 + (φ - 1) : ℝ) = φ by ring] using hX_le
+           simpa [ss] using (σ.slicing.phaseShift_leProp C (φ - 1) 1 X.obj).mpr hX_le'⟩
+         exact (t.mem_heart_iff X.obj).mpr ⟨inferInstance, inferInstance⟩
+       let Iφ : (σ.slicing.P φ).FullSubcategory := ⟨I_H.obj, hI_Pφ⟩
+       let Fφ : (σ.slicing.P φ).FullSubcategory := ⟨F, hPφ⟩
+       let iφ : Iφ ⟶ Fφ := ObjectProperty.homMk i_I.hom
+       haveI : Mono iφ := by
+         refine ⟨?_⟩
+         intro Z g h hgh
+         let ZH : t.heart.FullSubcategory := ⟨Z.obj, hP_phi_heart Z⟩
+         let gH : ZH ⟶ I_H := ObjectProperty.homMk g.hom
+         let hH : ZH ⟶ I_H := ObjectProperty.homMk h.hom
+         have hghH : gH ≫ i_I = hH ≫ i_I := by
+           apply ObjectProperty.hom_ext
+           simpa [ZH, gH, hH, iφ] using congrArg (fun f => f.hom) hgh
+         have : gH = hH := (cancel_mono i_I).1 hghH
+         apply ObjectProperty.hom_ext
+         simpa [ZH, gH, hH] using congrArg (fun f => f.hom) this
+       have hI_phase_le :
+           ∀ (hIne : ¬IsZero I_H.obj),
+             wPhaseOf (W (K₀.of C I_H.obj)) ψ ≤ ψ := by
+         intro hIne
+         have hIneφ : ¬IsZero Iφ := by
+           intro hZ
+           exact hIne (by simpa [Iφ] using ((σ.slicing.P φ).ι).map_isZero hZ)
+         have hFneφ : ¬IsZero Fφ := by
+           intro hZ
+           exact hFne (by simpa [Fφ] using ((σ.slicing.P φ).ι).map_isZero hZ)
+         have hI_phase_leφ :
+             wPhaseOf (W (K₀.of C I_H.obj)) φ ≤ ψ := by
+           simpa [Iφ, Fφ] using
+             (wPhaseOf_le_of_mono_P_phi_semistable C σ W hW hε₀ hε₀2 hsin
+               (φ := φ) (ψ := ψ) (F := Fφ) hFneφ hss hF_phase_phi (B := Iφ) iφ hIneφ)
+         have hI_phase_eq :
+             wPhaseOf (W (K₀.of C I_H.obj)) φ =
+               wPhaseOf (W (K₀.of C I_H.obj)) ψ := by
+           exact wPhaseOf_eq_at_phi_of_mem_P_phi C σ W hW hε₀ hε₀2 hsin
+             hI_Pφ hIne hψ_lo hψ_hi
+         linarith
        sorry⟩⟩
 
 variable [IsTriangulated C] in

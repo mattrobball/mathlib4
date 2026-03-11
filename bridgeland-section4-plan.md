@@ -187,8 +187,12 @@ Optional cleanup left for later, not on the blocker path:
    - Done: the proof now also contains the explicit `K₀`/`W` identity
      `W(K) + W(K_err⟦1⟧) = W(I_H)` and the thin-interval `W`-phase window for the
      shifted residual term `K_err⟦1⟧`.
-   - Remaining: transport the image-term semistability inequality cleanly into this
-     context, then close the final contradiction proving `wPhaseOf(W(K), ψ) ≤ ψ`.
+   - Done: the heart-side phase transport lemmas are now compiled on both sides:
+     `wPhaseOf_le_of_mono_P_phi_semistable` for `I_H ↪ F` and
+     `wPhaseOf_ge_of_epi_P_phi_semistable` for `F ↠ Q_H`.
+   - Remaining: use those inequalities to place the residual kernel term on the
+     correct side of `ψ`, then close the final contradiction proving
+     `wPhaseOf(W(K), ψ) ≤ ψ`.
 3. **#4 abelian HN bridge**
    - Use `stabilityFunctionOnP_hasHN`.
    - Send each abelian factor to `deformedPred` via #3.
@@ -232,9 +236,10 @@ have OPPOSITE SIGNS, so sum = 0 does NOT force both to zero.
    `I_H, Q_H ∈ P(φ)`.
 3. The remaining step is the actual W-phase inequality:
    - get `W(K) = W(I_H) + W(K_err)` from the original triangle plus the heart triangles,
-   - show `wPhaseOf(W(I_H), ψ) ≤ ψ` from abelian semistability,
-   - show the shifted kernel piece `K_err⟦1⟧` stays in the thin interval, hence
-     `wPhaseOf(W(K_err), ψ) < ψ`,
+   - Done: `wPhaseOf(W(I_H), ψ) ≤ ψ` is now transported from abelian semistability.
+   - Done: the quotient-side bound `ψ ≤ wPhaseOf(W(Q_H), ψ)` is also available.
+   - Remaining: combine those with the residual-term window to force the last
+     sign contradiction.
    - conclude `wPhaseOf(W(K), ψ) ≤ ψ` by the imaginary-part / see-saw argument.
 
 ### Sorry #4 (abelianHN_to_intervalProp):
