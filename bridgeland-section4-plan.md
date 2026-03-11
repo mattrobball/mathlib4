@@ -216,6 +216,9 @@ Optional cleanup left for later, not on the blocker path:
    - Done: the dual lower-endpoint transport is now compiled as
      `semistable_of_lower_inclusion`, and the full inclusion-case Node 7.5 transport is
      packaged as `semistable_of_interval_inclusion`.
+   - Done: the converse transport into a thinner target window is now also packaged as
+     `semistable_of_target_subinterval`; this closes the missing midpoint-transport
+     bookkeeping for future reuse in the blocker proofs.
    - Next atom: use the compiled inclusion theorem to replace the remaining ad hoc tails
      in blockers `#3` and `#1`.
    - Replaced plan: use the compiled common-heart / pullback / quotient infrastructure as

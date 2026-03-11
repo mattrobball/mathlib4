@@ -150,6 +150,8 @@ Current Phase 4 atomization:
      `semistable_of_lower_inclusion`.
    - newly compiled full inclusion-case transport:
      `semistable_of_interval_inclusion`.
+   - newly compiled converse target-window transport:
+     `semistable_of_target_subinterval`.
    - next live gap: use that compiled inclusion transport to replace the remaining ad
      hoc tails in `#3` and the small-gap branch of `#1`.
 4. Done: `abelianHN_to_intervalProp` is now closed. The proof uses
