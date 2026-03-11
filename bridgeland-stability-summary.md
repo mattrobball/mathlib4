@@ -138,6 +138,13 @@ Current Phase 4 atomization:
    - compiled phase transport lemmas
      `wPhaseOf_le_of_mono_P_phi_semistable` and
      `wPhaseOf_ge_of_epi_P_phi_semistable`.
+   - newly compiled boundary-strip helpers
+     `wPhaseOf_gt_of_geProp_target`,
+     `intervalProp_of_upper_boundary_triangle`, and
+     `wPhaseOf_gt_of_upper_boundary_triangle`, which isolate the upper-boundary
+     quotient step in the Node 7.5 inclusion argument.
+   - next live gap: package the pullback square into the two strict short exact
+     sequences `0 → K → pb(B₁) → B₁ → 0` and `0 → pb(B₁) → E → B₂ → 0`.
 3. Done: `abelianHN_to_intervalProp` is now closed. The proof uses
    `Fin.induction` on the abelian HN chain in `P(φ)`, the compiled single-factor bridges
    `stabilityFunctionOnP_semistable_deformedPred` /

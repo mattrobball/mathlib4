@@ -198,6 +198,17 @@ Optional cleanup left for later, not on the blocker path:
    - Done: the same octahedral package now gives the actual common-heart epi
      `K →> I_H`, the unshifted identity `W(K) = W(K_err) + W(I_H)`, a proof that
      `I_H` is nonzero, and the direct thin-interval `W`-phase window for `K`.
+   - Done: the first Node 7.5 boundary-strip support lemmas are now compiled in
+     `Deformation.lean`:
+     `wPhaseOf_gt_of_geProp_target`,
+     `intervalProp_of_upper_boundary_triangle`, and
+     `wPhaseOf_gt_of_upper_boundary_triangle`.
+     These isolate the paper's "`B₁` lies on the upper boundary strip, hence
+     `phase(B₁) > ψ`" step in the inclusion-case proof.
+   - Next atom: package the pullback square for a strict subobject
+     `K ↪ E ↠ Q` and a boundary-strip strict subobject `B₁ ↪ Q` into the two strict
+     short exact sequences from Bridgeland Lemma 7.5:
+     `0 → K → pb(B₁) → B₁ → 0` and `0 → pb(B₁) → E → B₂ → 0`.
    - Replaced plan: use the compiled common-heart / pullback / quotient infrastructure as
      support lemmas for the interval-independence proof. The previous "last contradiction"
      route is not strong enough on its own.

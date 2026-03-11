@@ -1936,6 +1936,226 @@ private theorem semistable_of_target_envelope_triangleTest
   exact wPhaseOf_eq_of_semistable_of_target_envelope
     (C := C) (σ := σ) (W := W) (hW := hW) hab₁ hSS hε₀ henv₂_lo henv₂_hi hthin₂
 
+private theorem exists_upper_boundary_triangle
+    (s : Slicing C) [IsTriangulated C] {a b₁ b₂ : ℝ}
+    (hab₁ : a < b₁) (hab₂ : a < b₂) (hb : b₁ ≤ b₂)
+    {Q : C} (hQ : s.intervalProp C a b₂ Q) :
+    ∃ (X Y : C) (f : X ⟶ Q) (g : Q ⟶ Y) (h : Y ⟶ X⟦(1 : ℤ)⟧),
+      Triangle.mk f g h ∈ distTriang C ∧
+      s.geProp C b₁ X ∧
+      s.intervalProp C a b₁ Y := by
+  let ss := s.phaseShift C b₁
+  let t := ss.toTStructureGE
+  obtain ⟨X, Y, hX : t.le 0 X, hY : t.ge 1 Y, f, g, h, hT⟩ := t.exists_triangle_zero_one Q
+  have hX_ge : s.geProp C b₁ X := by
+    have hX' : ss.geProp C 0 X := by
+      change ss.geProp C (-↑(0 : ℤ)) X at hX
+      simpa using hX
+    exact (s.phaseShift_geProp_zero C b₁ X).mp hX'
+  have hY_lt : s.ltProp C b₁ Y := by
+    have hY' : ss.ltProp C 0 Y := by
+      change ss.ltProp C (1 - ↑(1 : ℤ)) Y at hY
+      simpa using hY
+    exact (s.phaseShift_ltProp_zero C b₁ Y).mp hY'
+  refine ⟨X, Y, f, g, h, hT, hX_ge,
+    ?_⟩
+  by_cases hYZ : IsZero Y
+  · exact Or.inl hYZ
+  · have hY_minus : a < s.phiMinus C Y hYZ :=
+      s.phiMinus_gt_of_triangle_with_geProp C hYZ
+        (fun hQZ ↦ s.phiMinus_gt_of_intervalProp C hQZ hQ)
+        hX_ge (by linarith) hT
+    have hY_plus : s.phiPlus C Y hYZ < b₁ := s.phiPlus_lt_of_ltProp C hYZ hY_lt
+    obtain ⟨F, hn, hfirst, hlast⟩ := HNFiltration.exists_both_nonzero C s hYZ
+    exact Or.inr ⟨F, fun i ↦ ⟨by
+      calc
+        a < s.phiMinus C Y hYZ := hY_minus
+        _ = F.φ ⟨F.n - 1, by omega⟩ := s.phiMinus_eq C Y hYZ F hn hlast
+        _ ≤ F.φ i := F.hφ.antitone (Fin.mk_le_mk.mpr (by omega)),
+      by
+        calc
+          F.φ i ≤ F.φ ⟨0, hn⟩ :=
+            F.hφ.antitone (Fin.mk_le_mk.mpr (Nat.zero_le i.val))
+          _ = s.phiPlus C Y hYZ := (s.phiPlus_eq C Y hYZ F hn hfirst).symm
+          _ < b₁ := hY_plus⟩⟩
+
+private theorem gtProp_of_geProp_of_lt
+    (s : Slicing C) {a b : ℝ} (hab : a < b) {E : C}
+    (hE : s.geProp C b E) :
+    s.gtProp C a E := by
+  rcases hE with hZ | ⟨F, hF, hge⟩
+  · exact Or.inl hZ
+  · exact Or.inr ⟨F, hF, lt_of_lt_of_le hab hge⟩
+
+private theorem wPhaseOf_gt_of_geProp_target
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {a b ψ ε₀ : ℝ} (hab : a < b) {E : C}
+    (hI : σ.slicing.intervalProp C a b E) (hEne : ¬IsZero E)
+    (hGe : σ.slicing.geProp C (ψ + ε₀) E)
+    (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (henv_lo : a + ε₀ ≤ ψ) (henv_hi : ψ ≤ b - ε₀)
+    (hthin : b - a + 2 * ε₀ < 1)
+    (hsin : stabSeminorm C σ (W - σ.Z) <
+      ENNReal.ofReal (Real.sin (Real.pi * ε₀))) :
+    ψ < wPhaseOf (W (K₀.of C E)) ((a + b) / 2) := by
+  have hthin1 : b - a < 1 := by
+    linarith
+  let hpert := hperturb_of_stabSeminorm C σ W hW hthin1 hε₀ hε₀2 hsin
+  obtain ⟨F, hn, hfirst, hlast⟩ := HNFiltration.exists_both_nonzero C σ.slicing hEne
+  have hphi_lower : ψ + ε₀ ≤ σ.slicing.phiMinus C E hEne :=
+    σ.slicing.phiMinus_ge_of_geProp C hEne hGe
+  have hphases : ∀ i : Fin F.n, ψ + ε₀ ≤ F.φ i ∧ F.φ i < b := by
+    intro i
+    constructor
+    · calc
+        ψ + ε₀ ≤ σ.slicing.phiMinus C E hEne := hphi_lower
+        _ = F.φ ⟨F.n - 1, by omega⟩ := σ.slicing.phiMinus_eq C E hEne F hn hlast
+        _ ≤ F.φ i := F.hφ.antitone (Fin.mk_le_mk.mpr (by omega))
+    · calc
+        F.φ i ≤ F.φ ⟨0, hn⟩ := F.hφ.antitone (Fin.mk_le_mk.mpr (Nat.zero_le i.val))
+        _ = σ.slicing.phiPlus C E hEne := (σ.slicing.phiPlus_eq C E hEne F hn hfirst).symm
+        _ < b := σ.slicing.phiPlus_lt_of_intervalProp C hEne hI
+  set P := F.toPostnikovTower
+  set rot := Complex.exp (-(↑(Real.pi * ψ) * Complex.I))
+  have hWE : W (K₀.of C E) =
+      ∑ i : Fin F.n, W (K₀.of C (P.factor i)) := by
+    rw [K₀.of_postnikovTower_eq_sum C P, map_sum]
+  have him_pos :
+      0 < (W (K₀.of C E) * rot).im := by
+    rw [hWE, Finset.sum_mul]
+    rw [show (∑ i : Fin F.n, W (K₀.of C (P.factor i)) * rot).im =
+        ∑ i : Fin F.n, (W (K₀.of C (P.factor i)) * rot).im from
+      map_sum Complex.imAddGroupHom _ _]
+    apply lt_of_lt_of_le _ (Finset.single_le_sum
+      (f := fun i ↦ (W (K₀.of C (P.factor i)) * rot).im)
+      (fun i _ ↦ ?_) (Finset.mem_univ ⟨0, hn⟩))
+    · obtain ⟨hlo_pert, hhi_pert⟩ := hpert _ _ (F.semistable ⟨0, hn⟩) hfirst
+        (by linarith [(hphases ⟨0, hn⟩).1]) (hphases ⟨0, hn⟩).2
+      have hlo_pert' :
+          F.φ ⟨0, hn⟩ - ε₀ <
+            wPhaseOf (W (K₀.of C (P.factor ⟨0, hn⟩))) ((a + b) / 2) := by
+        simpa [P] using hlo_pert
+      have hhi_pert' :
+          wPhaseOf (W (K₀.of C (P.factor ⟨0, hn⟩))) ((a + b) / 2) < F.φ ⟨0, hn⟩ + ε₀ := by
+        simpa [P] using hhi_pert
+      exact im_pos_of_phase_above
+        (norm_pos_iff.mpr (σ.W_ne_zero_of_seminorm_lt_one C W hW
+          (F.semistable ⟨0, hn⟩) hfirst))
+        (wPhaseOf_compat _ _)
+        (by linarith [hlo_pert', (hphases ⟨0, hn⟩).1])
+        (by
+          have hbψ : b + ε₀ < ψ + 1 := by
+            linarith
+          have hupper : F.φ ⟨0, hn⟩ + ε₀ < ψ + 1 := by
+            linarith [(hphases ⟨0, hn⟩).2, hbψ]
+          linarith [hhi_pert', hupper])
+    · by_cases hi : IsZero (P.factor i)
+      · simp [K₀.of_isZero C hi]
+      · obtain ⟨hlo_pert, hhi_pert⟩ := hpert _ _ (F.semistable i) hi
+          (by linarith [(hphases i).1]) (hphases i).2
+        have hlo_pert' :
+            F.φ i - ε₀ < wPhaseOf (W (K₀.of C (P.factor i))) ((a + b) / 2) := by
+          simpa [P] using hlo_pert
+        have hhi_pert' :
+            wPhaseOf (W (K₀.of C (P.factor i))) ((a + b) / 2) < F.φ i + ε₀ := by
+          simpa [P] using hhi_pert
+        exact le_of_lt <| im_pos_of_phase_above
+          (norm_pos_iff.mpr (σ.W_ne_zero_of_seminorm_lt_one C W hW (F.semistable i) hi))
+          (wPhaseOf_compat _ _)
+          (by linarith [hlo_pert', (hphases i).1])
+          (by
+            have hbψ : b + ε₀ < ψ + 1 := by
+              linarith
+            have hupper : F.φ i + ε₀ < ψ + 1 := by
+              linarith [(hphases i).2, hbψ]
+            linarith [hhi_pert', hupper])
+  have hW_ne_ab : ∀ (G : C) (θ : ℝ), σ.slicing.P θ G → ¬IsZero G →
+      a < θ → θ < b → W (K₀.of C G) ≠ 0 := by
+    intro G θ hG hGne _ _
+    exact σ.W_ne_zero_of_seminorm_lt_one C W hW hG hGne
+  have hpert_gt : ∀ (G : C) (θ : ℝ), σ.slicing.P θ G → ¬IsZero G →
+      a < θ → θ < b →
+      a - ε₀ < wPhaseOf (W (K₀.of C G)) ((a + b) / 2) ∧
+        wPhaseOf (W (K₀.of C G)) ((a + b) / 2) < a - ε₀ + 1 := by
+    intro G θ hG hGne haθ hθb
+    obtain ⟨hlo, hhi⟩ := hpert G θ hG hGne haθ hθb
+    exact ⟨by linarith, by linarith⟩
+  have hpert_lt : ∀ (G : C) (θ : ℝ), σ.slicing.P θ G → ¬IsZero G →
+      a < θ → θ < b →
+      b + ε₀ - 1 < wPhaseOf (W (K₀.of C G)) ((a + b) / 2) ∧
+        wPhaseOf (W (K₀.of C G)) ((a + b) / 2) < b + ε₀ := by
+    intro G θ hG hGne haθ hθb
+    obtain ⟨hlo, hhi⟩ := hpert G θ hG hGne haθ hθb
+    exact ⟨by linarith, by linarith⟩
+  have hphase_lo :
+      a - ε₀ < wPhaseOf (W (K₀.of C E)) ((a + b) / 2) :=
+    wPhaseOf_gt_of_intervalProp C σ hEne W (by linarith) hI hW_ne_ab hpert_gt
+  have hphase_hi :
+      wPhaseOf (W (K₀.of C E)) ((a + b) / 2) < b + ε₀ :=
+    wPhaseOf_lt_of_intervalProp C σ hEne W (by linarith) hI hW_ne_ab hpert_lt
+  have hrange :
+      wPhaseOf (W (K₀.of C E)) ((a + b) / 2) ∈ Set.Ioo (ψ - 1) (ψ + 1) := by
+    constructor
+    · have : ψ - 1 < a - ε₀ := by
+        linarith
+      linarith
+    · have : b + ε₀ < ψ + 1 := by
+        linarith
+      linarith
+  exact wPhaseOf_gt_of_im_pos him_pos hrange
+
+private theorem intervalProp_of_upper_boundary_triangle
+    (s : Slicing C) [IsTriangulated C] {a b₁ b₂ : ℝ}
+    (hab₁ : a < b₁) (hab₂ : a < b₂) (hb₁ : b₁ ≤ a + 1)
+    {Q X Y : C}
+    (hQ : s.intervalProp C a b₂ Q)
+    (hX_ge : s.geProp C b₁ X)
+    (hY : s.intervalProp C a b₁ Y)
+    {f : X ⟶ Q} {g : Q ⟶ Y} {h : Y ⟶ X⟦(1 : ℤ)⟧}
+    (hT : Triangle.mk f g h ∈ distTriang C) :
+    s.intervalProp C a b₂ X := by
+  have hY_le : s.leProp C (a + 1) Y := by
+    exact ((s.leProp_mono (C := C) (t₁ := b₁) (t₂ := a + 1) hb₁) Y)
+      (s.leProp_of_intervalProp C hY)
+  have hX_gt : s.gtProp C a X :=
+    gtProp_of_geProp_of_lt (C := C) (s := s) hab₁ hX_ge
+  exact s.first_intervalProp_of_triangle C hab₂ hQ hY_le hX_gt hT
+
+private theorem wPhaseOf_gt_of_upper_boundary_triangle
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    [IsTriangulated C]
+    {a b₁ b₂ ψ ε₀ : ℝ}
+    (hab₁ : a < b₁) (hab₂ : a < b₂) (hb : b₁ ≤ b₂)
+    {Q X Y : C}
+    (hQ : σ.slicing.intervalProp C a b₂ Q)
+    (hX_ge : σ.slicing.geProp C b₁ X)
+    (hY : σ.slicing.intervalProp C a b₁ Y)
+    (hXne : ¬IsZero X)
+    (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (henv_lo : a + ε₀ ≤ ψ) (henv_hi : ψ ≤ b₁ - ε₀)
+    (hthin : b₂ - a + 2 * ε₀ < 1)
+    (hsin : stabSeminorm C σ (W - σ.Z) <
+      ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    {f : X ⟶ Q} {g : Q ⟶ Y} {h : Y ⟶ X⟦(1 : ℤ)⟧}
+    (hT : Triangle.mk f g h ∈ distTriang C) :
+    ψ < wPhaseOf (W (K₀.of C X)) ((a + b₂) / 2) := by
+  have hb₁ : b₁ ≤ a + 1 := by
+    have : b₂ - a < 1 := by
+      linarith
+    linarith
+  have hXI : σ.slicing.intervalProp C a b₂ X :=
+    intervalProp_of_upper_boundary_triangle (C := C) (s := σ.slicing)
+      hab₁ hab₂ hb₁ hQ hX_ge hY hT
+  have hX_ge' : σ.slicing.geProp C (ψ + ε₀) X := by
+    exact ((σ.slicing.geProp_anti (C := C) (t₁ := ψ + ε₀) (t₂ := b₁)
+      (by linarith)) X) hX_ge
+  have henv_hi₂ : ψ ≤ b₂ - ε₀ := by
+    linarith
+  exact wPhaseOf_gt_of_geProp_target (C := C) σ W hW hab₂
+    hXI hXne hX_ge' hε₀ hε₀2 henv_lo henv_hi₂ hthin hsin
+
 /-! ### Thin-interval Phase 3 selection infrastructure -/
 
 private lemma intervalSubobject_isZero_iff_eq_bot
