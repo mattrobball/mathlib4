@@ -2568,7 +2568,7 @@ private lemma SkewedStabilityFunction.Wobj_pullback_eq_add
 private lemma interval_lt_pullback_cokernel_of_ne_bot
     {s : Slicing C} [IsTriangulated C] {a b : ℝ}
     [Fact (a < b)] [Fact (b - a ≤ 1)]
-    {X : s.IntervalCat C a b} {M : Subobject X} (hM : IsStrictMono M.arrow)
+    {X : s.IntervalCat C a b} {M : Subobject X}
     {B : Subobject (cokernel M.arrow)} (hB : B ≠ ⊥) :
     M < (Subobject.pullback (cokernel.π M.arrow)).obj B := by
   let q := cokernel.π M.arrow
@@ -2601,6 +2601,118 @@ private lemma interval_lt_pullback_cokernel_of_ne_bot
     exact hB ((intervalSubobject_isZero_iff_eq_bot
       (C := C) (s := s) (a := a) (b := b) (X := cokernel M.arrow) B).mp hBZ)
   exact lt_of_le_of_ne hle hne
+
+private lemma interval_pullback_cokernel_ne_top_of_ne_top
+    {s : Slicing C} [IsTriangulated C] {a b : ℝ}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X : s.IntervalCat C a b} {M : Subobject X}
+    {B : Subobject (cokernel M.arrow)} (hB : B ≠ ⊤) (hB_strict : IsStrictMono B.arrow) :
+    (Subobject.pullback (cokernel.π M.arrow)).obj B ≠ ⊤ := by
+  let q := cokernel.π M.arrow
+  let pbB := (Subobject.pullback q).obj B
+  intro hpb_top
+  have hpb_iso : IsIso pbB.arrow := by
+    let heqObj : Subobject.underlying.obj pbB = Subobject.underlying.obj (⊤ : Subobject X) :=
+      congrArg Subobject.underlying.obj hpb_top
+    have harr : pbB.arrow = eqToHom heqObj ≫ (⊤ : Subobject X).arrow := by
+      simpa using (Subobject.arrow_congr pbB ⊤ hpb_top).symm
+    rw [harr]
+    infer_instance
+  let r : X ⟶ (B : s.IntervalCat C a b) :=
+    inv pbB.arrow ≫ Subobject.pullbackπ q B
+  have hr : r ≫ B.arrow = q := by
+    calc
+      r ≫ B.arrow = inv pbB.arrow ≫ (Subobject.pullbackπ q B ≫ B.arrow) := by
+        simp [r]
+      _ = inv pbB.arrow ≫ (pbB.arrow ≫ q) := by rw [(Subobject.isPullback q B).w]
+      _ = q := by simp
+  haveI : Epi q := by infer_instance
+  haveI : Epi B.arrow := epi_of_epi_fac hr
+  haveI : IsIso B.arrow := hB_strict.isIso
+  exact hB (Subobject.eq_top_of_isIso_arrow B)
+
+private lemma SkewedStabilityFunction.Wobj_cokernel_pullback_eq
+    {s : Slicing C} [IsTriangulated C] {a b : ℝ}
+    {ssf : SkewedStabilityFunction C s a b}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X : s.IntervalCat C a b} (M : Subobject X) (hM : IsStrictMono M.arrow)
+    {B : Subobject (cokernel M.arrow)} (hB : IsStrictMono B.arrow) :
+    ssf.W (K₀.of C (cokernel ((Subobject.pullback (cokernel.π M.arrow)).obj B).arrow).obj) =
+      ssf.W (K₀.of C (cokernel B.arrow).obj) := by
+  let q := cokernel.π M.arrow
+  let pbB := (Subobject.pullback q).obj B
+  have hpb_strict : IsStrictMono pbB.arrow :=
+    interval_pullback_arrow_strictMono_of_strictMono
+      (C := C) (s := s) (a := a) (b := b) q B hB
+  have hXM :
+      ssf.W (K₀.of C X.obj) =
+        ssf.W (K₀.of C (M : s.IntervalCat C a b).obj) +
+          ssf.W (K₀.of C (cokernel M.arrow).obj) := by
+    simpa [map_add] using congrArg ssf.W
+      (interval_K0_of_strictMono
+        (C := C) (s := s) (a := a) (b := b) M.arrow hM)
+  have hXpb :
+      ssf.W (K₀.of C X.obj) =
+        ssf.W (K₀.of C (pbB : s.IntervalCat C a b).obj) +
+          ssf.W (K₀.of C (cokernel pbB.arrow).obj) := by
+    simpa [map_add] using congrArg ssf.W
+      (interval_K0_of_strictMono
+        (C := C) (s := s) (a := a) (b := b) pbB.arrow hpb_strict)
+  have hQB :
+      ssf.W (K₀.of C (cokernel M.arrow).obj) =
+        ssf.W (K₀.of C (B : s.IntervalCat C a b).obj) +
+          ssf.W (K₀.of C (cokernel B.arrow).obj) := by
+    simpa [map_add] using congrArg ssf.W
+      (interval_K0_of_strictMono
+        (C := C) (s := s) (a := a) (b := b) B.arrow hB)
+  have hpb_add :
+      ssf.W (K₀.of C (pbB : s.IntervalCat C a b).obj) =
+        ssf.W (K₀.of C (M : s.IntervalCat C a b).obj) +
+          ssf.W (K₀.of C (B : s.IntervalCat C a b).obj) :=
+    Wobj_pullback_eq_add
+      (C := C) (s := s) (a := a) (b := b) (ssf := ssf) M hM B
+  rw [hpb_add, add_assoc] at hXpb
+  have hsum₁ :
+      ssf.W (K₀.of C (M : s.IntervalCat C a b).obj) +
+          ssf.W (K₀.of C (cokernel M.arrow).obj) =
+        ssf.W (K₀.of C (M : s.IntervalCat C a b).obj) +
+          (ssf.W (K₀.of C (B : s.IntervalCat C a b).obj) +
+            ssf.W (K₀.of C (cokernel pbB.arrow).obj)) := by
+    calc
+      ssf.W (K₀.of C (M : s.IntervalCat C a b).obj) +
+          ssf.W (K₀.of C (cokernel M.arrow).obj)
+          = ssf.W (K₀.of C X.obj) := hXM.symm
+      _ = ssf.W (K₀.of C (M : s.IntervalCat C a b).obj) +
+          (ssf.W (K₀.of C (B : s.IntervalCat C a b).obj) +
+            ssf.W (K₀.of C (cokernel pbB.arrow).obj)) := hXpb
+  have hsum₂ :
+      ssf.W (K₀.of C (M : s.IntervalCat C a b).obj) +
+          ssf.W (K₀.of C (B : s.IntervalCat C a b).obj) +
+            ssf.W (K₀.of C (cokernel B.arrow).obj) =
+        ssf.W (K₀.of C (M : s.IntervalCat C a b).obj) +
+          (ssf.W (K₀.of C (B : s.IntervalCat C a b).obj) +
+            ssf.W (K₀.of C (cokernel pbB.arrow).obj)) := by
+    rw [hQB] at hsum₁
+    simpa [add_assoc] using hsum₁
+  have hsum₃ :
+      ssf.W (K₀.of C (M : s.IntervalCat C a b).obj) +
+          (ssf.W (K₀.of C (B : s.IntervalCat C a b).obj) +
+            ssf.W (K₀.of C (cokernel B.arrow).obj)) =
+        ssf.W (K₀.of C (M : s.IntervalCat C a b).obj) +
+          (ssf.W (K₀.of C (B : s.IntervalCat C a b).obj) +
+            ssf.W (K₀.of C (cokernel pbB.arrow).obj)) := by
+    simpa [add_assoc] using hsum₂
+  have hsum₄ :
+      ssf.W (K₀.of C (B : s.IntervalCat C a b).obj) +
+          ssf.W (K₀.of C (cokernel B.arrow).obj) =
+        ssf.W (K₀.of C (B : s.IntervalCat C a b).obj) +
+          ssf.W (K₀.of C (cokernel pbB.arrow).obj) := by
+    exact add_left_cancel hsum₃
+  have hsum₅ :
+      ssf.W (K₀.of C (cokernel B.arrow).obj) =
+        ssf.W (K₀.of C (cokernel pbB.arrow).obj) := by
+    exact add_left_cancel hsum₄
+  exact hsum₅.symm
 /-! ### Extension-closure of `intervalProp` over Postnikov towers -/
 
 /-- Extension-closure of `intervalProp` over Postnikov towers: if all factors of a
