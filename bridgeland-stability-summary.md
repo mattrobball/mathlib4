@@ -125,6 +125,8 @@ Current Phase 4 atomization:
    - thin-interval containment for the shifted residual kernel piece,
    - explicit `W(K) + W(K_err⟦1⟧) = W(I_H)` bookkeeping,
    - compiled `W`-phase window for `K_err⟦1⟧`,
+   - exposed octahedral image-factorisation helper plus the explicit heart morphism
+     `K → I_H`,
    - compiled phase transport lemmas
      `wPhaseOf_le_of_mono_P_phi_semistable` and
      `wPhaseOf_ge_of_epi_P_phi_semistable`.

@@ -190,6 +190,9 @@ Optional cleanup left for later, not on the blocker path:
    - Done: the heart-side phase transport lemmas are now compiled on both sides:
      `wPhaseOf_le_of_mono_P_phi_semistable` for `I_H ↪ F` and
      `wPhaseOf_ge_of_epi_P_phi_semistable` for `F ↠ Q_H`.
+   - Done: the octahedral image-factorisation helper is now exposed in
+     `AbelianSubcategory`, and blocker `#3` now contains the explicit heart
+     factorisation morphism `K → I_H` rather than only the derived `K₀` relation.
    - Remaining: use those inequalities to place the residual kernel term on the
      correct side of `ψ`, then close the final contradiction proving
      `wPhaseOf(W(K), ψ) ≤ ψ`.
