@@ -4037,6 +4037,53 @@ private theorem SkewedStabilityFunction.phase_gt_of_maxPhase_strictSubobject_of_
     exact hIsoK.trans_le hPhaseSub
   simpa [phaseObj, KI] using hPhaseB.trans hle
 
+variable [IsTriangulated C] in
+/-- Bridgeland's first strict short exact sequence in a thin category: if an interval object is
+not `W`-semistable, there is a proper strict subobject of maximal `W`-phase, and its inclusion
+gives a strict short exact sequence `0 → A → E → B → 0`. -/
+private theorem SkewedStabilityFunction.exists_first_strictShortExact_of_not_semistable
+    (σ : StabilityCondition C) {a b : ℝ}
+    {ssf : SkewedStabilityFunction C σ.slicing a b}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    (hFinSub : ∀ Y : σ.slicing.IntervalCat C a b, Finite (Subobject Y))
+    {X : σ.slicing.IntervalCat C a b} (hX : ¬IsZero X)
+    (hns : ¬ ssf.Semistable C X.obj
+      (wPhaseOf (ssf.W (K₀.of C X.obj)) ssf.α))
+    (hW_interval : ∀ {F : C}, σ.slicing.intervalProp C a b F → ¬IsZero F →
+      ssf.W (K₀.of C F) ≠ 0) :
+    ∃ M : Subobject X,
+      M ≠ ⊥ ∧
+      M ≠ ⊤ ∧
+      IsStrictMono M.arrow ∧
+      ssf.Semistable C (M : σ.slicing.IntervalCat C a b).obj
+        (wPhaseOf (ssf.W (K₀.of C (M : σ.slicing.IntervalCat C a b).obj)) ssf.α) ∧
+      wPhaseOf (ssf.W (K₀.of C X.obj)) ssf.α <
+        wPhaseOf (ssf.W (K₀.of C (M : σ.slicing.IntervalCat C a b).obj)) ssf.α ∧
+      StrictShortExact
+        (ShortComplex.mk M.arrow (cokernel.π M.arrow) (cokernel.condition M.arrow)) := by
+  haveI : Finite (Subobject X) := hFinSub X
+  obtain ⟨M, hM_ne, hM_strict, hM_max, _⟩ :=
+    ssf.exists_maxPhase_maximal_strictSubobject
+      (C := C) (σ := σ) (a := a) (b := b) (X := X) hX
+  have hM_ne_top : M ≠ ⊤ :=
+    ssf.maxPhase_strictSubobject_ne_top_of_not_semistable
+      (C := C) (σ := σ) (a := a) (b := b) (X := X) hns hM_ne hM_strict hM_max hW_interval
+  have hM_ss :
+      ssf.Semistable C (M : σ.slicing.IntervalCat C a b).obj
+        (wPhaseOf (ssf.W (K₀.of C (M : σ.slicing.IntervalCat C a b).obj)) ssf.α) :=
+    ssf.semistable_of_maxPhase_strictSubobject
+      (C := C) (σ := σ) (a := a) (b := b) hM_ne hM_strict hM_max hW_interval
+  have hphase_gt :
+      wPhaseOf (ssf.W (K₀.of C X.obj)) ssf.α <
+        wPhaseOf (ssf.W (K₀.of C (M : σ.slicing.IntervalCat C a b).obj)) ssf.α :=
+    ssf.phase_gt_of_maxPhase_strictSubobject_of_not_semistable
+      (C := C) (σ := σ) (a := a) (b := b) (X := X) hX hns hM_ne hM_strict hM_max hW_interval
+  have hS : StrictShortExact
+      (ShortComplex.mk M.arrow (cokernel.π M.arrow) (cokernel.condition M.arrow)) :=
+    interval_strictShortExact_cokernel_of_strictMono
+      (C := C) (s := σ.slicing) (a := a) (b := b) M.arrow hM_strict
+  exact ⟨M, hM_ne, hM_ne_top, hM_strict, hM_ss, hphase_gt, hS⟩
+
 private lemma interval_pullback_cokernel_bot_eq
     {s : Slicing C} [IsTriangulated C] {a b : ℝ}
     [Fact (a < b)] [Fact (b - a ≤ 1)]
@@ -7040,6 +7087,15 @@ private theorem intervalProp_P_phi_lower_source
     σ.slicing.intervalProp C (φ - ε₀) (ψ + ε₀) E := by
   exact σ.slicing.intervalProp_of_semistable C hPφ (by linarith) (by linarith)
 
+private theorem finite_subobject_of_mem_P_phi_sector
+    (σ : StabilityCondition C) {ε₀ φ : ℝ} {E : C}
+    (hε₀ : 0 < ε₀)
+    (hFinSector : ∀ t : ℝ, ∀ F : C,
+      σ.slicing.intervalProp C (t - 2 * ε₀) (t + 2 * ε₀) F → Finite (Subobject F))
+    (hPφ : σ.slicing.P φ E) :
+    Finite (Subobject E) := by
+  exact hFinSector φ E (σ.slicing.intervalProp_of_semistable C hPφ (by linarith) (by linarith))
+
 variable [IsTriangulated C] in
 private theorem wPhaseOf_eq_upper_source_midpoint_of_mem_P_phi
     (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
@@ -7362,39 +7418,30 @@ private theorem stabilityFunctionOnP_hasHN
   exact StabilityFunction.hasHN_of_finiteLength _
     (fun E => σ.locallyFinite.phaseFinite φ E)
 
-/-! #### Step A2b: Triangle test — requires quasi-abelian theory
+/-! #### Step A2b: Faithful route for the `P(φ)` bridge
 
-The triangle test for `P_phi_wSemistable_is_deformedPred` asks: given `K → F → Q → K⟦1⟧`
-with `F ∈ P(φ)` and `K, Q ∈ P((ψ-ε₀, ψ+ε₀))`, `K` nonzero, show
-`wPhaseOf(W(K), ψ) ≤ ψ`.
+The old direct common-heart sign chase for
+`P_phi_wSemistable_is_deformedPred` is insufficient: the final `K/I_H/K_err⟦1⟧/Q_H`
+phase inequalities do not force a contradiction on their own.
 
-**What we can prove** (see `IntervalCategory.lean`):
-- `phiPlus_le_of_semistable_triangle`: `φ⁺(K) ≤ φ` (all σ-phases of K are ≤ φ)
-- `phiMinus_ge_of_semistable_triangle`: `φ ≤ φ⁻(Q)` (all σ-phases of Q are ≥ φ)
-These follow directly from Lemma 3.4 (`phiPlus_triangle_le`/`phiMinus_triangle_le`).
+The paper-faithful route is instead:
+1. work in a one-sided source envelope containing `P(φ)`,
+2. use Bridgeland's first strict short exact sequence in that thin category,
+3. compare its image in `P(φ)` against abelian `W`-semistability of `F`,
+4. transport semistability back to the target interval with
+   `semistable_of_target_subinterval`.
 
-**Why the Z-ray argument fails**: The aggregate imaginary part argument
-(`Im(Z(K)·rot) ≤ 0` and `Im(Z(Q)·rot) ≥ 0` with sum = 0) does NOT force either to
-vanish. The terms have **opposite signs** (K below φ, Q above φ), so cancellation is
-possible. Concrete counterexample: elliptic curve, `0 → O_E → F → F/O_E → 0` with
-`O_E ∈ P(1/2)`, `F ∈ P(3/4)` rank 2 degree 2, `F/O_E` of phase ≈ 0.85.
+The compiled support for this route is now present:
+- the source-envelope `P(φ)` helpers
+  `intervalProp_P_phi_upper_source`, `intervalProp_P_phi_lower_source`,
+  `wPhaseOf_eq_upper_source_midpoint_of_mem_P_phi`, and
+  `wPhaseOf_eq_lower_source_midpoint_of_mem_P_phi`,
+- the inclusion / interval-independence transport theorems,
+- and the Node 7.3 wrapper
+  `SkewedStabilityFunction.exists_first_strictShortExact_of_not_semistable`.
 
-**Partial decomposition** (not sufficient to close the sorry):
-Decompose K = K_{=φ} + K_{<φ} via the σ-HN at phase φ. Then:
-1. K_{=φ} ↪ F is a P(φ)-subobject (heart-mono between P(φ) objects).
-2. If F is W-semistable in P(φ): `wPhaseOf(W(K_{=φ})) ≤ ψ`. ✓
-3. F/K_{=φ} in P(φ) has `wPhaseOf(W(F/K_{=φ})) ≥ ψ`. ✓
-4. But `Im(W(K_{<φ}) · rot_ψ)` has indeterminate sign — individual factor
-   W-phases straddle ψ, so the aggregate can be positive or negative.
-Result: `Im(W(K) · rot_ψ) ≤ 0` reduces to `Im(W(Q) · rot_ψ) ≥ 0`, which is
-equivalent but equally hard.
-
-**What is needed**: Bridgeland's proof uses the quasi-abelian structure of `P((a,b))`
-(§4), where W-semistability is defined via strict short exact sequences. The strict
-subobjects of F ∈ P(φ) in P((a,b)) have additional structure (they are kernels of
-morphisms to other interval objects). This constrains the non-P(φ) part of K more
-tightly than the general triangle test. Building the quasi-abelian theory (~800 lines)
-would close this gap. -/
+What still remains is to connect that first strict short exact sequence to the
+`P(φ)` image comparison in the one-sided source-envelope proof. -/
 
 /-! #### Step A3: Convert AbelianHNFiltration in P(φ) to HNFiltration in C -/
 
@@ -7418,6 +7465,7 @@ private theorem P_phi_wSemistable_is_deformedPred
     (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hε₀8 : ε₀ < 1 / 8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     {φ : ℝ} {F : C} (hPφ : σ.slicing.P φ F) (hFne : ¬IsZero F)
     (hss : @StabilityFunction.IsSemistable (σ.slicing.P φ).FullSubcategory _ (σ.P_phi_abelian C φ)
@@ -7891,6 +7939,7 @@ private theorem stabilityFunctionOnP_semistable_deformedPred
     (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hε₀8 : ε₀ < 1 / 8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     {φ : ℝ} {a b : ℝ} (ha : a < φ - ε₀) (hb : φ + ε₀ < b)
     {E : (σ.slicing.P φ).FullSubcategory}
@@ -7937,7 +7986,7 @@ private theorem stabilityFunctionOnP_semistable_deformedPred
         hψ_eq_phi
   refine ⟨ψ, lt_trans ha hψ_lo, lt_trans hψ_hi hb, ?_⟩
   exact P_phi_wSemistable_is_deformedPred (C := C) (σ := σ) (W := W) (hW := hW)
-    hε₀ hε₀2 hsin E.property hEobj_ne hss hψ_lo hψ_hi hWne hψ_eq
+    hε₀ hε₀2 hε₀8 hsin E.property hEobj_ne hss hψ_lo hψ_hi hWne hψ_eq
 
 variable [IsTriangulated C] in
 private theorem stabilityFunctionOnP_semistable_intervalProp
@@ -7952,7 +8001,7 @@ private theorem stabilityFunctionOnP_semistable_intervalProp
       (σ.P_phi_abelian C φ) (stabilityFunctionOnP C σ W hW hε₀ hε₀2 hsin φ) E) :
     (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hsin).intervalProp C a b E.obj := by
   rcases stabilityFunctionOnP_semistable_deformedPred (C := C) (σ := σ) (W := W) (hW := hW)
-    hε₀ hε₀2 hsin ha hb hss with ⟨ψ, hψa, hψb, hQ⟩
+    hε₀ hε₀2 hε₀8 hsin ha hb hss with ⟨ψ, hψa, hψb, hQ⟩
   refine Or.inr ⟨HNFiltration.single C E.obj ψ hQ, ?_⟩
   intro j
   fin_cases j

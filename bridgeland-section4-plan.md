@@ -235,6 +235,21 @@ Optional cleanup left for later, not on the blocker path:
      `intervalProp_P_phi_upper_source`, `intervalProp_P_phi_lower_source`,
      `wPhaseOf_eq_upper_source_midpoint_of_mem_P_phi`, and
      `wPhaseOf_eq_lower_source_midpoint_of_mem_P_phi`.
+   - Audit against Bridgeland's original Lemma 7.5/7.6 proof: the paper-faithful
+     `#3` closure is not another terminal triangle-test squeeze. It should run through
+     the **first strict short exact sequence** in the thin target category, exactly as
+     Node 7.3 says, and then compare its image in `P(φ)` to the abelian
+     `stabilityFunctionOnP` semistability of `F`.
+   - Done: the `#3` bridge API itself now carries the paper's `ε₀ < 1/8` slack, so the
+     documented one-sided source envelopes are genuinely thin in the formalization.
+   - Done: `Deformation.lean` now has an explicit thin-category first-SES wrapper,
+     `SkewedStabilityFunction.exists_first_strictShortExact_of_not_semistable`, which
+     packages the Node 7.3 output once a local `hFinSub` hypothesis is supplied.
+   - Remaining faithful gap: the open issue is no longer the shape of the first strict SES,
+     but how to feed it into `#3`. The bridge still needs either:
+     1. a local derivation of the needed `hFinSub : ∀ Y, Finite (Subobject Y)` for the
+        relevant target/source envelopes from the paper's `ε₀` choice, or
+     2. a direct `P(φ)`-based contradiction that bypasses a fully generic `hFinSub`.
 3. **#4 abelian HN bridge**
    - Done: `abelianHN_to_intervalProp` is now closed.
    - The proof uses `stabilityFunctionOnP_hasHN`, the single-factor bridges

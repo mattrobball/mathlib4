@@ -167,6 +167,18 @@ Current Phase 4 atomization:
      `intervalProp_P_phi_upper_source`, `intervalProp_P_phi_lower_source`,
      `wPhaseOf_eq_upper_source_midpoint_of_mem_P_phi`, and
      `wPhaseOf_eq_lower_source_midpoint_of_mem_P_phi`.
+   - audit against the original paper: the faithful `#3` proof should now pivot to
+     Bridgeland's **first strict short exact sequence** argument in the thin target
+     category, not back to more endpoint-sign bookkeeping.
+   - newly compiled API alignment: `P_phi_wSemistable_is_deformedPred` and its immediate
+     bridge now explicitly carry `ε₀ < 1 / 8`, which is the bound under which the paper's
+     one-sided source envelopes are actually thin.
+   - newly compiled faithful API: `Deformation.lean` now has
+     `SkewedStabilityFunction.exists_first_strictShortExact_of_not_semistable`, which
+     packages Bridgeland's Node 7.3 first strict short exact sequence once local thin
+     subobject finiteness is available.
+   - remaining gap: `#3` still needs a way to supply or bypass that local
+     `hFinSub : ∀ Y, Finite (Subobject Y)` input in the one-sided source-envelope proof.
 4. Done: `abelianHN_to_intervalProp` is now closed. The proof uses
    `Fin.induction` on the abelian HN chain in `P(φ)`, the compiled single-factor bridges
    `stabilityFunctionOnP_semistable_deformedPred` /
