@@ -65,13 +65,11 @@ need changing. The missing piece is proof infrastructure, not definitions.
 ### Slicing.lean additions (~140 lines added)
 - [x] `toTStructure_bounded` — fully proved
 - [x] `toTStructure_heart_iff` — fully proved
-- [x] Temporary surrogate `IsLocallyFinite` structure with `intervalFinite` + `phaseFinite`
-- [ ] Replace that surrogate by the paper-faithful Definition 5.7:
+- [x] `Slicing.IsLocallyFinite` corrected to the paper-faithful Definition 5.7:
   local finite length of the thin interval categories themselves, i.e. ACC/DCC on
   **strict** subobjects / strict quotients in `P((t-η, t+η))`.
-  Do **not** use either `Finite (Subobject _)` in ambient categories or ordinary
-  `IsArtinianObject` / `IsNoetherianObject` on all subobjects of the thin category as
-  the definition.
+  The old `Finite (Subobject _)` / ordinary Artinian-Noetherian surrogate is gone as a
+  definition.
 - [x] `ltProp` (P(< t)) and `geProp` (P(≥ t)) subcategory predicates
 - [x] `phiPlus_lt_of_ltProp` / `phiMinus_ge_of_geProp` extraction lemmas
 
@@ -178,7 +176,7 @@ Audit correction:
 
 ## Phase 4: Fill the 5 Sorrys (~830 lines)
 
-### Actual blocker order (current file state, March 11, 2026):
+### Actual blocker order (current file state, March 12, 2026):
 
 | Order | Sorry | Line | Lines | Depends on |
 |-------|-------|------|-------|------------|
@@ -347,32 +345,38 @@ Audit correction:
    - Leave until #1-2 are done; the correct route goes through the constructed deformed
      slicing, not through naive subobject injection.
 
-### Immediate top priority: fix `IsLocallyFinite`
+### Finite-length refactor status
 
-The current local-finiteness definition is a stronger surrogate:
+`Slicing.IsLocallyFinite` is now fixed to the paper-faithful strict finite-length form,
+and `StabilityFunction.hasHN_of_artinian_noetherian` is now proved in the faithful
+Proposition 2.4 order:
 
-- `intervalFinite : ... -> Finite (Subobject E)`
-- `phaseFinite : Finite (Subobject E)` in `P(φ)`
-
-This is not Bridgeland's Definition 5.7. The paper asks for finite length of the
-thin quasi-abelian categories `P((t-η, t+η))`, i.e. chain conditions on **strict**
-subobjects / strict quotients in those thin categories.
-Ordinary `IsArtinianObject` / `IsNoetherianObject` on all subobjects is still stronger
-than what Bridgeland states.
+1. semistable subobject / quotient existence from Artinian / Noetherian chain conditions,
+2. private `IsMDQ` packaging,
+3. arbitrary-quotient mdq comparison and factor-through transport,
+4. Proposition 2.4e kernel-step inequality,
+5. local induction on nonzero subobjects of an ambient object,
+6. append the mdq quotient as the final HN factor.
 
 Required order from here:
 
-1. update the docs,
-2. change `Slicing.IsLocallyFinite` itself to the paper-faithful finite-length form,
-3. replace every downstream use of `Finite (Subobject _)` / `phaseFinite` that was only
-   justified by the old surrogate, especially:
-   - abelian HN existence in `StabilityFunction.lean`, which must follow Bridgeland
-     Proposition 2.4 from chain conditions / finite length rather than `Nat.card (Subobject E)`,
-   - thin-interval first-SES and HN recursion in `Deformation.lean`, which must be
-     reformulated from finite-length chain conditions on strict subobjects / quotients,
-     not from a finite strict-subobject set and not from ordinary subobject ACC/DCC,
-4. build and repair the resulting breakage,
-5. only after that worry about theorem names or residual comment cleanup.
+1. use `StabilityFunction.hasHN_of_artinian_noetherian` to refill the `P(φ)` finite-length
+   bridge in `Deformation.lean`,
+   in particular `P_phi_subobject_strict_in_interval` and `stabilityFunctionOnP_hasHN`,
+2. then return to the remaining deformation-theorem proofs in the already-audited order
+   `#3 -> #2 -> #5`,
+3. only after Theorem 7.1 is honestly proved, fill the top-level
+   `bridgeland_theorem_1_2` shell by the Section 6 uniqueness + Section 7 existence
+   argument.
+
+Current explicit refactor placeholders:
+
+- `StabilityCondition.exists_epsilon0`
+- `StabilityCondition.exists_epsilon0_sector`
+- `P_phi_subobject_strict_in_interval`
+- `deformedSlicing.hn_exists`
+- `P_phi_wSemistable_is_deformedPred`
+- `bridgeland_theorem_1_2`
 
 ### Sorry #1 (small-gap hom-vanishing) — correct strategy:
 1. Assume `0 < ψ₁ - ψ₂ ≤ 2 ε₀` and set

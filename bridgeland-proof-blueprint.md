@@ -455,6 +455,11 @@ structure IsMDQ (q : E ⟶ B) : Prop :=
 ```
 
 The exact shape can be adapted, but the mdq property should be a separate reusable definition.
+Status update:
+this package now exists privately in `StabilityFunction.lean`, and the required
+arbitrary-quotient comparison / factor-through transport have also been formalized
+(`IsMDQ.phase_le_of_quotient`, `IsMDQ.of_epi_factor`), so Node 2.4c is no longer a
+live blocker.
 
 #### Node 2.4d — mdq existence
 
@@ -477,11 +482,19 @@ Proof atoms:
 5. append `B` as final factor,
 6. prove strict phase decrease from mdq minimality.
 
+Status update:
+this node is now formalized faithfully via a local induction on nonzero subobjects of
+an ambient object and a compiled append step for the final mdq quotient.
+
 #### Node 2.4f — final theorem
 
 ```lean
 theorem hasHN_of_chain_conditions : HasHNProperty Z
 ```
+
+Status update:
+the corrected finite-length theorem is now compiled as
+`StabilityFunction.hasHN_of_artinian_noetherian`.
 
 This is the exact section-2 endpoint needed later inside hearts and thin quasi-abelian categories.
 
@@ -1149,6 +1162,9 @@ After 7.11b, continuity of the inverse is a basis-neighborhood check using the s
 #### Node 7.11d — final theorem 1.2 statement
 
 The repo's current `IsLocalHomeomorph`-based statement is a good target.
+Status update: the code now also has an explicit theorem shell
+`bridgeland_theorem_1_2` in `Deformation.lean`, with refactor notes recording that the
+proof should be filled exactly by Nodes 7.11b–7.11d after Theorem 7.1 is complete.
 
 ---
 

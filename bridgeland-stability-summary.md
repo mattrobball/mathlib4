@@ -34,19 +34,25 @@ covering Sections 2–7 and the main deformation theorem (Theorem 7.1 / Theorem 
 
 ## Sorry Summary
 
-### Core sorrys (5 in Deformation.lean)
+### Current compiling proof gaps
 
-These are the real blockers for completing the deformation theorem.
+The project is compiling again after the `IsLocallyFinite` refactor, and the finite-length
+infrastructure is now back on the paper-faithful track: Proposition 2.4 is finished in
+`StabilityFunction.lean`. The remaining explicit placeholders are now all in
+`Deformation.lean`.
 
-| # | Name | Line | Description | Depends on |
-|---|------|------|-------------|------------|
-| 1 | `hom_eq_zero_of_deformedPred` | 6227 | Lemma 7.6: small-gap hom-vanishing | closed on branch |
-| 2 | `deformedSlicing.hn_exists` | 6800 | Lemma 7.7: HN in deformed slicing | Phase 3 + sorry #3 |
-| 3 | `P_phi_wSemistable_is_deformedPred` | 7363 | Triangle test for deformedPred | Phase 2 (quasi-abelian strict subobjects) |
-| 4 | `abelianHN_to_intervalProp` | 5877 | Abelian HN → interval containment | closed on branch |
-| 5 | Q(ψ)-subobject finiteness | 8106 | In `bridgeland_7_1` | Sorrys #2-3 resolved first |
+| File | Name | Line | Status |
+|---|---|---|---|
+| `Deformation.lean` | `StabilityCondition.exists_epsilon0` | 58 | Statement correct; dependent transport proof postponed |
+| `Deformation.lean` | `StabilityCondition.exists_epsilon0_sector` | 83 | Statement correct; same transport issue |
+| `Deformation.lean` | `deformedSlicing.hn_exists` | 7036 | Node 7.7 still open |
+| `Deformation.lean` | `P_phi_subobject_strict_in_interval` | 7667 | Heart-to-thin bridge reopened by the finite-length refactor |
+| `Deformation.lean` | `P_phi_wSemistable_is_deformedPred` | 7811 | Faithful Lemma 7.5 / 7.6 rewrite still open |
+| `Deformation.lean` | `bridgeland_theorem_1_2` | 8682 | New top-level shell; should be proved from Theorem 7.1 + Section 6 uniqueness |
 
-**Dependency chain:** #3 → #2; #1 and #4 are now done, and #5 remains deferred until #2-3 land.
+**Current proof order:** the `P(φ)` finite-length bridge in `Deformation.lean`,
+then Phase 4 blockers `#3 -> #2 -> #5`,
+and only then the final Theorem 1.2 topology packaging.
 
 ### Scaffolding sorrys
 
@@ -56,11 +62,11 @@ These are the real blockers for completing the deformation theorem.
 
 ### What is sorry-free
 
-- `Slicing.lean` (2403 lines) — fully proved
-- `IntervalCategory.lean` (584 lines) — fully proved
-- `StabilityFunction.lean` (1997 lines) — fully proved
-- `StabilityCondition.lean` (1617 lines) — fully proved
-- `GrothendieckGroup.lean` (208 lines) — fully proved
+- `Slicing.lean` — local-finiteness definition corrected to strict finite-length form
+- `IntervalCategory.lean` — Phase 2 and Phase 3 infrastructure compiled
+- `Strict.lean` — strict subobject / strict Artinian-Noetherian transfer compiled
+- `StabilityCondition.lean` — Section 6 layer compiled
+- `GrothendieckGroup.lean` — compiled
 
 ---
 
@@ -74,8 +80,7 @@ These are the real blockers for completing the deformation theorem.
 - [x] `toTStructure_bounded` — proved (Slicing.lean)
 - [x] `toTStructure_heart_iff` — proved (Slicing.lean)
 - [x] `heart_shortExact_triangle` — proved (HeartEquivalence.lean)
-- [x] Temporary surrogate `IsLocallyFinite` structure with `intervalFinite` + `phaseFinite`
-- [ ] Replace that surrogate by the paper-faithful Definition 5.7:
+- [x] `Slicing.IsLocallyFinite` corrected to the paper-faithful Definition 5.7:
   finite length of thin interval categories, i.e. ACC/DCC on **strict**
   subobjects / strict quotients in the thin quasi-abelian category itself
 - [x] `Finite.subobject_of_faithful_preservesMono` — proved (Strict.lean)
@@ -212,13 +217,9 @@ Current Phase 4 atomization:
      use the pullback square and Lemma 3.4 to descend a destabilizing strict SES to
      the smaller category,
      then compare the descended data to the abelian `P(φ)` semistability of `F`.
-   - newest structural decision:
-     pause further proof freelancing until `Slicing.IsLocallyFinite` is fixed.
-     The current surrogate is still wrong twice over:
-     it must not be `Finite (Subobject _)`, and it must not be ordinary
-     `IsArtinianObject` / `IsNoetherianObject` on all subobjects of the thin category.
-     The correct replacement is the paper's chain conditions on **strict**
-     subobjects / strict quotients.
+   - Proposition 2.4 status:
+     this finite-length detour is now complete in `StabilityFunction.lean`, so the live
+     work is back in `Deformation.lean` rather than in the abelian HN infrastructure.
 4. Done: `abelianHN_to_intervalProp` is now closed. The proof uses
    `Fin.induction` on the abelian HN chain in `P(φ)`, the compiled single-factor bridges
    `stabilityFunctionOnP_semistable_deformedPred` /
@@ -259,34 +260,33 @@ Current Phase 4 atomization:
    kernel/cokernel half-open target windows inside the midpoint heart, not by assuming
    a pre-existing `Fact (ψ₁ - ε₀ < ψ₂ + ε₀)`.
 
-Current remaining sorry sites in `Deformation.lean`:
+Current remaining explicit refactor placeholders:
 
-- `#2` `deformedSlicing.hn_exists`: line 6813
-- `#3` `P_phi_wSemistable_is_deformedPred`: line 7828
-- `#5` Q(ψ)-subobject finiteness: line 8106
+- `StabilityCondition.exists_epsilon0`
+- `StabilityCondition.exists_epsilon0_sector`
+- `deformedSlicing.hn_exists`
+- `P_phi_subobject_strict_in_interval`
+- `P_phi_wSemistable_is_deformedPred`
+- `bridgeland_theorem_1_2`
 
 ---
 
 ## Key Mathematical Discoveries
 
 - Audit result on local finiteness:
-  the current `Slicing.IsLocallyFinite` is stronger than Bridgeland's definition.
-  It packages finite subobject sets, not finite length, and even the intermediate
-  `Subobject`-Artinian / `Subobject`-Noetherian replacement is still stronger than the
-  paper because Bridgeland's finite length is about **strict** subobjects / strict
-  quotients in the thin quasi-abelian category.
-- This matters immediately because `StabilityFunction.hasHN_of_finiteLength` and the
-  current `phaseFinite` usage were built around that stronger surrogate.
-- The same issue also infects the current thin-interval Phase 3 machinery:
-  first strict short exact sequence selection and quasi-abelian HN were formalized
-  via finite strict-subobject sets, so those proofs must be rewritten from the paper's
-  chain-condition / finite-length argument before the deformation theorem is truly faithful.
-- Refactor order is now fixed:
-  1. change `IsLocallyFinite`,
-  2. replace the old finite-subobject HN inputs in both the abelian and thin
-     quasi-abelian layers,
-  3. build and repair the fallout,
-  4. only then revisit names/comments.
+  `Slicing.IsLocallyFinite` has now been corrected to the paper-faithful strict
+  finite-length form.
+- The old finite-subobject route is no longer the right API:
+  `StabilityFunction.hasHN_of_finiteLength` is now legacy infrastructure, while the new
+  public target is `StabilityFunction.hasHN_of_artinian_noetherian`.
+- Proposition 2.4 is now fully formalized in the faithful order:
+  semistable subobjects / quotients, mdq existence, arbitrary-quotient mdq comparison,
+  the kernel-step phase inequality, the local nonzero-subobject induction, and the
+  final append-the-last-mdq-factor recursion all compile.
+- `StabilityFunction.hasHN_of_artinian_noetherian` is now the working public theorem
+  for the corrected finite-length API.
+- The next proof to fill is fixed by paper order:
+  the `P(φ)` bridge in `Deformation.lean`, then the remaining deformation theorem proofs.
 
 ### False theorems (discovered and deleted)
 
@@ -317,10 +317,14 @@ Heart-subobject shortcuts don't work.
 - wPhaseOf infrastructure (indep, neg, add_two, see-saw)
 - deformedSlicing construction (closedUnderIso, shift_iff)
 - deformedSlicing hom-vanishing (large gap case)
-- stabilityFunctionOnP + stabilityFunctionOnP_hasHN
+- `stabilityFunctionOnP` compiles, and `stabilityFunctionOnP_hasHN` now routes through
+  the new public finite-length HN theorem shell
 - Lemma 3.4 phase bounds (phiPlus_lt_of_triangle, phiMinus_gt_of_triangle)
 - intervalProp_of_postnikovTower (extension closure)
-- bridgeland_7_1 distance bound + local finiteness (modulo sorrys)
+- `bridgeland_7_1` compiles with the faithful `ε₀ < 1/8` API, modulo the explicit
+  refactor placeholders listed above
+- `bridgeland_theorem_1_2` now exists as an explicit top-level theorem shell depending
+  on the Section 6 + Section 7 story
 - P(φ) admissibility, closure lemmas, truncation lemmas
 
 ---
