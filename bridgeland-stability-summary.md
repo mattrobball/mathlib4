@@ -40,13 +40,13 @@ These are the real blockers for completing the deformation theorem.
 
 | # | Name | Line | Description | Depends on |
 |---|------|------|-------------|------------|
-| 1 | `hom_eq_zero_of_deformedPred` | 4434 | Lemma 7.6: small-gap hom-vanishing | Phase 2 (two-heart factoring) |
-| 2 | `deformedSlicing.hn_exists` | 4779 | Lemma 7.7: HN in deformed slicing | Phase 3 + sorrys #1, #3 |
-| 3 | `P_phi_wSemistable_is_deformedPred` | 5328 | Triangle test for deformedPred | Phase 2 (quasi-abelian strict subobjects) |
+| 1 | `hom_eq_zero_of_deformedPred` | 6227 | Lemma 7.6: small-gap hom-vanishing | closed on branch |
+| 2 | `deformedSlicing.hn_exists` | 6800 | Lemma 7.7: HN in deformed slicing | Phase 3 + sorry #3 |
+| 3 | `P_phi_wSemistable_is_deformedPred` | 7363 | Triangle test for deformedPred | Phase 2 (quasi-abelian strict subobjects) |
 | 4 | `abelianHN_to_intervalProp` | 5877 | Abelian HN → interval containment | closed on branch |
-| 5 | Q(ψ)-subobject finiteness | 6067 | In `bridgeland_7_1` | Sorrys #1-2 resolved first |
+| 5 | Q(ψ)-subobject finiteness | 8106 | In `bridgeland_7_1` | Sorrys #2-3 resolved first |
 
-**Dependency chain:** #3 → #1 → #2; #4 is now done, and #5 remains deferred until #1-2 land.
+**Dependency chain:** #3 → #2; #1 and #4 are now done, and #5 remains deferred until #2-3 land.
 
 ### Scaffolding sorrys
 
@@ -109,9 +109,9 @@ Current blocker order:
 
 - [ ] #3 `P_phi_wSemistable_is_deformedPred`
 - [x] #4 `abelianHN_to_intervalProp`
-- [ ] #1 `hom_eq_zero_of_deformedPred`
+- [x] #1 `hom_eq_zero_of_deformedPred`
 - [ ] #2 `deformedSlicing.hn_exists`
-- [ ] #5 Q(ψ)-subobject finiteness (deferred until #1-2 land)
+- [ ] #5 Q(ψ)-subobject finiteness (deferred until #2-3 land)
 
 Current Phase 4 atomization:
 
@@ -164,11 +164,12 @@ Current Phase 4 atomization:
    `stabilityFunctionOnP_semistable_intervalProp`, the new local `stepTriangle`
    heart-admissibility bridge, and `intervalProp_of_triangle` to propagate interval
    containment up the chain.
-5. Return to the small-gap branch of `hom_eq_zero_of_deformedPred`, then finish
-   `deformedSlicing.hn_exists`.
-   Current checkpoint: the shared-heart/image-factorisation setup is still compiled,
-   and the interval-independence layer now has the general target-envelope transport
-   theorem needed for the paper-faithful rewrite.
+5. Done: the small-gap branch of `hom_eq_zero_of_deformedPred` is now closed.
+   The faithful midpoint-heart proof uses the compiled target-envelope transport on
+   both sides, gets `ψ₁ ≤ ψ(im_A(f))` from the left target window, then enlarges the
+   right target window by an explicit `δ > 0` so `Q_A` becomes an honest thin-interval
+   object and the existing upper-inclusion semistability theorem can deliver
+   `ψ(im_A(f)) ≤ ψ₂`.
    The faithful Lemma 7.6 shape is now explicit:
    for `a := (ψ₁ + ψ₂) / 2 - 1 / 2`, work in the heart `A = P((a, a + 1])`,
    factor `f` as `E ↠ im_A(f) ↪ F`, then prove
@@ -180,11 +181,11 @@ Current Phase 4 atomization:
    `P((ψ₂ - ε₀, a + 1))` for `F`,
    and the image comparison is made in the overlap
    `P((ψ₁ - ε₀, ψ₂ + ε₀))`.
-   Current compiled checkpoint inside `hom_eq_zero_of_deformedPred`:
-   the proof now transports `E` and `F` to those faithful target envelopes,
-   transports semistability to the target windows, proves the left-envelope quotient
-   inequality `ψ₁ ≤ ψ(im_A(f))`, and proves the midpoint-heart window pieces
-   `ker_A(f) ∈ P((a, ψ₁ + ε₀))` and `φ⁻(Q_A) > ψ₂ - ε₀`.
+   The compiled theorem now transports `E` and `F` to those faithful target envelopes,
+   proves the left-envelope quotient inequality `ψ₁ ≤ ψ(im_A(f))`, proves the
+   midpoint-heart window pieces `ker_A(f) ∈ P((a, ψ₁ + ε₀))` and
+   `φ⁻(Q_A) > ψ₂ - ε₀`, and closes the target-side inequality by the explicit
+   `δ`-enlargement trick on the right envelope.
    New constraint discovered during the audit:
    those target windows are thin only when `ε₀ < 1 / 8`.
    The theorem layer has now been tightened accordingly:
@@ -193,16 +194,15 @@ Current Phase 4 atomization:
    and `bridgeland_7_1` all now carry the faithful extra `1 / 8` hypothesis.
    Additional boundary discovery: at the endpoint `ψ₁ = ψ₂ + 2 ε₀`, the nominal
    overlap satisfies `ψ₁ - ε₀ = ψ₂ + ε₀`, so the open overlap interval can collapse.
-   That means the remaining small-gap proof must compare the image through the
+   The closed small-gap proof therefore compares the image through the
    kernel/cokernel half-open target windows inside the midpoint heart, not by assuming
    a pre-existing `Fact (ψ₁ - ε₀ < ψ₂ + ε₀)`.
 
 Current remaining sorry sites in `Deformation.lean`:
 
-- `#1` small-gap `hom_eq_zero_of_deformedPred`: line 5441
-- `#2` `deformedSlicing.hn_exists`: line 5680
-- `#3` `P_phi_wSemistable_is_deformedPred`: line 6694
-- `#5` Q(ψ)-subobject finiteness: line 6968
+- `#2` `deformedSlicing.hn_exists`: line 6813
+- `#3` `P_phi_wSemistable_is_deformedPred`: line 7828
+- `#5` Q(ψ)-subobject finiteness: line 8106
 
 ---
 

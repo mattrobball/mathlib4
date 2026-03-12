@@ -167,10 +167,9 @@ Optional cleanup left for later, not on the blocker path:
 
 | Order | Sorry | Line | Lines | Depends on |
 |-------|-------|------|-------|------------|
-| 1 | #3 Triangle test | 6694 | ~220 | Phase 2 (quasi-abelian strict subobjects) |
-| 2 | #1 Small-gap hom-vanishing | 5441 | ~150 | Phase 2 (two-heart factoring) |
-| 3 | #2 HN existence | 5680 | ~350 | Phase 3 + sorrys #1, #3 |
-| 4 | #5 Q(psi)-subobject finiteness | 6968 | ~80 | Sorrys #1-2 resolved first |
+| 1 | #3 Triangle test | 7363 | ~470 | Phase 2 (quasi-abelian strict subobjects) |
+| 2 | #2 HN existence | 6800 | ~350 | Phase 3 + sorry #3 |
+| 3 | #5 Q(psi)-subobject finiteness | 8106 | ~80 | Sorrys #2-3 resolved first |
 
 ### Phase 4 atomization
 
@@ -248,13 +247,17 @@ Optional cleanup left for later, not on the blocker path:
      the left-envelope quotient inequality `ψ₁ ≤ ψ(im_A(f))` is compiled, and the
      midpoint-heart window lemmas `K_A ∈ P((a, ψ₁ + ε₀))` and
      `φ⁻(Q_A) > ψ₂ - ε₀` are compiled.
-   - Remaining: rewrite the small-gap proof around the paper's actual midpoint-heart plus
-     two target envelopes argument, using the half-open left/right target windows rather
-     than assuming the open overlap `(ψ₁ - ε₀, ψ₂ + ε₀)` is nonempty.
+   - Done: the small-gap proof is now fully closed. The target-side image inequality is
+     discharged by a paper-faithful half-open-window move: enlarge the right target
+     envelope by an explicit `δ > 0`, transport `F`-semistability to
+     `P((ψ₂ - ε₀, a + 1 + δ))`, upgrade `Q_A` from the half-open window
+     `((ψ₂ - ε₀, a + 1]]` to that honest interval, and then apply the compiled
+     upper-inclusion semistability theorem plus `wPhaseOf` upper-inclusion independence
+     to get `ψ(im_A(f)) ≤ ψ₂`.
    - Important boundary note: at the endpoint `ψ₁ = ψ₂ + 2 ε₀`, one has
      `ψ₁ - ε₀ = ψ₂ + ε₀`, so the overlap interval from the paper can degenerate.
-     The Lean proof therefore has to recover the image comparison from the kernel and
-     cokernel windows inside the common heart, not by prematurely inserting a
+     The closed Lean proof therefore recovers the image comparison from the kernel and
+     cokernel half-open windows inside the common heart, not by prematurely inserting a
      `Fact (ψ₁ - ε₀ < ψ₂ + ε₀)`.
 5. **#2 deformed slicing HN**
    - Finish the `hn_exists` field from sigma-HN plus the Phase 3 thin-interval HN recursion.
@@ -283,7 +286,10 @@ Optional cleanup left for later, not on the blocker path:
    `im_A(f) → F → Q_A → im_A(f)[1]`.
    This gives `ψ₁ ≤ ψ(im_A(f))` from the first triangle and `ψ(im_A(f)) ≤ ψ₂`
    from the second.
-   Status: the first inequality is now compiled; the second is the remaining live gap.
+   Status: closed on branch. The second inequality is obtained by enlarging the right
+   target envelope by an explicit `δ > 0`, transporting `F`-semistability to that
+   larger open interval, and then applying the transported triangle test to
+   `im_A(f) → F → Q_A`.
 6. Tighten the wrapper API to the paper's `ε₀ < 1/8`.
    This is not cosmetic: the two target windows have widths
    `ψ₁ + ε₀ - a` and `a + 1 - (ψ₂ - ε₀)`, and their thinness condition

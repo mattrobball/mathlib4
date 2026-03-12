@@ -6524,14 +6524,52 @@ theorem StabilityCondition.hom_eq_zero_of_deformedPred
           hI_gt (by
             dsimp [a]
             linarith [hε₀2]) hT_I'
-      -- Remaining work in the faithful route:
-      -- 1. show ker_A(f) ∈ P((a, ψ₁ + ε₀)),
-      --    im_A(f) ∈ P((ψ₁ - ε₀, ψ₂ + ε₀)),
-      --    coker_A(f) ∈ P((ψ₂ - ε₀, a + 1));
-      -- 2. transport E and F to the left/right target envelopes using Node 7.5;
-      -- 3. apply the transported semistability triangle tests to force
-      --    ψ₁ ≤ ψ(im_A(f)) ≤ ψ₂.
-      sorry
+      set δ := (1 - (((a + 1) - (ψ₂ - ε₀)) + 2 * ε₀)) / 2 with hδ_def
+      have hδ_pos : 0 < δ := by
+        have : ((a + 1) - (ψ₂ - ε₀)) + 2 * ε₀ < 1 := by
+          simpa [sub_eq_add_neg, add_assoc, add_left_comm, add_comm] using hrightThin
+        linarith
+      have habF_big : ψ₂ - ε₀ < a + 1 + δ := by
+        linarith
+      have hthin_big : (a + 1 + δ) - (ψ₂ - ε₀) + 2 * ε₀ < 1 := by
+        rw [hδ_def]
+        linarith
+      have hF_big : σ.slicing.intervalProp C (ψ₂ - ε₀) (a + 1 + δ) F := by
+        exact σ.slicing.intervalProp_mono C (show ψ₂ - ε₀ ≤ ψ₂ - ε₀ by linarith)
+          (show a + 1 ≤ a + 1 + δ by linarith) hF_right
+      have hSS₂_big :
+          (σ.skewedStabilityFunction_of_near C W hW habF_big).Semistable C F ψ₂ := by
+        exact semistable_of_upper_inclusion
+          (C := C) (σ := σ) (W := W) (hW := hW)
+          (hab₁ := habF_right) (hab₂ := habF_big)
+          (hb := by linarith) hSS₂_right hε₀ hε₀2
+          (by linarith) henvF_right_hi hthin_big hsin
+      have hI_big : σ.slicing.intervalProp C (ψ₂ - ε₀) (a + 1 + δ) I_H.obj := by
+        exact σ.slicing.intervalProp_mono C (show ψ₂ - ε₀ ≤ ψ₂ - ε₀ by linarith)
+          (show a + 1 ≤ a + 1 + δ by linarith) hI_right
+      have hQ_big : σ.slicing.intervalProp C (ψ₂ - ε₀) (a + 1 + δ) Q.obj := by
+        by_cases hQZ : IsZero Q.obj
+        · exact Or.inl hQZ
+        · exact σ.slicing.intervalProp_of_intrinsic_phases C hQZ
+            (hQ_phiMinus_right hQZ)
+            (lt_of_le_of_lt (σ.slicing.phiPlus_le_of_leProp C hQZ hQ_le) (by linarith))
+      have hI_phase_le_big :
+          wPhaseOf (W (K₀.of C I_H.obj)) ((ψ₂ - ε₀ + (a + 1 + δ)) / 2) ≤ ψ₂ := by
+        simpa [StabilityCondition.skewedStabilityFunction_of_near] using
+          hSS₂_big.2.2.2.2 hT_I' hI_big hQ_big hIne
+      have hI_phase_eq_right_big :
+          wPhaseOf (W (K₀.of C I_H.obj)) αR =
+            wPhaseOf (W (K₀.of C I_H.obj)) ((ψ₂ - ε₀ + (a + 1 + δ)) / 2) := by
+        simpa [αR] using
+          (wPhaseOf_eq_of_intervalProp_upper_inclusion
+            (C := C) (σ := σ) (W := W) (hW := hW) habF_right (by linarith)
+            hI_right hIne hε₀ hε₀2 hthin_big hsin)
+      have hI_phase_le_right :
+          wPhaseOf (W (K₀.of C I_H.obj)) αR ≤ ψ₂ := by
+        rw [hI_phase_eq_right_big]
+        exact hI_phase_le_big
+      rw [← hI_phase_eq_left_right] at hI_phase_le_right
+      linarith
 
 /-! ### Extension-closed subcategories Q(> t), Q(≤ t) (Node 7.8a) -/
 
