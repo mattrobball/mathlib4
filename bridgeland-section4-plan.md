@@ -223,6 +223,18 @@ Optional cleanup left for later, not on the blocker path:
    - Replaced plan: use the compiled common-heart / pullback / quotient infrastructure as
      support lemmas for the interval-independence proof. The previous "last contradiction"
      route is not strong enough on its own.
+   - Audit result: the current terminal `K`, `I_H`, `K_err⟦1⟧`, `Q_H` phase inequalities
+     are genuinely underdetermined; they admit direct complex-number models, so no
+     further terminal sign chase should be attempted.
+   - Current faithful rewrite: treat `#3` by the paper's one-sided source envelopes
+     `(ψ - ε₀, φ + ε₀)` and `(φ - ε₀, ψ + ε₀)`, prove semistability there via the
+     heart/pullback argument, then transport back to `(ψ - ε₀, ψ + ε₀)` with
+     `semistable_of_target_subinterval`.
+   - Done: `Deformation.lean` now has the first source-envelope scaffolding for that
+     rewrite:
+     `intervalProp_P_phi_upper_source`, `intervalProp_P_phi_lower_source`,
+     `wPhaseOf_eq_upper_source_midpoint_of_mem_P_phi`, and
+     `wPhaseOf_eq_lower_source_midpoint_of_mem_P_phi`.
 3. **#4 abelian HN bridge**
    - Done: `abelianHN_to_intervalProp` is now closed.
    - The proof uses `stabilityFunctionOnP_hasHN`, the single-factor bridges

@@ -7028,6 +7028,56 @@ private theorem wPhaseOf_eq_at_phi_sub_half_of_mem_P_phi
   exact wPhaseOf_indep hWne φ (φ - 1 / 2) <| by
     constructor <;> linarith
 
+private theorem intervalProp_P_phi_upper_source
+    (σ : StabilityCondition C) {φ ψ ε₀ : ℝ} {E : C}
+    (hPφ : σ.slicing.P φ E) (hψ_lo : φ - ε₀ < ψ) (hψ_hi : ψ < φ + ε₀) :
+    σ.slicing.intervalProp C (ψ - ε₀) (φ + ε₀) E := by
+  exact σ.slicing.intervalProp_of_semistable C hPφ (by linarith) (by linarith)
+
+private theorem intervalProp_P_phi_lower_source
+    (σ : StabilityCondition C) {φ ψ ε₀ : ℝ} {E : C}
+    (hPφ : σ.slicing.P φ E) (hψ_lo : φ - ε₀ < ψ) (hψ_hi : ψ < φ + ε₀) :
+    σ.slicing.intervalProp C (φ - ε₀) (ψ + ε₀) E := by
+  exact σ.slicing.intervalProp_of_semistable C hPφ (by linarith) (by linarith)
+
+variable [IsTriangulated C] in
+private theorem wPhaseOf_eq_upper_source_midpoint_of_mem_P_phi
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    {φ ψ : ℝ} {E : C} (hPφ : σ.slicing.P φ E) (hEne : ¬IsZero E)
+    (hψ_lo : φ - ε₀ < ψ) (hψ_hi : ψ < φ + ε₀) :
+    wPhaseOf (W (K₀.of C E)) ((ψ - ε₀ + (φ + ε₀)) / 2) =
+      wPhaseOf (W (K₀.of C E)) φ := by
+  exact (wPhaseOf_eq_at_phi_of_mem_P_phi (C := C) (σ := σ) (W := W) (hW := hW)
+    hε₀ hε₀2 hsin hPφ hEne (by
+      have hmid : φ - ε₀ < ((ψ - ε₀ + (φ + ε₀)) / 2 : ℝ) := by
+        linarith
+      linarith [hmid]) (by
+      have hmid : ((ψ - ε₀ + (φ + ε₀)) / 2 : ℝ) < φ + ε₀ := by
+        linarith
+      linarith [hmid])).symm
+
+variable [IsTriangulated C] in
+private theorem wPhaseOf_eq_lower_source_midpoint_of_mem_P_phi
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    {φ ψ : ℝ} {E : C} (hPφ : σ.slicing.P φ E) (hEne : ¬IsZero E)
+    (hψ_lo : φ - ε₀ < ψ) (hψ_hi : ψ < φ + ε₀) :
+    wPhaseOf (W (K₀.of C E)) ((φ - ε₀ + (ψ + ε₀)) / 2) =
+      wPhaseOf (W (K₀.of C E)) φ := by
+  exact (wPhaseOf_eq_at_phi_of_mem_P_phi (C := C) (σ := σ) (W := W) (hW := hW)
+    hε₀ hε₀2 hsin hPφ hEne (by
+      have hmid : φ - ε₀ < ((φ - ε₀ + (ψ + ε₀)) / 2 : ℝ) := by
+        linarith
+      linarith [hmid]) (by
+      have hmid : ((φ - ε₀ + (ψ + ε₀)) / 2 : ℝ) < φ + ε₀ := by
+        linarith
+      linarith [hmid])).symm
+
 variable [IsTriangulated C] in
 private theorem leProp_of_phiPlus_le
     (s : Slicing C) {E : C} (hE : ¬IsZero E) {t : ℝ}
@@ -7357,9 +7407,13 @@ If `F ∈ P(φ)` is nonzero and W-semistable in the abelian category `P(φ)` (wi
 The proof uses:
 1. Choose deformedPred interval `(ψ - ε₀, ψ + ε₀)` (width `2ε₀`, thinness `4ε₀ < 1`).
 2. `F ∈ P(φ) ⊂ P((ψ-ε₀, ψ+ε₀))` since `|φ - ψ| < ε₀`.
-3. For the triangle test: split `K` via σ-t-structure at cutoff `φ`. The `P(≤ φ)` part
-   of `K` maps to `F` and is a P(φ)-subobject (by heart closure). W-semistability bounds
-   its W-phase. The `P(> φ)` part maps to 0 by hom-vanishing. Combined via K₀ + see-saw. -/
+3. For the triangle test: follow the paper-faithful Node 7.5 route.
+   - Build a one-sided source envelope containing `P(φ)`:
+     `(ψ - ε₀, φ + ε₀)` if `ψ ≤ φ`, or `(φ - ε₀, ψ + ε₀)` if `φ ≤ ψ`.
+   - Prove semistability there from the heart/pullback argument.
+   - Transport semistability back to `(ψ - ε₀, ψ + ε₀)` with
+     `semistable_of_target_subinterval`.
+   The old terminal common-heart sign chase is insufficient on its own. -/
 private theorem P_phi_wSemistable_is_deformedPred
     (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)

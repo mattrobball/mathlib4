@@ -156,8 +156,17 @@ Current Phase 4 atomization:
      `semistable_of_target_envelope`, obtained by intersecting source and target
      envelopes and chaining `semistable_of_target_subinterval` with
      `semistable_of_interval_inclusion`.
-   - next live gap: use that transport to rewrite the remaining ad hoc tails in `#3`
-     and the small-gap branch of `#1` around the actual Lemma 7.5 / 7.6 proof shape.
+   - audit result: the remaining terminal `K₀` sign chase in `#3` is actually
+     underdetermined. The present `K`, `I_H`, `K_err⟦1⟧`, `Q_H` phase data has direct
+     complex-number models, so that tail cannot be closed by more bookkeeping alone.
+   - next live gap: replace the old `#3` tail by the faithful one-sided source-envelope
+     rewrite. The intended source intervals are `(ψ - ε₀, φ + ε₀)` and
+     `(φ - ε₀, ψ + ε₀)`, followed by transport back to `(ψ - ε₀, ψ + ε₀)` via
+     `semistable_of_target_subinterval`.
+   - newly compiled source-envelope scaffolding in `Deformation.lean`:
+     `intervalProp_P_phi_upper_source`, `intervalProp_P_phi_lower_source`,
+     `wPhaseOf_eq_upper_source_midpoint_of_mem_P_phi`, and
+     `wPhaseOf_eq_lower_source_midpoint_of_mem_P_phi`.
 4. Done: `abelianHN_to_intervalProp` is now closed. The proof uses
    `Fin.induction` on the abelian HN chain in `P(φ)`, the compiled single-factor bridges
    `stabilityFunctionOnP_semistable_deformedPred` /
