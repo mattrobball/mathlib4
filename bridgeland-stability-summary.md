@@ -46,12 +46,10 @@ infrastructure is now back on the paper-faithful track: Proposition 2.4 is finis
 | `Deformation.lean` | `StabilityCondition.exists_epsilon0` | 58 | Statement correct; dependent transport proof postponed |
 | `Deformation.lean` | `StabilityCondition.exists_epsilon0_sector` | 83 | Statement correct; same transport issue |
 | `Deformation.lean` | `deformedSlicing.hn_exists` | 7036 | Node 7.7 still open |
-| `Deformation.lean` | `P_phi_subobject_strict_in_interval` | 7667 | Heart-to-thin bridge reopened by the finite-length refactor |
 | `Deformation.lean` | `P_phi_wSemistable_is_deformedPred` | 7811 | Faithful Lemma 7.5 / 7.6 rewrite still open |
 | `Deformation.lean` | `bridgeland_theorem_1_2` | 8682 | New top-level shell; should be proved from Theorem 7.1 + Section 6 uniqueness |
 
-**Current proof order:** the `P(φ)` finite-length bridge in `Deformation.lean`,
-then Phase 4 blockers `#3 -> #2 -> #5`,
+**Current proof order:** Phase 4 blockers `#3 -> #2 -> #5`,
 and only then the final Theorem 1.2 topology packaging.
 
 ### Scaffolding sorrys
@@ -220,13 +218,17 @@ Current Phase 4 atomization:
    - Proposition 2.4 status:
      this finite-length detour is now complete in `StabilityFunction.lean`, so the live
      work is back in `Deformation.lean` rather than in the abelian HN infrastructure.
-4. Done: `abelianHN_to_intervalProp` is now closed. The proof uses
+4. Done: `P_phi_subobject_strict_in_interval` now follows the faithful bridge from the
+   abelian cokernel sequence in `P(φ)` to a distinguished triangle via
+   `P_phi_admissible`, then reads strictness of the embedded subobject in
+   `P((φ - η, φ + η))` from `strictMono_strictEpi_of_distTriang`.
+5. Done: `abelianHN_to_intervalProp` is now closed. The proof uses
    `Fin.induction` on the abelian HN chain in `P(φ)`, the compiled single-factor bridges
    `stabilityFunctionOnP_semistable_deformedPred` /
    `stabilityFunctionOnP_semistable_intervalProp`, the new local `stepTriangle`
    heart-admissibility bridge, and `intervalProp_of_triangle` to propagate interval
    containment up the chain.
-5. Done: the small-gap branch of `hom_eq_zero_of_deformedPred` is now closed.
+6. Done: the small-gap branch of `hom_eq_zero_of_deformedPred` is now closed.
    The faithful midpoint-heart proof uses the compiled target-envelope transport on
    both sides, gets `ψ₁ ≤ ψ(im_A(f))` from the left target window, then enlarges the
    right target window by an explicit `δ > 0` so `Q_A` becomes an honest thin-interval

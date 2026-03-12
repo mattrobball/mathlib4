@@ -360,10 +360,11 @@ Proposition 2.4 order:
 
 Required order from here:
 
-1. use `StabilityFunction.hasHN_of_artinian_noetherian` to refill the `P(φ)` finite-length
-   bridge in `Deformation.lean`,
-   in particular `P_phi_subobject_strict_in_interval` and `stabilityFunctionOnP_hasHN`,
-2. then return to the remaining deformation-theorem proofs in the already-audited order
+1. the `P(φ)` finite-length bridge in `Deformation.lean` is now restored:
+   `P_phi_subobject_strict_in_interval` follows the faithful cokernel-sequence ->
+   admissible triangle -> thin-interval strictness route, and
+   `stabilityFunctionOnP_hasHN` is back on the corrected Proposition 2.4 theorem,
+2. now return to the remaining deformation-theorem proofs in the already-audited order
    `#3 -> #2 -> #5`,
 3. only after Theorem 7.1 is honestly proved, fill the top-level
    `bridgeland_theorem_1_2` shell by the Section 6 uniqueness + Section 7 existence
@@ -373,7 +374,6 @@ Current explicit refactor placeholders:
 
 - `StabilityCondition.exists_epsilon0`
 - `StabilityCondition.exists_epsilon0_sector`
-- `P_phi_subobject_strict_in_interval`
 - `deformedSlicing.hn_exists`
 - `P_phi_wSemistable_is_deformedPred`
 - `bridgeland_theorem_1_2`

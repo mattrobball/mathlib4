@@ -7669,13 +7669,65 @@ private theorem P_phi_subobject_strict_in_interval
     [Fact (φ - η < φ + η)] [Fact ((φ + η) - (φ - η) ≤ 1)]
     {E : (σ.slicing.P φ).FullSubcategory} (B : Subobject E) :
     IsStrictMono ((P_phi_intervalInclusion (C := C) σ φ η hη).map B.arrow) := by
-  /-
-  Refactor note:
-  this is the first heart-to-thin-interval bridge that genuinely depends on the new
-  finite-length path. The statement is still the correct one, but the previous proof
-  mixed the old surrogate assumptions with a brittle kernel comparison.
-  -/
-  sorry
+  let A := (σ.slicing.P φ).FullSubcategory
+  letI : Abelian A := σ.P_phi_abelian C φ
+  let ι := (σ.slicing.P φ).ι
+  let I : A ⥤ σ.slicing.IntervalCat C (φ - η) (φ + η) :=
+    P_phi_intervalInclusion (C := C) σ φ η hη
+  let f : (B : A) ⟶ E := B.arrow
+  let q : E ⟶ cokernel f := cokernel.π f
+  haveI : Epi q := inferInstance
+  obtain ⟨K, i, δ, hT⟩ :=
+    Triangulated.AbelianSubcategory.exists_distinguished_triangle_of_epi
+      (ι := ι) (hι := σ.P_phi_hom_vanishing C φ) (hA := σ.P_phi_admissible C φ) q
+  have hKer :
+      IsLimit (KernelFork.ofι i (show i ≫ q = 0 by
+        exact ι.map_injective (comp_distTriang_mor_zero₁₂ _ hT))) :=
+    Triangulated.AbelianSubcategory.isLimitKernelForkOfDistTriang
+      (σ.P_phi_hom_vanishing C φ) i q δ hT
+  let β : K ⟶ (B : A) :=
+    Abelian.monoLift f i (show i ≫ q = 0 by
+      exact ι.map_injective (comp_distTriang_mor_zero₁₂ _ hT))
+  have hβf : β ≫ f = i := Abelian.monoLift_comp f i
+    (show i ≫ q = 0 by
+      exact ι.map_injective (comp_distTriang_mor_zero₁₂ _ hT))
+  let γ : (B : A) ⟶ K :=
+    hKer.lift (KernelFork.ofι f (cokernel.condition _))
+  have hγi : γ ≫ i = f := Fork.IsLimit.lift_ι hKer
+  have hβγ : β ≫ γ = 𝟙 K :=
+    Fork.IsLimit.hom_ext hKer (by simp [hγi, hβf])
+  have hγβ : γ ≫ β = 𝟙 (B : A) := by
+    haveI : Mono f := inferInstance
+    rw [← cancel_mono f, Category.assoc, hβf, hγi, Category.id_comp]
+  have hT' :
+      Triangle.mk (ι.map f) (ι.map q)
+          (δ ≫ (shiftFunctor C (1 : ℤ)).map (ι.map β)) ∈ distTriang C := by
+    refine isomorphic_distinguished _ hT _
+      (Triangle.isoMk _ _ (ι.mapIso
+        ⟨γ, β, hγβ, hβγ⟩) (Iso.refl _) (Iso.refl _) ?_ ?_ ?_)
+    · simp only [Iso.refl_hom, Functor.mapIso_hom, Triangle.mk_mor₁]
+      change ι.map f ≫ 𝟙 _ = ι.map γ ≫ ι.map i
+      rw [Category.comp_id, ← Functor.map_comp, hγi]
+    · simp only [Iso.refl_hom, Triangle.mk_mor₂, Triangle.mk_obj₂, Triangle.mk_obj₃]
+      rw [Category.comp_id, Category.id_comp]
+    · simp only [Iso.refl_hom, Triangle.mk_mor₃, Functor.mapIso_hom]
+      change (δ ≫ (shiftFunctor C (1 : ℤ)).map (ι.map β)) ≫
+          (shiftFunctor C (1 : ℤ)).map (ι.map γ) = 𝟙 _ ≫ δ
+      rw [Category.assoc, ← (shiftFunctor C (1 : ℤ)).map_comp, ← ι.map_comp, hβγ,
+        ι.map_id, Functor.map_id, Category.comp_id]
+      simp
+  let S : ShortComplex (σ.slicing.IntervalCat C (φ - η) (φ + η)) :=
+    ShortComplex.mk (I.map f) (I.map q) (by
+      rw [← I.map_comp, cokernel.condition, I.map_zero])
+  have hTS :
+      Triangle.mk S.f.hom S.g.hom
+          (δ ≫ (shiftFunctor C (1 : ℤ)).map (ι.map β)) ∈ distTriang C := by
+    simpa [S, I, f, q] using hT'
+  have hstrict :
+      IsStrictMono S.f :=
+    (Slicing.IntervalCat.strictMono_strictEpi_of_distTriang
+      (C := C) (s := σ.slicing) (a := φ - η) (b := φ + η) (S := S) hTS).1
+  simpa [S, I, f] using hstrict
 
 variable [IsTriangulated C] in
 /-- Objects of `P(φ)` are Artinian and Noetherian in the abelian slice `P(φ)`. The proof
