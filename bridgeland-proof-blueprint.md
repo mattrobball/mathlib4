@@ -314,10 +314,20 @@ Use the paper definition, not the current surrogate.
 ```lean
 class Slicing.IsLocallyFinite (s : Slicing C) : Prop :=
   (exists_eta : ∃ η > 0, ∀ t : ℝ,
-      FiniteLength (s.Interval (Set.Ioo (t - η) (t + η))))
+      FiniteLengthStrict (s.IntervalCat C (t - η) (t + η)))
 ```
 
-If desired, later derive the current `WellFoundedLT`/`WellFoundedGT` style statement as a consequence.
+This is the definition that should drive the code. The current branch still has a
+stronger surrogate in terms of `Finite (Subobject _)`; replacing it merely by ordinary
+`IsArtinianObject` / `IsNoetherianObject` on all subobjects would still be too strong.
+The formal target has to talk about ACC/DCC on **strict** subobjects / strict quotients
+in the thin quasi-abelian category itself. In particular, both:
+
+- the abelian HN existence theorem of Section 2, and
+- the thin quasi-abelian first-SES / HN recursion of Section 7,
+
+have to be driven by the paper's chain conditions / finite-length argument, not by
+enumerating subobject sets.
 
 ---
 
@@ -796,7 +806,10 @@ Need two inverse statements up to definitional transport of the heart equivalenc
 
 ### 3D.4 Definition 5.7: local finiteness
 
-Use the categorical finite-length form from section 4, not the current `Subobject`-only surrogate.
+Use the section-4 exact/quasi-abelian finite-length form, not the current
+`Subobject`-only surrogate.
+Concrete formal target: chain conditions on **strict** subobjects / strict quotients
+for objects of the thin interval category `P((t-η, t+η))`.
 
 ---
 
@@ -961,6 +974,9 @@ Support API needed:
 
 - existence of strict short exact sequence `0 → A → E → B → 0` with `A` top phase and `B` lower phases inside a thin category,
 - translation between strict short exact sequences and triangles.
+- the finiteness input should come from Bridgeland's finite-length chain conditions on
+  strict subobjects / strict quotients in the thin quasi-abelian category itself,
+  not from an ambient or internal `Finite (Subobject _)` enumeration.
 
 ### 3F.4 Definition 7.4 and Lemma 7.5
 
@@ -974,6 +990,19 @@ def EnvelopedBy (A : ThinCategory) (E : A) : Prop :=
 #### Node 7.5 — independence of `W`-semistability from the chosen thin enveloping category
 
 Formalize exactly in the inclusion case `B ⊂ C` and use symmetry.
+
+Paper reference:
+
+- Bridgeland, Annals 166 (2007), pp. 338-339.
+- The proof direction matters:
+  start with a destabilizing strict short exact sequence in the larger thin category `C`,
+  decompose its quotient as `0 → B₁ → B → B₂ → 0` where `B₁` lies on the boundary strip
+  and `B₂` belongs to the smaller thin category `B`,
+  then use the pullback square and Lemma 3.4 to descend a destabilizing strict short
+  exact sequence to `B`.
+- For the current branch this is the authoritative proof shape for blocker `#3`.
+  Do not replace it by an ad hoc terminal `K₀` sign chase or by a generic
+  common-heart bookkeeping argument that skips the paper's quotient decomposition.
 
 Need small support lemmas:
 
@@ -1287,7 +1316,8 @@ Definition 4.4        -> exact-additive central charge on quasi-abelian category
 Definition 5.1        -> slicing + central charge + local finiteness
 Lemma 5.2             -> 3.4, 3.5b, heart abelianity
 Proposition 5.3       -> 2.4, 3.2, 3.5b, 5.2
-Definition 5.7        -> finite-length interval categories
+Definition 5.7        -> finite-length interval categories (ACC/DCC on strict
+                         subobjects / strict quotients in thin interval categories)
 
 Lemma 6.1             -> intrinsic φ±
 Lemma 6.2             -> sector estimate + Lemma 6.1
@@ -1332,4 +1362,3 @@ The two places that need immediate redesign are:
 
 Once those are repaired, the rest of the paper up through Corollary 1.3 has a clean formal path.
 Section 9 should be split off as a later algebraic-geometry project.
-

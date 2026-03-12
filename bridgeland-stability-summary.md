@@ -74,7 +74,10 @@ These are the real blockers for completing the deformation theorem.
 - [x] `toTStructure_bounded` — proved (Slicing.lean)
 - [x] `toTStructure_heart_iff` — proved (Slicing.lean)
 - [x] `heart_shortExact_triangle` — proved (HeartEquivalence.lean)
-- [x] `IsLocallyFinite` upgraded to structure with `intervalFinite` + `phaseFinite`
+- [x] Temporary surrogate `IsLocallyFinite` structure with `intervalFinite` + `phaseFinite`
+- [ ] Replace that surrogate by the paper-faithful Definition 5.7:
+  finite length of thin interval categories, i.e. ACC/DCC on **strict**
+  subobjects / strict quotients in the thin quasi-abelian category itself
 - [x] `Finite.subobject_of_faithful_preservesMono` — proved (Strict.lean)
 - [x] `isStrictMono_kernel` / `isStrictEpi_cokernel` — proved (Strict.lean)
 - [ ] `Subobject.IsStrict` predicate on subobjects
@@ -167,18 +170,55 @@ Current Phase 4 atomization:
      `intervalProp_P_phi_upper_source`, `intervalProp_P_phi_lower_source`,
      `wPhaseOf_eq_upper_source_midpoint_of_mem_P_phi`, and
      `wPhaseOf_eq_lower_source_midpoint_of_mem_P_phi`.
-   - audit against the original paper: the faithful `#3` proof should now pivot to
-     Bridgeland's **first strict short exact sequence** argument in the thin target
-     category, not back to more endpoint-sign bookkeeping.
+   - re-audit against Bridgeland's original paper, Annals 166 (2007), pp. 337-339:
+     the faithful `#3` proof should now pivot to the actual Lemma 7.5 larger-to-smaller
+     destabilization argument, not back to more endpoint-sign bookkeeping and not to a
+     bespoke common-heart surrogate.
    - newly compiled API alignment: `P_phi_wSemistable_is_deformedPred` and its immediate
      bridge now explicitly carry `ε₀ < 1 / 8`, which is the bound under which the paper's
      one-sided source envelopes are actually thin.
    - newly compiled faithful API: `Deformation.lean` now has
      `SkewedStabilityFunction.exists_first_strictShortExact_of_not_semistable`, which
-     packages Bridgeland's Node 7.3 first strict short exact sequence once local thin
-     subobject finiteness is available.
-   - remaining gap: `#3` still needs a way to supply or bypass that local
-     `hFinSub : ∀ Y, Finite (Subobject Y)` input in the one-sided source-envelope proof.
+     packages Bridgeland's Node 7.3 first strict short exact sequence once local
+     finiteness of the thin category's **strict-subobject set** is available for the
+     specific interval object under study.
+   - newly compiled left-heart bridge:
+     `Slicing.IntervalCat.finite_strictSubobjects_of_finite_leftHeartSubobjects`
+     reduces strict-subobject finiteness to finiteness of the left-heart subobject
+     lattice, and
+     `SkewedStabilityFunction.exists_first_strictShortExact_of_not_semistable_of_finite_leftHeartSubobjects`
+     packages the resulting first-SES corollary.
+   - new audit correction:
+     do not try to derive that Node 7.3 input from an ambient statement
+     `Finite (Subobject X.obj)` in `C`. Bridgeland's local finiteness is finite-length
+     information inside the thin quasi-abelian category, so the formal interface has to
+     talk about strict subobjects in the thin category itself.
+   - current finiteness bottleneck:
+     what is still missing is a faithful source-envelope theorem proving finiteness of
+     the left-heart subobject lattice in the specific Node 7.5 / `#3` situations.
+   - remaining gap after the paper re-read:
+     `#3` still needs the exact p. 338 quotient decomposition
+     `0 → B₁ → B → B₂ → 0`
+     and the resulting pullback-produced destabilizing sequence in the smaller target
+     thin category. The finite-subobject issue is now secondary to getting that
+     control flow aligned with the paper.
+   - authoritative proof shape for the remaining `#3` work:
+     let the smaller thin category be
+     `P((ψ - ε₀, ψ + ε₀))`,
+     let the larger one be the appropriate one-sided source envelope,
+     assume instability in the larger category,
+     apply the first strict SES there,
+     decompose the quotient into a boundary-strip part plus a smaller-category part,
+     use the pullback square and Lemma 3.4 to descend a destabilizing strict SES to
+     the smaller category,
+     then compare the descended data to the abelian `P(φ)` semistability of `F`.
+   - newest structural decision:
+     pause further proof freelancing until `Slicing.IsLocallyFinite` is fixed.
+     The current surrogate is still wrong twice over:
+     it must not be `Finite (Subobject _)`, and it must not be ordinary
+     `IsArtinianObject` / `IsNoetherianObject` on all subobjects of the thin category.
+     The correct replacement is the paper's chain conditions on **strict**
+     subobjects / strict quotients.
 4. Done: `abelianHN_to_intervalProp` is now closed. The proof uses
    `Fin.induction` on the abelian HN chain in `P(φ)`, the compiled single-factor bridges
    `stabilityFunctionOnP_semistable_deformedPred` /
@@ -228,6 +268,25 @@ Current remaining sorry sites in `Deformation.lean`:
 ---
 
 ## Key Mathematical Discoveries
+
+- Audit result on local finiteness:
+  the current `Slicing.IsLocallyFinite` is stronger than Bridgeland's definition.
+  It packages finite subobject sets, not finite length, and even the intermediate
+  `Subobject`-Artinian / `Subobject`-Noetherian replacement is still stronger than the
+  paper because Bridgeland's finite length is about **strict** subobjects / strict
+  quotients in the thin quasi-abelian category.
+- This matters immediately because `StabilityFunction.hasHN_of_finiteLength` and the
+  current `phaseFinite` usage were built around that stronger surrogate.
+- The same issue also infects the current thin-interval Phase 3 machinery:
+  first strict short exact sequence selection and quasi-abelian HN were formalized
+  via finite strict-subobject sets, so those proofs must be rewritten from the paper's
+  chain-condition / finite-length argument before the deformation theorem is truly faithful.
+- Refactor order is now fixed:
+  1. change `IsLocallyFinite`,
+  2. replace the old finite-subobject HN inputs in both the abelian and thin
+     quasi-abelian layers,
+  3. build and repair the fallout,
+  4. only then revisit names/comments.
 
 ### False theorems (discovered and deleted)
 

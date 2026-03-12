@@ -47,37 +47,92 @@ namespace CategoryTheory.Triangulated
 
 variable (C : Type u) [Category.{v} C] [HasZeroObject C] [HasShift C ℤ]
   [Preadditive C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
+  [IsTriangulated C]
 
 /-! ### Node 7.0: ε₀ extraction from local finiteness -/
 
 /-- **Node 7.0: Extraction of ε₀**. Given a stability condition `σ`, extract a positive
 real `ε₀ < 1/8` such that for all `t`, every object in `P((t - 4ε₀, t + 4ε₀))` has
-well-founded subobject lattice. The width `8ε₀` is chosen to fit inside the local
-finiteness parameter `2η`. -/
+finite length. The width `8ε₀` is chosen to fit inside the local finiteness
+parameter `2η`. -/
 theorem StabilityCondition.exists_epsilon0 (σ : StabilityCondition C) :
-    ∃ ε₀ : ℝ, 0 < ε₀ ∧ ε₀ < 1 / 8 ∧
-      ∀ t : ℝ, ∀ (E : C),
-        σ.slicing.intervalProp C (t - 4 * ε₀) (t + 4 * ε₀) E →
-          Finite (Subobject E) := by
-  obtain ⟨η, hη, hlf⟩ := σ.locallyFinite.intervalFinite
-  refine ⟨min (η / 4) (1 / 16), by positivity,
-    by linarith [min_le_right (η / 4) (1 / 16 : ℝ)],
-    fun t E hI ↦ ?_⟩
-  exact σ.slicing.intervalFiniteLength C hI (η := η)
-    (by have h := min_le_left (η / 4) (1 / 16 : ℝ); linarith) hlf
+    ∃ ε₀ : ℝ, ∃ hε₀ : 0 < ε₀, ∃ hε₀' : ε₀ < 1 / 8,
+      ∀ t : ℝ,
+        let a := t - 4 * ε₀
+        let b := t + 4 * ε₀
+        letI : Fact (a < b) := ⟨by
+          dsimp [a, b]
+          linarith⟩
+        letI : Fact (b - a ≤ 1) := ⟨by
+          dsimp [a, b]
+          linarith⟩
+        ∀ (E : σ.slicing.IntervalCat C a b),
+          IsStrictArtinianObject E ∧ IsStrictNoetherianObject E := by
+  obtain ⟨η, hη, hη', hlf⟩ := σ.locallyFinite.intervalFinite
+  refine ⟨η / 4, by positivity, by linarith, ?_⟩
+  intro t
+  have ha : t - 4 * (η / 4) = t - η := by ring
+  have hb : t + 4 * (η / 4) = t + η := by ring
+  letI : Fact (t - η < t + η) := ⟨by linarith [hη]⟩
+  letI : Fact ((t + η) - (t - η) ≤ 1) := ⟨by linarith [hη']⟩
+  let h' : ∀ (E : σ.slicing.IntervalCat C (t - η) (t + η)),
+      IsStrictArtinianObject E ∧ IsStrictNoetherianObject E := hlf t
+  suffices
+      ∀ a b : ℝ, a = t - η → b = t + η →
+        letI : Fact (a < b) := ⟨by
+          subst a
+          subst b
+          linarith [hη]⟩
+        letI : Fact (b - a ≤ 1) := ⟨by
+          subst a
+          subst b
+          linarith [hη']⟩
+        ∀ (E : σ.slicing.IntervalCat C a b),
+          IsStrictArtinianObject E ∧ IsStrictNoetherianObject E by
+    exact this _ _ ha hb
+  intro a b ha' hb'
+  subst ha' hb'
+  exact h'
 
 /-- Variant of ε₀ extraction providing 2ε₀-intervals for the sector bound. -/
 theorem StabilityCondition.exists_epsilon0_sector (σ : StabilityCondition C) :
-    ∃ ε₀ : ℝ, 0 < ε₀ ∧ ε₀ < 1 / 4 ∧
-      ∀ t : ℝ, ∀ (E : C),
-        σ.slicing.intervalProp C (t - 2 * ε₀) (t + 2 * ε₀) E →
-          Finite (Subobject E) := by
-  obtain ⟨η, hη, hlf⟩ := σ.locallyFinite.intervalFinite
-  refine ⟨min (η / 2) (1 / 8), by positivity,
-    by linarith [min_le_right (η / 2) (1 / 8 : ℝ)],
-    fun t E hI ↦ ?_⟩
-  exact σ.slicing.intervalFiniteLength C hI (η := η)
-    (by have h := min_le_left (η / 2) (1 / 8 : ℝ); linarith) hlf
+    ∃ ε₀ : ℝ, ∃ hε₀ : 0 < ε₀, ∃ hε₀' : ε₀ < 1 / 4,
+      ∀ t : ℝ,
+        let a := t - 2 * ε₀
+        let b := t + 2 * ε₀
+        letI : Fact (a < b) := ⟨by
+          dsimp [a, b]
+          linarith⟩
+        letI : Fact (b - a ≤ 1) := ⟨by
+          dsimp [a, b]
+          linarith⟩
+        ∀ (E : σ.slicing.IntervalCat C a b),
+          IsStrictArtinianObject E ∧ IsStrictNoetherianObject E := by
+  obtain ⟨η, hη, hη', hlf⟩ := σ.locallyFinite.intervalFinite
+  refine ⟨η / 2, by positivity, by linarith, ?_⟩
+  intro t
+  have ha : t - 2 * (η / 2) = t - η := by ring
+  have hb : t + 2 * (η / 2) = t + η := by ring
+  letI : Fact (t - η < t + η) := ⟨by linarith [hη]⟩
+  letI : Fact ((t + η) - (t - η) ≤ 1) := ⟨by linarith [hη']⟩
+  let h' : ∀ (E : σ.slicing.IntervalCat C (t - η) (t + η)),
+      IsStrictArtinianObject E ∧ IsStrictNoetherianObject E := hlf t
+  suffices
+      ∀ a b : ℝ, a = t - η → b = t + η →
+        letI : Fact (a < b) := ⟨by
+          subst a
+          subst b
+          linarith [hη]⟩
+        letI : Fact (b - a ≤ 1) := ⟨by
+          subst a
+          subst b
+          linarith [hη']⟩
+        ∀ (E : σ.slicing.IntervalCat C a b),
+          IsStrictArtinianObject E ∧ IsStrictNoetherianObject E by
+    exact this _ _ ha hb
+  intro a b ha' hb'
+  subst ha' hb'
+  exact h'
 
 /-! ### Phase confinement for nearby stability conditions -/
 
@@ -1222,6 +1277,54 @@ theorem wPhaseOf_lt_of_add_le_lt {w w₁ w₂ : ℂ} {α ψ : ℝ}
     rw [← hsum, add_mul, Complex.add_im]
     linarith
   exact wPhaseOf_lt_of_im_neg him_w hw_range
+
+/-- If `w = w₁ + w₂`, the total phase is at most `ψ`, and one summand has phase strictly
+above `ψ`, then the other summand has phase strictly below `ψ`. This is the one-sided
+source-envelope variant of the phase seesaw used in the faithful Lemma 7.5 argument. -/
+theorem wPhaseOf_lt_of_add_le_gt {w w₁ w₂ : ℂ} {α ψ : ℝ}
+    (hsum : w₁ + w₂ = w)
+    (hw_le : wPhaseOf w α ≤ ψ)
+    (hw_range : wPhaseOf w α ∈ Set.Ioo (ψ - 1) (ψ + 1))
+    (hw₁_gt : ψ < wPhaseOf w₁ α)
+    (hw₁_ne : w₁ ≠ 0)
+    (hw₁_range : wPhaseOf w₁ α ∈ Set.Ioo (ψ - 1) (ψ + 1))
+    (hw₂_range : wPhaseOf w₂ α ∈ Set.Ioo (ψ - 1) (ψ + 1)) :
+    wPhaseOf w₂ α < ψ := by
+  set rot := Complex.exp (-(↑(Real.pi * ψ) * Complex.I))
+  have him_w : (w * rot).im ≤ 0 := by
+    have hw_compat := wPhaseOf_compat w α
+    rw [hw_compat, mul_assoc, ← Complex.exp_add]
+    have harg : ↑(Real.pi * wPhaseOf w α) * Complex.I +
+        -(↑(Real.pi * ψ) * Complex.I) =
+        ↑(Real.pi * (wPhaseOf w α - ψ)) * Complex.I := by
+      push_cast
+      ring
+    rw [harg, Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im,
+      Complex.exp_ofReal_mul_I_re, Complex.exp_ofReal_mul_I_im,
+      zero_mul, add_zero]
+    exact mul_nonpos_of_nonneg_of_nonpos (norm_nonneg w)
+      (Real.sin_nonpos_of_nonpos_of_neg_pi_le
+        (by nlinarith [Real.pi_pos, hw_le])
+        (by nlinarith [Real.pi_pos, hw_range.1]))
+  have him_w₁ : 0 < (w₁ * rot).im := by
+    have hw₁_compat := wPhaseOf_compat w₁ α
+    rw [hw₁_compat, mul_assoc, ← Complex.exp_add]
+    have harg : ↑(Real.pi * wPhaseOf w₁ α) * Complex.I +
+        -(↑(Real.pi * ψ) * Complex.I) =
+        ↑(Real.pi * (wPhaseOf w₁ α - ψ)) * Complex.I := by
+      push_cast
+      ring
+    rw [harg, Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im,
+      Complex.exp_ofReal_mul_I_re, Complex.exp_ofReal_mul_I_im,
+      zero_mul, add_zero]
+    exact mul_pos (norm_pos_iff.mpr hw₁_ne)
+      (Real.sin_pos_of_pos_of_lt_pi
+        (by nlinarith [Real.pi_pos, hw₁_gt])
+        (by nlinarith [Real.pi_pos, hw₁_range.2]))
+  have him_w₂ : (w₂ * rot).im < 0 := by
+    rw [← hsum, add_mul, Complex.add_im] at him_w
+    linarith
+  exact wPhaseOf_lt_of_im_neg him_w₂ hw₂_range
 
 /-! ### K₀ decomposition of imaginary parts -/
 
@@ -2831,6 +2934,29 @@ private theorem interval_strictShortExact_cokernel_of_strictMono
   exact Slicing.IntervalCat.strictShortExact_of_distTriang
     (C := C) (s := s) (a := a) (b := b) hT
 
+private theorem intervalInclusion_map_strictMono
+    {s₁ s₂ : Slicing C} [IsTriangulated C]
+    {a₁ b₁ a₂ b₂ : ℝ}
+    [Fact (a₁ < b₁)] [Fact (b₁ - a₁ ≤ 1)]
+    [Fact (a₂ < b₂)] [Fact (b₂ - a₂ ≤ 1)]
+    (h : s₁.intervalProp C a₁ b₁ ≤ s₂.intervalProp C a₂ b₂)
+    {X Y : s₁.IntervalCat C a₁ b₁} (f : X ⟶ Y) (hf : IsStrictMono f) :
+    IsStrictMono ((ObjectProperty.ιOfLE h).map f) := by
+  let S : ShortComplex (s₁.IntervalCat C a₁ b₁) :=
+    ShortComplex.mk f (cokernel.π f) (cokernel.condition f)
+  have hS : StrictShortExact S :=
+    interval_strictShortExact_cokernel_of_strictMono
+      (C := C) (s := s₁) (a := a₁) (b := b₁) f hf
+  obtain ⟨δ, hT⟩ := Slicing.IntervalCat.exists_distTriang_of_strictShortExact
+    (C := C) (s := s₁) (a := a₁) (b := b₁) hS
+  let I : s₁.IntervalCat C a₁ b₁ ⥤ s₂.IntervalCat C a₂ b₂ := ObjectProperty.ιOfLE h
+  let S' : ShortComplex (s₂.IntervalCat C a₂ b₂) := S.map I
+  have hT' : Triangle.mk S'.f.hom S'.g.hom δ ∈ distTriang C := by
+    simpa [I, S, S'] using hT
+  exact
+    (Slicing.IntervalCat.strictMono_strictEpi_of_distTriang
+      (C := C) (s := s₂) (a := a₂) (b := b₂) hT').1
+
 private theorem interval_K0_of_strictMono
     {s : Slicing C} [IsTriangulated C] {a b : ℝ}
     [Fact (a < b)] [Fact (b - a ≤ 1)]
@@ -3137,12 +3263,12 @@ variable [IsTriangulated C] in
 W-phase, and among those maximal-phase candidates we may choose one that is maximal for
 inclusion. This is the strict-subobject selection step needed for the thin-interval HN
 recursion. -/
-private theorem SkewedStabilityFunction.exists_maxPhase_maximal_strictSubobject
+private theorem SkewedStabilityFunction.exists_maxPhase_maximal_strictSubobject_of_finite
     (σ : StabilityCondition C) {a b : ℝ}
     {ssf : SkewedStabilityFunction C σ.slicing a b}
     [Fact (a < b)] [Fact (b - a ≤ 1)]
     {X : σ.slicing.IntervalCat C a b} (hX : ¬IsZero X)
-    [Finite (Subobject X)] :
+    (hT_fin : Set.Finite {B : Subobject X | B ≠ ⊥ ∧ IsStrictMono B.arrow}) :
     ∃ M : Subobject X, M ≠ ⊥ ∧ IsStrictMono M.arrow ∧
       (∀ B : Subobject X, B ≠ ⊥ → IsStrictMono B.arrow →
         wPhaseOf (ssf.W (K₀.of C (B : σ.slicing.IntervalCat C a b).obj)) ssf.α ≤
@@ -3158,11 +3284,14 @@ private theorem SkewedStabilityFunction.exists_maxPhase_maximal_strictSubobject
       intervalSubobject_top_ne_bot_of_not_isZero
         (C := C) (s := σ.slicing) (a := a) (b := b) (X := X) hX, ?_⟩
     exact isStrictMono_of_isIso
-  have hT_fin : T.Finite := Set.toFinite _
-  obtain ⟨M₀, hM₀T, hM₀max⟩ := Set.exists_max_image T phase hT_fin hT_ne
+  have hT_fin' : T.Finite := by
+    simpa [T] using hT_fin
+  obtain ⟨M₀, hM₀T, hM₀max⟩ := Set.exists_max_image T phase hT_fin' hT_ne
   let S : Set (Subobject X) := {B | B ∈ T ∧ phase B = phase M₀}
   have hS_ne : S.Nonempty := ⟨M₀, hM₀T, rfl⟩
-  have hS_fin : S.Finite := Set.toFinite _
+  have hS_fin : S.Finite := hT_fin'.subset (by
+    intro B hB
+    exact hB.1)
   obtain ⟨M, ⟨hMT, hM_phase⟩, hM_max⟩ := hS_fin.exists_maximal hS_ne
   refine ⟨M, hMT.1, hMT.2, ?_, ?_⟩
   · intro B hB hBstrict
@@ -3177,6 +3306,27 @@ private theorem SkewedStabilityFunction.exists_maxPhase_maximal_strictSubobject
     change phase B < phase M
     exact lt_of_le_of_ne hle (fun hEq ↦
       absurd (hM_max ⟨hBT, hEq.trans hM_phase⟩ hMB.le) (not_le_of_gt hMB))
+
+variable [IsTriangulated C] in
+/-- Among the nonzero strict subobjects of a thin-interval object, there is one with maximal
+W-phase, and among those maximal-phase candidates we may choose one that is maximal for
+inclusion. This is the strict-subobject selection step needed for the thin-interval HN
+recursion. -/
+private theorem SkewedStabilityFunction.exists_maxPhase_maximal_strictSubobject
+    (σ : StabilityCondition C) {a b : ℝ}
+    {ssf : SkewedStabilityFunction C σ.slicing a b}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X : σ.slicing.IntervalCat C a b} (hX : ¬IsZero X)
+    [Finite (Subobject X)] :
+    ∃ M : Subobject X, M ≠ ⊥ ∧ IsStrictMono M.arrow ∧
+      (∀ B : Subobject X, B ≠ ⊥ → IsStrictMono B.arrow →
+        wPhaseOf (ssf.W (K₀.of C (B : σ.slicing.IntervalCat C a b).obj)) ssf.α ≤
+          wPhaseOf (ssf.W (K₀.of C (M : σ.slicing.IntervalCat C a b).obj)) ssf.α) ∧
+      (∀ B : Subobject X, IsStrictMono B.arrow → M < B →
+        wPhaseOf (ssf.W (K₀.of C (B : σ.slicing.IntervalCat C a b).obj)) ssf.α <
+          wPhaseOf (ssf.W (K₀.of C (M : σ.slicing.IntervalCat C a b).obj)) ssf.α) := by
+  exact ssf.exists_maxPhase_maximal_strictSubobject_of_finite
+    (C := C) (σ := σ) (a := a) (b := b) (X := X) hX (Set.toFinite _)
 
 variable [IsTriangulated C] in
 /-- A nonzero strict subobject that is maximal for W-phase among all nonzero strict subobjects
@@ -4038,15 +4188,49 @@ private theorem SkewedStabilityFunction.phase_gt_of_maxPhase_strictSubobject_of_
   simpa [phaseObj, KI] using hPhaseB.trans hle
 
 variable [IsTriangulated C] in
+/-- Finiteness of subobjects in the left-heart image of an interval object implies finiteness of
+its strict-subobject set in the thin interval category. This is the paper-faithful local
+finite-length input for the first strict short exact sequence. -/
+private theorem Slicing.IntervalCat.finite_strictSubobjects_of_finite_leftHeartSubobjects
+    (s : Slicing C) {a b : ℝ} [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X : s.IntervalCat C a b}
+    (hX : Finite (Subobject ((Slicing.IntervalCat.toLeftHeart
+      (C := C) (s := s) a b (Fact.out : b - a ≤ 1)).obj X))) :
+    Finite {B : Subobject X // B ≠ ⊥ ∧ IsStrictMono B.arrow} := by
+  let FL := Slicing.IntervalCat.toLeftHeart (C := C) (s := s) a b (Fact.out : b - a ≤ 1)
+  let φ : {B : Subobject X // B ≠ ⊥ ∧ IsStrictMono B.arrow} → Subobject (FL.obj X) :=
+    fun B ↦ by
+      letI : Mono (FL.map B.1.arrow) :=
+        Slicing.IntervalCat.mono_toLeftHeart_of_strictMono
+          (C := C) (s := s) (a := a) (b := b) B.1.arrow B.2.2
+      exact Subobject.mk (FL.map B.1.arrow)
+  exact Finite.of_injective φ (fun B₁ B₂ hEq ↦ by
+    letI : Mono (FL.map B₁.1.arrow) :=
+      Slicing.IntervalCat.mono_toLeftHeart_of_strictMono
+        (C := C) (s := s) (a := a) (b := b) B₁.1.arrow B₁.2.2
+    letI : Mono (FL.map B₂.1.arrow) :=
+      Slicing.IntervalCat.mono_toLeftHeart_of_strictMono
+        (C := C) (s := s) (a := a) (b := b) B₂.1.arrow B₂.2.2
+    apply Subtype.ext
+    simpa [Subobject.mk_arrow] using Subobject.mk_eq_mk_of_comm B₁.1.arrow B₂.1.arrow
+      (FL.preimageIso (Subobject.isoOfMkEqMk _ _ hEq))
+      (FL.map_injective (by
+        simp only [Functor.preimageIso_hom, Functor.map_comp, Functor.map_preimage]
+        exact Subobject.ofMkLEMk_comp hEq.le)))
+
+variable [IsTriangulated C] in
 /-- Bridgeland's first strict short exact sequence in a thin category: if an interval object is
 not `W`-semistable, there is a proper strict subobject of maximal `W`-phase, and its inclusion
-gives a strict short exact sequence `0 → A → E → B → 0`. -/
+gives a strict short exact sequence `0 → A → E → B → 0`.
+
+The faithful local-finiteness input here is finiteness of the thin category's
+strict-subobject set, not an ambient `Finite (Subobject X.obj)` statement in `C`. -/
 private theorem SkewedStabilityFunction.exists_first_strictShortExact_of_not_semistable
     (σ : StabilityCondition C) {a b : ℝ}
     {ssf : SkewedStabilityFunction C σ.slicing a b}
     [Fact (a < b)] [Fact (b - a ≤ 1)]
-    (hFinSub : ∀ Y : σ.slicing.IntervalCat C a b, Finite (Subobject Y))
     {X : σ.slicing.IntervalCat C a b} (hX : ¬IsZero X)
+    (hT_fin : Set.Finite {M : Subobject X | M ≠ ⊥ ∧ IsStrictMono M.arrow})
     (hns : ¬ ssf.Semistable C X.obj
       (wPhaseOf (ssf.W (K₀.of C X.obj)) ssf.α))
     (hW_interval : ∀ {F : C}, σ.slicing.intervalProp C a b F → ¬IsZero F →
@@ -4058,13 +4242,12 @@ private theorem SkewedStabilityFunction.exists_first_strictShortExact_of_not_sem
       ssf.Semistable C (M : σ.slicing.IntervalCat C a b).obj
         (wPhaseOf (ssf.W (K₀.of C (M : σ.slicing.IntervalCat C a b).obj)) ssf.α) ∧
       wPhaseOf (ssf.W (K₀.of C X.obj)) ssf.α <
-        wPhaseOf (ssf.W (K₀.of C (M : σ.slicing.IntervalCat C a b).obj)) ssf.α ∧
+      wPhaseOf (ssf.W (K₀.of C (M : σ.slicing.IntervalCat C a b).obj)) ssf.α ∧
       StrictShortExact
         (ShortComplex.mk M.arrow (cokernel.π M.arrow) (cokernel.condition M.arrow)) := by
-  haveI : Finite (Subobject X) := hFinSub X
   obtain ⟨M, hM_ne, hM_strict, hM_max, _⟩ :=
-    ssf.exists_maxPhase_maximal_strictSubobject
-      (C := C) (σ := σ) (a := a) (b := b) (X := X) hX
+    ssf.exists_maxPhase_maximal_strictSubobject_of_finite
+      (C := C) (σ := σ) (a := a) (b := b) (X := X) hX hT_fin
   have hM_ne_top : M ≠ ⊤ :=
     ssf.maxPhase_strictSubobject_ne_top_of_not_semistable
       (C := C) (σ := σ) (a := a) (b := b) (X := X) hns hM_ne hM_strict hM_max hW_interval
@@ -4083,6 +4266,43 @@ private theorem SkewedStabilityFunction.exists_first_strictShortExact_of_not_sem
     interval_strictShortExact_cokernel_of_strictMono
       (C := C) (s := σ.slicing) (a := a) (b := b) M.arrow hM_strict
   exact ⟨M, hM_ne, hM_ne_top, hM_strict, hM_ss, hphase_gt, hS⟩
+
+variable [IsTriangulated C] in
+/-- A convenient left-heart version of the first strict short exact sequence wrapper. If the
+left-heart image of `X` has finite subobject lattice, then `X` admits Bridgeland's first strict
+short exact sequence whenever it is not `W`-semistable. -/
+private theorem SkewedStabilityFunction.exists_first_strictShortExact_of_not_semistable_of_finite_leftHeartSubobjects
+    (σ : StabilityCondition C) {a b : ℝ}
+    {ssf : SkewedStabilityFunction C σ.slicing a b}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    {X : σ.slicing.IntervalCat C a b} (hX : ¬IsZero X)
+    (hX_left : Finite (Subobject ((Slicing.IntervalCat.toLeftHeart
+      (C := C) (s := σ.slicing) a b (Fact.out : b - a ≤ 1)).obj X)))
+    (hns : ¬ ssf.Semistable C X.obj
+      (wPhaseOf (ssf.W (K₀.of C X.obj)) ssf.α))
+    (hW_interval : ∀ {F : C}, σ.slicing.intervalProp C a b F → ¬IsZero F →
+      ssf.W (K₀.of C F) ≠ 0) :
+    ∃ M : Subobject X,
+      M ≠ ⊥ ∧
+      M ≠ ⊤ ∧
+      IsStrictMono M.arrow ∧
+      ssf.Semistable C (M : σ.slicing.IntervalCat C a b).obj
+        (wPhaseOf (ssf.W (K₀.of C (M : σ.slicing.IntervalCat C a b).obj)) ssf.α) ∧
+      wPhaseOf (ssf.W (K₀.of C X.obj)) ssf.α <
+        wPhaseOf (ssf.W (K₀.of C (M : σ.slicing.IntervalCat C a b).obj)) ssf.α ∧
+      StrictShortExact
+        (ShortComplex.mk M.arrow (cokernel.π M.arrow) (cokernel.condition M.arrow)) := by
+  let T : Set (Subobject X) := {M | M ≠ ⊥ ∧ IsStrictMono M.arrow}
+  have hT_type : Finite T := by
+    simpa [T] using
+      (Slicing.IntervalCat.finite_strictSubobjects_of_finite_leftHeartSubobjects
+        (C := C) (s := σ.slicing) (a := a) (b := b) hX_left)
+  have hT_fin : T.Finite := by
+    letI : Finite T := hT_type
+    letI : Fintype T := Fintype.ofFinite T
+    exact T.toFinite
+  exact ssf.exists_first_strictShortExact_of_not_semistable
+    (C := C) (σ := σ) (a := a) (b := b) hX hT_fin hns hW_interval
 
 private lemma interval_pullback_cokernel_bot_eq
     {s : Slicing C} [IsTriangulated C] {a b : ℝ}
@@ -7096,6 +7316,52 @@ private theorem finite_subobject_of_mem_P_phi_sector
     Finite (Subobject E) := by
   exact hFinSector φ E (σ.slicing.intervalProp_of_semistable C hPφ (by linarith) (by linarith))
 
+private theorem finite_subobject_of_target_interval
+    (σ : StabilityCondition C) {ε₀ ψ : ℝ} {E : C}
+    (hε₀ : 0 < ε₀)
+    (hFinSector : ∀ t : ℝ, ∀ F : C,
+      σ.slicing.intervalProp C (t - 2 * ε₀) (t + 2 * ε₀) F → Finite (Subobject F))
+    (hI : σ.slicing.intervalProp C (ψ - ε₀) (ψ + ε₀) E) :
+    Finite (Subobject E) := by
+  apply hFinSector ψ E
+  exact σ.slicing.intervalProp_mono C (by linarith) (by linarith) hI
+
+private theorem finite_subobject_of_upper_source
+    (σ : StabilityCondition C) {ε₀ φ ψ : ℝ} {E : C}
+    (hε₀ : 0 < ε₀)
+    (hFinSector : ∀ t : ℝ, ∀ F : C,
+      σ.slicing.intervalProp C (t - 2 * ε₀) (t + 2 * ε₀) F → Finite (Subobject F))
+    (hI : σ.slicing.intervalProp C (ψ - ε₀) (φ + ε₀) E)
+    (hψ_lo : φ - ε₀ < ψ) :
+    Finite (Subobject E) := by
+  let t : ℝ := (ψ + φ) / 2
+  apply hFinSector t E
+  have hleft : t - 2 * ε₀ ≤ ψ - ε₀ := by
+    dsimp [t]
+    linarith
+  have hright : φ + ε₀ ≤ t + 2 * ε₀ := by
+    dsimp [t]
+    linarith
+  exact σ.slicing.intervalProp_mono C hleft hright hI
+
+private theorem finite_subobject_of_lower_source
+    (σ : StabilityCondition C) {ε₀ φ ψ : ℝ} {E : C}
+    (hε₀ : 0 < ε₀)
+    (hFinSector : ∀ t : ℝ, ∀ F : C,
+      σ.slicing.intervalProp C (t - 2 * ε₀) (t + 2 * ε₀) F → Finite (Subobject F))
+    (hI : σ.slicing.intervalProp C (φ - ε₀) (ψ + ε₀) E)
+    (hψ_hi : ψ < φ + ε₀) :
+    Finite (Subobject E) := by
+  let t : ℝ := (ψ + φ) / 2
+  apply hFinSector t E
+  have hleft : t - 2 * ε₀ ≤ φ - ε₀ := by
+    dsimp [t]
+    linarith
+  have hright : ψ + ε₀ ≤ t + 2 * ε₀ := by
+    dsimp [t]
+    linarith
+  exact σ.slicing.intervalProp_mono C hleft hright hI
+
 variable [IsTriangulated C] in
 private theorem wPhaseOf_eq_upper_source_midpoint_of_mem_P_phi
     (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
@@ -7401,11 +7667,171 @@ private theorem wPhaseOf_ge_of_epi_P_phi_semistable
   rw [hphase_Q, hphase_F] at hphase_ge
   linarith
 
-/-! #### Step A2: Finite subobject lattice in P(φ) and HN existence -/
+/-! #### Step A2: Finite-length objects in P(φ) and HN existence -/
 
 variable [IsTriangulated C] in
-/-- **HN property for the W-stability function on P(φ)**. Uses the P(φ)-subobject
-finiteness from `IsLocallyFinite` (condition 2) and `hasHN_of_finiteLength`. -/
+/-- The canonical inclusion of `P(φ)` into a sufficiently small thin interval around `φ`. -/
+private noncomputable def P_phi_intervalInclusion
+    (σ : StabilityCondition C) (φ η : ℝ) (hη : 0 < η) :
+    (σ.slicing.P φ).FullSubcategory ⥤ σ.slicing.IntervalCat C (φ - η) (φ + η) :=
+  ObjectProperty.ιOfLE (fun X hX ↦
+    σ.slicing.intervalProp_of_semistable C hX
+      (by linarith [hη]) (by linarith [hη]))
+
+private instance P_phi_intervalInclusion_full
+    (σ : StabilityCondition C) (φ η : ℝ) (hη : 0 < η) :
+    (P_phi_intervalInclusion (C := C) σ φ η hη).Full := by
+  dsimp [P_phi_intervalInclusion]
+  infer_instance
+
+private instance P_phi_intervalInclusion_faithful
+    (σ : StabilityCondition C) (φ η : ℝ) (hη : 0 < η) :
+    (P_phi_intervalInclusion (C := C) σ φ η hη).Faithful := by
+  dsimp [P_phi_intervalInclusion]
+  infer_instance
+
+variable [IsTriangulated C] in
+/-- A `P(φ)`-subobject becomes a strict subobject in any sufficiently small thin interval
+containing phase `φ`. The proof follows Bridgeland's picture: complete the quotient map in
+`P(φ)` to a distinguished triangle, view all three vertices inside the thin interval, and
+then apply the quasi-abelian strictness criterion from Section 4. -/
+private theorem P_phi_subobject_strict_in_interval
+    (σ : StabilityCondition C) (φ η : ℝ) (hη : 0 < η)
+    [Fact (φ - η < φ + η)] [Fact ((φ + η) - (φ - η) ≤ 1)]
+    {E : (σ.slicing.P φ).FullSubcategory} (B : Subobject E) :
+    IsStrictMono ((P_phi_intervalInclusion (C := C) σ φ η hη).map B.arrow) := by
+  let A := (σ.slicing.P φ).FullSubcategory
+  letI : Abelian A := σ.P_phi_abelian C φ
+  letI : Balanced A := ⟨fun f _ _ ↦ CategoryTheory.isIso_of_mono_of_epi f⟩
+  have hφ_lo : φ - η < φ := by linarith [hη]
+  have hφ_hi : φ < φ + η := by linarith [hη]
+  let I : A ⥤ σ.slicing.IntervalCat C (φ - η) (φ + η) :=
+    P_phi_intervalInclusion (C := C) σ φ η hη
+  let q : E ⟶ cokernel B.arrow := cokernel.π B.arrow
+  have hX₁ :
+      σ.slicing.intervalProp C (φ - η) (φ + η) (((B : Subobject E) : A).obj) := by
+    exact σ.slicing.intervalProp_of_semistable C (((B : Subobject E) : A).property)
+      hφ_lo hφ_hi
+  have hX₃ :
+      σ.slicing.intervalProp C (φ - η) (φ + η) (cokernel B.arrow).obj := by
+    exact σ.slicing.intervalProp_of_semistable C (cokernel B.arrow).property
+      hφ_lo hφ_hi
+  obtain ⟨X₁, i, δ, hT⟩ :=
+    Triangulated.AbelianSubcategory.exists_distinguished_triangle_of_epi
+      (ι := (σ.slicing.P φ).ι) (hι := σ.P_phi_hom_vanishing C φ)
+      (hA := σ.P_phi_admissible C φ) q
+  have hiq : i ≫ q = 0 := by
+    apply ((σ.slicing.P φ).ι).map_injective
+    simpa using comp_distTriang_mor_zero₁₂ _ hT
+  let S : ShortComplex (σ.slicing.IntervalCat C (φ - η) (φ + η)) :=
+    ShortComplex.mk (I.map i) (I.map q) (by
+      simpa using congrArg I.map hiq)
+  have hS_strict :
+      IsStrictMono S.f := by
+    exact
+      (Slicing.IntervalCat.strictMono_strictEpi_of_distTriang
+        (C := C) (s := σ.slicing) (a := φ - η) (b := φ + η) (δ := δ)
+        (by simpa [S, I, hX₁, hX₃] using hT)).1
+  have hB_short :
+      (ShortComplex.mk B.arrow q (cokernel.condition B.arrow)).ShortExact :=
+    ShortComplex.ShortExact.mk' (ShortComplex.exact_cokernel B.arrow) inferInstance inferInstance
+  let hKerI :=
+    Triangulated.AbelianSubcategory.isLimitKernelForkOfDistTriang
+      (ι := (σ.slicing.P φ).ι) (hι := σ.P_phi_hom_vanishing C φ)
+      i q δ hT
+  let e : (((B : Subobject E) : A) : A) ≅ X₁ :=
+    IsLimit.conePointUniqueUpToIso hB_short.fIsKernel hKerI
+  have he : e.hom ≫ i = B.arrow := by
+    simpa [e, KernelFork.ofι] using
+      IsLimit.conePointUniqueUpToIso_hom_comp hB_short.fIsKernel hKerI
+        Limits.WalkingParallelPair.zero
+  have hmap :
+      I.map B.arrow = I.map e.hom ≫ S.f := by
+    ext
+    simpa [S, I] using congrArg InducedCategory.Hom.hom (congrArg I.map he).symm
+  have he_strict : IsStrictMono (I.map e.hom) := isStrictMono_of_isIso
+  have hcomp_strict :
+      IsStrictMono (I.map e.hom ≫ S.f) :=
+    Slicing.IntervalCat.comp_strictMono
+      (C := C) (s := σ.slicing) (a := φ - η) (b := φ + η) (I.map e.hom) S.f
+      he_strict hS_strict
+  simpa [hmap] using hcomp_strict
+
+variable [IsTriangulated C] in
+/-- Objects of `P(φ)` are Artinian and Noetherian in the abelian slice `P(φ)`. The proof
+embeds `P(φ)` into a thin interval given by local finiteness and transfers chain conditions
+through the induced embedding of subobjects into strict subobjects of that interval. -/
+private theorem P_phi_finiteLength
+    (σ : StabilityCondition C) (φ : ℝ)
+    (E : (σ.slicing.P φ).FullSubcategory) :
+    IsArtinianObject E ∧ IsNoetherianObject E := by
+  let A := (σ.slicing.P φ).FullSubcategory
+  letI : Abelian A := σ.P_phi_abelian C φ
+  obtain ⟨η, hη, hη', hlf⟩ := σ.locallyFinite.intervalFinite
+  letI : Fact (φ - η < φ + η) := ⟨by linarith [hη]⟩
+  letI : Fact ((φ + η) - (φ - η) ≤ 1) := ⟨by linarith [hη']⟩
+  let I : A ⥤ σ.slicing.IntervalCat C (φ - η) (φ + η) :=
+    P_phi_intervalInclusion (C := C) σ φ η hη
+  let F : Subobject E → StrictSubobject (I.obj E) := fun B ↦ by
+    let hstrict := P_phi_subobject_strict_in_interval (C := C) σ φ η hη B
+    letI : Mono (I.map B.arrow) := hstrict.1
+    exact ⟨Subobject.mk (I.map B.arrow),
+      intervalSubobject_arrow_strictMono_of_strictMono
+        (C := C) (s := σ.slicing) (a := φ - η) (b := φ + η) (I.map B.arrow) hstrict⟩
+  have hF_inj : Function.Injective F := by
+    intro B₁ B₂ hEq
+    let hstrict₁ := P_phi_subobject_strict_in_interval (C := C) σ φ η hη B₁
+    let hstrict₂ := P_phi_subobject_strict_in_interval (C := C) σ φ η hη B₂
+    letI : Mono (I.map B₁.arrow) := hstrict₁.1
+    letI : Mono (I.map B₂.arrow) := hstrict₂.1
+    have hEq' : Subobject.mk (I.map B₁.arrow) = Subobject.mk (I.map B₂.arrow) :=
+      congrArg Subtype.val hEq
+    have hmk : Subobject.mk B₁.arrow = Subobject.mk B₂.arrow := by
+      apply Subobject.mk_eq_mk_of_comm B₁.arrow B₂.arrow
+        (I.preimageIso (Subobject.isoOfMkEqMk _ _ hEq'))
+      exact I.map_injective (by
+        simp only [Functor.preimageIso_hom, Functor.map_comp, Functor.map_preimage]
+        exact Subobject.ofMkLEMk_comp hEq'.le)
+    simpa [Subobject.mk_arrow] using hmk
+  have hF_mono : Monotone F := by
+    intro B₁ B₂ hB
+    let hstrict₁ := P_phi_subobject_strict_in_interval (C := C) σ φ η hη B₁
+    let hstrict₂ := P_phi_subobject_strict_in_interval (C := C) σ φ η hη B₂
+    letI : Mono (I.map B₁.arrow) := hstrict₁.1
+    letI : Mono (I.map B₂.arrow) := hstrict₂.1
+    have hmk : Subobject.mk B₁.arrow ≤ Subobject.mk B₂.arrow := by
+      simpa [Subobject.mk_arrow] using hB
+    change Subobject.mk (I.map B₁.arrow) ≤ Subobject.mk (I.map B₂.arrow)
+    exact Subobject.mk_le_mk_of_comm (I.map (Subobject.ofMkLEMk B₁.arrow B₂.arrow hmk)) (by
+      change I.map (Subobject.ofMkLEMk B₁.arrow B₂.arrow hmk) ≫ I.map B₂.arrow =
+        I.map B₁.arrow
+      rw [← I.map_comp]
+      simpa using congrArg I.map (Subobject.ofMkLEMk_comp hmk))
+  have hI_art : IsStrictArtinianObject (I.obj E) := (hlf φ (I.obj E)).1
+  have hI_noeth : IsStrictNoetherianObject (I.obj E) := (hlf φ (I.obj E)).2
+  refine ⟨?_, ?_⟩
+  · rw [isArtinianObject_iff_antitone_chain_condition]
+    intro g
+    let g' : ℕ →o (StrictSubobject (I.obj E))ᵒᵈ :=
+      ⟨fun n ↦ OrderDual.toDual (F (g n)),
+        fun i j hij ↦ by
+          change F (g j) ≤ F (g i)
+          exact hF_mono (g.2 hij)⟩
+    letI : IsStrictArtinianObject (I.obj E) := hI_art
+    obtain ⟨n, hn⟩ := WellFoundedGT.monotone_chain_condition g'
+    exact ⟨n, fun m hm ↦ hF_inj (by simpa using hn m hm)⟩
+  · rw [isNoetherianObject_iff_monotone_chain_condition]
+    intro g
+    let g' : ℕ →o StrictSubobject (I.obj E) :=
+      ⟨fun n ↦ F (g n),
+        fun i j hij ↦ hF_mono (g.2 hij)⟩
+    letI : IsStrictNoetherianObject (I.obj E) := hI_noeth
+    obtain ⟨n, hn⟩ := WellFoundedGT.monotone_chain_condition g'
+    exact ⟨n, fun m hm ↦ hF_inj (hn m hm)⟩
+
+variable [IsTriangulated C] in
+/-- **HN property for the W-stability function on P(φ)**. Uses the finite-length result
+for `P(φ)` objects coming from local finiteness. -/
 private theorem stabilityFunctionOnP_hasHN
     (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
@@ -7415,8 +7841,9 @@ private theorem stabilityFunctionOnP_hasHN
     @StabilityFunction.HasHNProperty (σ.slicing.P φ).FullSubcategory _
       (σ.P_phi_abelian C φ) (stabilityFunctionOnP C σ W hW hε₀ hε₀2 hsin φ) := by
   letI := σ.P_phi_abelian C φ
-  exact StabilityFunction.hasHN_of_finiteLength _
-    (fun E => σ.locallyFinite.phaseFinite φ E)
+  exact StabilityFunction.hasHN_of_artinian_noetherian _
+    (fun E => (P_phi_finiteLength (C := C) σ φ E).1)
+    (fun E => (P_phi_finiteLength (C := C) σ φ E).2)
 
 /-! #### Step A2b: Faithful route for the `P(φ)` bridge
 
@@ -8172,41 +8599,78 @@ theorem bridgeland_7_1 (σ : StabilityCondition C)
     (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hε₀8 : ε₀ < 1 / 8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
-    (hε₀_lf : ∃ δ : ℝ, 0 < δ ∧ ∀ t (E : C),
-      σ.slicing.intervalProp C (t - (ε₀ + δ)) (t + (ε₀ + δ)) E →
-      Finite (Subobject E)) :
+    (hε₀_lf : ∃ δ : ℝ, 0 < δ ∧ ε₀ + δ < 1 / 2 ∧ ∀ t : ℝ,
+      ∀ (E :
+        (σ.slicing.intervalProp C (t - (ε₀ + δ)) (t + (ε₀ + δ))).FullSubcategory),
+        IsArtinianObject E ∧ IsNoetherianObject E) :
     ∃ (τ : StabilityCondition C), τ.Z = W ∧
       slicingDist C σ.slicing τ.slicing ≤ ENNReal.ofReal ε₀ := by
   refine ⟨⟨σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hsin, W,
     σ.deformedSlicing_compat C W hW ε₀ hε₀ hε₀2 hε₀8 hsin, ?_⟩, rfl, ?_⟩
   · -- Local finiteness: inherited from σ via phase confinement
-    obtain ⟨δ, hδ, hlf_σ⟩ := hε₀_lf
+    obtain ⟨δ, hδ, hδ_half, hlf_σ⟩ := hε₀_lf
+    let δ' : ℝ := min (δ / 2) (1 / 4)
     constructor
-    · -- Part 1: C-subobject finiteness (inherited from σ)
-      refine ⟨δ / 2, by linarith, fun t E hE_int ↦ ?_⟩
-      -- Show E ∈ σ.intervalProp C (t - (ε₀ + δ)) (t + (ε₀ + δ))
-      have hE_sigma : σ.slicing.intervalProp C (t - (ε₀ + δ)) (t + (ε₀ + δ)) E := by
-        rcases hE_int with hZ | ⟨F, hF⟩
-        · exact Or.inl hZ
-        · -- F : HNFiltration for deformedPred, with Q-phases in (t - δ/2, t + δ/2)
-          -- Each factor is in σ's interval by phase confinement
-          apply intervalProp_of_postnikovTower C σ.slicing F.toPostnikovTower
-          intro i
-          have hsem := F.semistable i
-          change σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin (F.φ i) _ at hsem
-          rcases hsem with hZ_i | ⟨a_i, b_i, hab_i, hthin_i, _, _, hSS_i⟩
-          · exact Or.inl hZ_i
-          · have ⟨hlo, hhi⟩ := phase_confinement_from_stabSeminorm C σ W hW hab_i
-              hε₀ hε₀2 hthin_i hsin hSS_i
-            exact σ.slicing.intervalProp_of_intrinsic_phases C hSS_i.2.1
-              (by have := (hF i).1; linarith) (by have := (hF i).2; linarith)
-      exact hlf_σ t E hE_sigma
-    · -- Part 2: Q(ψ)-subobject finiteness
-      -- This follows from the fact that Q(ψ) objects lie in thin σ-intervals,
-      -- and within a common heart, monomorphisms in P(φ) and Q(ψ) agree.
-      -- The full proof requires the heart-based mono transfer.
-      intro ψ E
-      sorry
+    refine ⟨δ', by
+      dsimp [δ']
+      positivity, by
+      dsimp [δ']
+      exact lt_of_le_of_lt (min_le_right _ _) (by norm_num), fun t E ↦ ?_⟩
+    letI : Fact (t - δ' < t + δ') := ⟨by
+      dsimp [δ']
+      have : 0 < δ' := by
+        dsimp [δ']
+        positivity
+      linarith⟩
+    letI : Fact ((t + δ') - (t - δ') ≤ 1) := ⟨by
+      dsimp [δ']
+      have hδ' : δ' ≤ 1 / 4 := by
+        dsimp [δ']
+        exact min_le_right _ _
+      linarith⟩
+    have hIncl :
+        (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hsin).intervalProp C (t - δ') (t + δ') ≤
+          σ.slicing.intervalProp C (t - (ε₀ + δ)) (t + (ε₀ + δ)) := by
+      intro X hX
+      rcases hX with hZ | ⟨F, hF⟩
+      · exact Or.inl hZ
+      · apply intervalProp_of_postnikovTower C σ.slicing F.toPostnikovTower
+        intro i
+        have hsem := F.semistable i
+        change σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin (F.φ i) _ at hsem
+        rcases hsem with hZ_i | ⟨a_i, b_i, hab_i, hthin_i, _, _, hSS_i⟩
+        · exact Or.inl hZ_i
+        · have ⟨hlo, hhi⟩ := phase_confinement_from_stabSeminorm C σ W hW hab_i
+            hε₀ hε₀2 hthin_i hsin hSS_i
+          exact σ.slicing.intervalProp_of_intrinsic_phases C hSS_i.2.1
+            (by
+              have hleft := (hF i).1
+              dsimp [δ'] at hleft
+              linarith [hlo, min_le_left (δ / 2) (1 / 4 : ℝ)])
+            (by
+              have hright := (hF i).2
+              dsimp [δ'] at hright
+              linarith [hhi, min_le_left (δ / 2) (1 / 4 : ℝ)])
+    let I :
+        (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hsin).IntervalCat C (t - δ') (t + δ') ⥤
+          σ.slicing.IntervalCat C (t - (ε₀ + δ)) (t + (ε₀ + δ)) :=
+      ObjectProperty.ιOfLE hIncl
+    have hI : IsArtinianObject (I.obj E) ∧ IsNoetherianObject (I.obj E) := hlf_σ t (I.obj E)
+    letI : Fact (t - (ε₀ + δ) < t + (ε₀ + δ)) := ⟨by linarith [hε₀, hδ]⟩
+    letI : Fact ((t + (ε₀ + δ)) - (t - (ε₀ + δ)) ≤ 1) := ⟨by linarith [hδ_half]⟩
+    haveI : IsArtinianObject (I.obj E) := hI.1
+    haveI : IsNoetherianObject (I.obj E) := hI.2
+    haveI : IsStrictArtinianObject E :=
+      isStrictArtinianObject_of_faithful_map_strictMono I (fun f hf ↦
+        intervalInclusion_map_strictMono (C := C)
+          (s₁ := σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hsin) (s₂ := σ.slicing)
+          (a₁ := t - δ') (b₁ := t + δ') (a₂ := t - (ε₀ + δ)) (b₂ := t + (ε₀ + δ)) hIncl f hf)
+    haveI : IsStrictNoetherianObject E :=
+      isStrictNoetherianObject_of_faithful_map_strictMono I (fun f hf ↦
+        intervalInclusion_map_strictMono (C := C)
+          (s₁ := σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hsin) (s₂ := σ.slicing)
+          (a₁ := t - δ') (b₁ := t + δ') (a₂ := t - (ε₀ + δ)) (b₂ := t + (ε₀ + δ)) hIncl f hf)
+    exact ⟨inferInstance, inferInstance⟩
   · -- Distance bound: d(P, Q) ≤ ε₀ by phase confinement
     set Q := σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hsin
     -- Forward: Q-HN factors → phase confinement → σ-intervalProp
