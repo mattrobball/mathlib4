@@ -3,7 +3,7 @@
 ## 0. Scope and audited starting point
 
 This document is a formalization blueprint for Bridgeland's Annals paper, aligned with the current branch layout in
-`feat/bridgeland-stability-conditions`.
+`feat/bridgeland-section4-quasiabelian`.
 
 It is written for an advanced Lean formalization agent. The goals are:
 
@@ -317,11 +317,13 @@ class Slicing.IsLocallyFinite (s : Slicing C) : Prop :=
       FiniteLengthStrict (s.IntervalCat C (t - η) (t + η)))
 ```
 
-This is the definition that should drive the code. The current branch still has a
-stronger surrogate in terms of `Finite (Subobject _)`; replacing it merely by ordinary
-`IsArtinianObject` / `IsNoetherianObject` on all subobjects would still be too strong.
-The formal target has to talk about ACC/DCC on **strict** subobjects / strict quotients
-in the thin quasi-abelian category itself. In particular, both:
+This is the definition that should drive the code. The `Slicing.IsLocallyFinite`
+definition in the branch has now been corrected accordingly. The remaining stale
+surrogate is downstream in the old section-7 thin-interval HN theorem, which still
+assumes `Finite (Subobject _)`. Replacing it merely by ordinary `IsArtinianObject` /
+`IsNoetherianObject` on all subobjects would still be too strong. The formal target
+has to talk about ACC/DCC on **strict** subobjects / strict quotients in the thin
+quasi-abelian category itself. In particular, both:
 
 - the abelian HN existence theorem of Section 2, and
 - the thin quasi-abelian first-SES / HN recursion of Section 7,
@@ -1351,19 +1353,25 @@ Theorem 9.1           -> Example 5.4 + Lemma 8.2 + theorem 1.2 + AG/Serre-dualit
 
 ---
 
-## 5. What should be proved first in the current branch
+## 5. Current checkpoint in the branch
 
-The fastest route to a real theorem is:
+The branch has already completed the earlier structural work:
 
-1. **Refactor `QuasiAbelian`** to use strict mono/epi.
-2. **Add `TStructure.Heart` and `TStructure.IsBounded`.**
-3. **Formalize section 2 in abelian categories.**
-4. **Repair `Slicing` so HN phase data is intrinsic.**
-5. **Formalize Lemma 3.4 and Proposition 5.3.**
-6. **Then formalize section 6 and section 7.**
-7. **Only after theorem 1.2 is complete, return to numerical stability.**
+1. `QuasiAbelian` has been refactored to strict mono/epi form.
+2. The thin interval category `P((a,b))` is implemented with its two-heart quasi-abelian structure.
+3. `Slicing.IsLocallyFinite` now matches Bridgeland's finite-length definition.
+4. Proposition 2.4 is proved in `StabilityFunction.lean` as
+   `StabilityFunction.hasHN_of_artinian_noetherian`.
 
-If one tries to prove theorem 7.1 before completing the section-2 / section-4 infrastructure, the proof will fragment badly.
+The live proof order is therefore narrower:
+
+1. finish Node 7.5 / 7.6 faithfully, i.e. the remaining `P_phi_wSemistable_is_deformedPred` bridge,
+2. rebuild the Node 7.7 thin-interval HN theorem so it uses strict finite-length data instead of `Finite (Subobject _)`,
+3. close `deformedSlicing.hn_exists`,
+4. package Theorem 1.2 from Theorem 7.1 plus the Section 6 uniqueness results.
+
+Trying to prove `deformedSlicing.hn_exists` before that thin-interval HN refactor would
+reintroduce the exact post-`IsLocallyFinite` mismatch that the current audit has exposed.
 
 ---
 

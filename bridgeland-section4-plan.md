@@ -143,7 +143,7 @@ Also added: `SkewedStabilityFunction` definition, `stabilityFunctionOnP` in Defo
 
 **Dependencies**: Phase 1.
 
-## Phase 3: Quasi-Abelian HN (~600 lines) — TEMPORARILY COMPLETE, NEEDS FAITHFUL REPAIR
+## Phase 3: Quasi-Abelian HN (~600 lines) — SECTION 2 COMPLETE, THIN-INTERVAL HN STILL NEEDS REPAIR
 
 Implemented directly on the critical path in `Deformation.lean`, rather than first
 extracting a standalone quasi-abelian HN API in `StabilityFunction.lean`.
@@ -165,12 +165,15 @@ Optional cleanup left for later, not on the blocker path:
 
 Audit correction:
 
-- The current compiled Phase 3 still uses finite strict-subobject **sets** for several
-  selection steps.
-- That is stronger than Bridgeland's finite-length hypothesis.
-- After `Slicing.IsLocallyFinite` is corrected, Phase 3 must be rebuilt from
-  well-founded strict-subobject / strict-quotient chain conditions, not finite
-  enumeration.
+- Proposition 2.4 is now genuinely repaired in `StabilityFunction.lean` via
+  Artinian/Noetherian recursion on kernels and mdq quotients.
+- The remaining stale part is the thin-interval theorem
+  `SkewedStabilityFunction.hn_exists_in_thin_interval` in `Deformation.lean`,
+  which still assumes `Finite (Subobject _)`.
+- So the real remaining Phase 3 work is **not** in the abelian section-2 layer anymore;
+  it is the section-7 thin-category HN recursion, which must be rebuilt from strict
+  finite-length chain conditions before `deformedSlicing.hn_exists` can be closed
+  faithfully.
 
 **Dependencies**: Phase 2.
 
@@ -180,9 +183,13 @@ Audit correction:
 
 | Order | Sorry | Line | Lines | Depends on |
 |-------|-------|------|-------|------------|
-| 1 | #3 Triangle test | 7363 | ~470 | Phase 2 (quasi-abelian strict subobjects) |
-| 2 | #2 HN existence | 6800 | ~350 | Phase 3 + sorry #3 |
-| 3 | #5 Q(psi)-subobject finiteness | 8106 | ~80 | Sorrys #2-3 resolved first |
+| 1 | #3 Triangle test | 7863 | ~470 | Faithful Lemma 7.5 / 7.6 larger-to-smaller argument |
+| 2 | #2 HN existence | 7049 | ~300 | Rebuild thin-interval HN from strict finite length + blocker #3 |
+| 3 | Theorem 1.2 shell | 8734 | ~15 | Theorem 7.1 + Section 6 local-homeomorphism packaging |
+
+The old standalone “Q(ψ)-subobject finiteness” bullet is no longer a separate explicit
+`sorry`. Its remaining content has been absorbed into the faithful Node 7.7 / HN
+existence refactor.
 
 ### Phase 4 atomization
 
@@ -340,10 +347,13 @@ Audit correction:
      cokernel half-open windows inside the common heart, not by prematurely inserting a
      `Fact (ψ₁ - ε₀ < ψ₂ + ε₀)`.
 5. **#2 deformed slicing HN**
-   - Finish the `hn_exists` field from sigma-HN plus the Phase 3 thin-interval HN recursion.
-6. **#5 local finiteness**
-   - Leave until #1-2 are done; the correct route goes through the constructed deformed
-     slicing, not through naive subobject injection.
+   - Replace the stale `Finite (Subobject _)` theorem
+     `SkewedStabilityFunction.hn_exists_in_thin_interval` by a strict finite-length
+     version driven by `Slicing.IsLocallyFinite`.
+   - Then finish the `hn_exists` field from sigma-HN plus the repaired thin-interval HN recursion.
+6. **Theorem 1.2**
+   - After Theorem 7.1 is honestly proved, package it with the Section 6 uniqueness
+     results into `bridgeland_theorem_1_2`.
 
 ### Finite-length refactor status
 

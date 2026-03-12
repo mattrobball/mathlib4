@@ -1,8 +1,8 @@
 # Bridgeland Stability Conditions: Formalization Status
 
-**Branch:** `feat/bridgeland-stability-conditions`
+**Branch:** `feat/bridgeland-section4-quasiabelian`
 **Repository:** `mattrobball/mathlib4_fork`
-**Last updated:** 2026-03-10
+**Last updated:** 2026-03-12
 
 ---
 
@@ -11,7 +11,7 @@
 Formalization of Bridgeland's "Stability conditions on triangulated categories" (Annals 2007),
 covering Sections 2–7 and the main deformation theorem (Theorem 7.1 / Theorem 1.2).
 
-**10 files, ~11,027 lines total.**
+**10 files, 20,604 lines total.**
 
 ---
 
@@ -19,16 +19,16 @@ covering Sections 2–7 and the main deformation theorem (Theorem 7.1 / Theorem 
 
 | File | Lines | Sorrys | Description |
 |------|-------|--------|-------------|
-| `Deformation.lean` | 3365 | 10 | §7: deformation theorem, wPhaseOf, bridgeland_7_1 |
-| `Slicing.lean` | 2480 | 0 | §3: HNFiltration, Slicing, Lemma 3.4, toTStructure, ltProp/geProp |
-| `StabilityFunction.lean` | 1997 | 0 | §2: StabilityFunction, IsSemistable, hasHN_of_finiteLength |
+| `Deformation.lean` | 8744 | 5 | §7: deformation theorem, thin-interval semistability transport, deformed slicing |
+| `Slicing.lean` | 2873 | 0 | §3: HNFiltration, Slicing, Lemma 3.4, ltProp/geProp |
+| `StabilityFunction.lean` | 3086 | 0 | §2: StabilityFunction, mdq recursion, `hasHN_of_artinian_noetherian` |
 | `StabilityCondition.lean` | 1617 | 0 | §5-6: StabilityCondition, Lemma 6.4, Thm 1.2 skeleton |
-| `IntervalCategory.lean` | 694 | 0 | §4: IntervalCat, two-heart theory, cokernel containment, SkewedStabilityFunction |
-| `HeartEquivalence.lean` | 336 | 11 | §5.3: Prop 5.3, Lemma 5.2, HeartStabilityData scaffolding |
+| `IntervalCategory.lean` | 2762 | 0 | §4: IntervalCat, two-heart theory, quasi-abelian structure, strict SES bridge |
+| `HeartEquivalence.lean` | 336 | 10 | §5.3: Prop 5.3, Lemma 5.2, HeartStabilityData scaffolding |
 | `GrothendieckGroup.lean` | 208 | 0 | K₀, K₀.of, K₀.lift |
-| `Strict.lean` | 252 | 0 | §4: IsStrict, QuasiAbelian, StrictShortExact, kernel/cokernel strictness |
-| `PostnikovTower.lean` | ~120 | 0 | Postnikov towers, factor extraction |
-| `NumericalStability.lean` | ~60 | 0 | Cor 1.3 statement |
+| `Strict.lean` | 701 | 0 | §4: IsStrict, QuasiAbelian, StrictShortExact, strict Artinian/Noetherian transfer |
+| `PostnikovTower.lean` | 88 | 0 | Postnikov towers, factor extraction |
+| `NumericalStability.lean` | 188 | 0 | Cor. 1.3 statement |
 
 ---
 
@@ -36,21 +36,24 @@ covering Sections 2–7 and the main deformation theorem (Theorem 7.1 / Theorem 
 
 ### Current compiling proof gaps
 
-The project is compiling again after the `IsLocallyFinite` refactor, and the finite-length
-infrastructure is now back on the paper-faithful track: Proposition 2.4 is finished in
-`StabilityFunction.lean`. The remaining explicit placeholders are now all in
-`Deformation.lean`.
+The project is compiling again after the `IsLocallyFinite` refactor. The section-2
+finite-length infrastructure is now back on the paper-faithful track:
+Proposition 2.4 is finished in `StabilityFunction.lean`. The remaining explicit
+placeholders are all in `Deformation.lean`, and the main structural debt is that the
+thin-interval HN recursion in `Deformation.lean` still uses the pre-refactor
+`Finite (Subobject _)` surrogate and must be rebuilt from strict finite-length data.
 
 | File | Name | Line | Status |
 |---|---|---|---|
 | `Deformation.lean` | `StabilityCondition.exists_epsilon0` | 58 | Statement correct; dependent transport proof postponed |
 | `Deformation.lean` | `StabilityCondition.exists_epsilon0_sector` | 83 | Statement correct; same transport issue |
-| `Deformation.lean` | `deformedSlicing.hn_exists` | 7036 | Node 7.7 still open |
-| `Deformation.lean` | `P_phi_wSemistable_is_deformedPred` | 7811 | Faithful Lemma 7.5 / 7.6 rewrite still open |
-| `Deformation.lean` | `bridgeland_theorem_1_2` | 8682 | New top-level shell; should be proved from Theorem 7.1 + Section 6 uniqueness |
+| `Deformation.lean` | `deformedSlicing.hn_exists` | 7049 | Node 7.7 still open; currently still depends on stale `Finite (Subobject _)` thin-interval HN recursion |
+| `Deformation.lean` | `P_phi_wSemistable_is_deformedPred` | 7863 | Live Phase 4 blocker: faithful Lemma 7.5 / 7.6 larger-to-smaller argument still open |
+| `Deformation.lean` | `bridgeland_theorem_1_2` | 8734 | Top-level shell; should be proved from Theorem 7.1 + Section 6 uniqueness |
 
-**Current proof order:** Phase 4 blockers `#3 -> #2 -> #5`,
-and only then the final Theorem 1.2 topology packaging.
+**Current proof order:** `#3 -> rebuild #2 on strict finite length -> Theorem 1.2`.
+The old separate “Q(ψ)-subobject finiteness” placeholder has been absorbed into the
+Phase 4 / Node 7.7 refactor rather than surviving as a standalone `sorry`.
 
 ### Scaffolding sorrys
 
@@ -98,14 +101,15 @@ and only then the final Theorem 1.2 topology packaging.
 - [x] `intervalCat_quasiAbelian`
 - [x] Strict SES ↔ triangles correspondence
 
-### Phase 3: Quasi-Abelian HN — complete
+### Phase 3: Quasi-Abelian / Thin-Interval HN — partially repaired
 
+- [x] Paper-faithful abelian finite-length route (Proposition 2.4) in `StabilityFunction.lean`
+- [x] `P(φ)`-side finite-length bridge in `Deformation.lean`
 - [x] Thin-interval selection / quotient-recursion infrastructure in `Deformation.lean`
-- [x] Lemma 7.7 (HN in thin interval categories):
-  `SkewedStabilityFunction.hn_exists_in_thin_interval`
-- [x] Critical-path quasi-abelian HN step discharged directly in `Deformation.lean`
-  rather than via a separate extracted `exists_mdq_quasiAbelian` / `hasHN_quasiAbelian`
-  API
+- [ ] Thin-interval HN recursion itself still needs refactoring:
+  `SkewedStabilityFunction.hn_exists_in_thin_interval` currently assumes
+  `Finite (Subobject _)` and is therefore no longer faithful to the corrected
+  `IsLocallyFinite`
 
 ### Phase 4: Fill sorrys — in progress
 
@@ -116,8 +120,8 @@ Current blocker order:
 - [ ] #3 `P_phi_wSemistable_is_deformedPred`
 - [x] #4 `abelianHN_to_intervalProp`
 - [x] #1 `hom_eq_zero_of_deformedPred`
-- [ ] #2 `deformedSlicing.hn_exists`
-- [ ] #5 Q(ψ)-subobject finiteness (deferred until #2-3 land)
+- [ ] #2 `deformedSlicing.hn_exists` after replacing the stale thin-interval HN theorem
+- [ ] Theorem 1.2 packaging after Theorem 7.1 is complete
 
 Current Phase 4 atomization:
 
