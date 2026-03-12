@@ -180,6 +180,11 @@ Current Phase 4 atomization:
    `P((ψ₂ - ε₀, a + 1))` for `F`,
    and the image comparison is made in the overlap
    `P((ψ₁ - ε₀, ψ₂ + ε₀))`.
+   Current compiled checkpoint inside `hom_eq_zero_of_deformedPred`:
+   the proof now transports `E` and `F` to those faithful target envelopes,
+   transports semistability to the target windows, proves the left-envelope quotient
+   inequality `ψ₁ ≤ ψ(im_A(f))`, and proves the midpoint-heart window pieces
+   `ker_A(f) ∈ P((a, ψ₁ + ε₀))` and `φ⁻(Q_A) > ψ₂ - ε₀`.
    New constraint discovered during the audit:
    those target windows are thin only when `ε₀ < 1 / 8`.
    The theorem layer has now been tightened accordingly:

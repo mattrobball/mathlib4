@@ -243,6 +243,11 @@ Optional cleanup left for later, not on the blocker path:
    - Done: the Node 7.6 / deformed-slicing theorem layer now explicitly carries the
      faithful extra hypothesis `ε₀ < 1/8`, so the midpoint-heart rewrite can use the
      paper's target-window geometry without a fake `1/4 ⇒ 1/8` derivation.
+   - Done: the faithful target-envelope transport now actually appears in the small-gap
+     proof. `E` is transported to `P((a, ψ₁ + ε₀))`, `F` to `P((ψ₂ - ε₀, a + 1))`,
+     the left-envelope quotient inequality `ψ₁ ≤ ψ(im_A(f))` is compiled, and the
+     midpoint-heart window lemmas `K_A ∈ P((a, ψ₁ + ε₀))` and
+     `φ⁻(Q_A) > ψ₂ - ε₀` are compiled.
    - Remaining: rewrite the small-gap proof around the paper's actual midpoint-heart plus
      two target envelopes argument, using the half-open left/right target windows rather
      than assuming the open overlap `(ψ₁ - ε₀, ψ₂ + ε₀)` is nonempty.
@@ -278,6 +283,7 @@ Optional cleanup left for later, not on the blocker path:
    `im_A(f) → F → Q_A → im_A(f)[1]`.
    This gives `ψ₁ ≤ ψ(im_A(f))` from the first triangle and `ψ(im_A(f)) ≤ ψ₂`
    from the second.
+   Status: the first inequality is now compiled; the second is the remaining live gap.
 6. Tighten the wrapper API to the paper's `ε₀ < 1/8`.
    This is not cosmetic: the two target windows have widths
    `ψ₁ + ε₀ - a` and `a + 1 - (ψ₂ - ε₀)`, and their thinness condition
