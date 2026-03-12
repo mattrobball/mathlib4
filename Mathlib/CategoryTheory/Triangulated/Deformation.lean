@@ -5927,6 +5927,18 @@ private theorem leProp_of_phiPlus_le_smallGap
     _ ≤ t := h
 
 variable [IsTriangulated C] in
+private theorem geProp_of_phiMinus_ge_smallGap
+    (s : Slicing C) {E : C} (hE : ¬IsZero E) {t : ℝ}
+    (h : t ≤ s.phiMinus C E hE) :
+    s.geProp C t E := by
+  obtain ⟨F, hn, hlast⟩ := HNFiltration.exists_nonzero_last C s hE
+  refine s.geProp_of_hn C F t (fun j ↦ ?_) hn
+  calc
+    t ≤ s.phiMinus C E hE := h
+    _ = F.φ ⟨F.n - 1, by omega⟩ := s.phiMinus_eq C E hE F hn hlast
+    _ ≤ F.φ j := F.hφ.antitone (Fin.mk_le_mk.mpr (by omega))
+
+variable [IsTriangulated C] in
 private theorem mem_phaseShiftHeart_of_phaseBounds_smallGap
     (s : Slicing C) {E : C} (hE : ¬IsZero E) {t : ℝ}
     (hgt : t < s.phiMinus C E hE)
@@ -5952,6 +5964,35 @@ private theorem mem_phaseShiftHeart_of_phaseBounds_smallGap
     simpa [ss] using (s.phaseShift_leProp C t 1 E).mpr hE_le'⟩
   exact (u.mem_heart_iff E).mpr ⟨inferInstance, inferInstance⟩
 
+variable [IsTriangulated C] in
+private theorem gtProp_leProp_of_phaseShiftHeart
+    (s : Slicing C) {E : C} {a u : ℝ}
+    (hHeart : ((s.phaseShift C a).toTStructure).heart E)
+    (hE : ¬IsZero E)
+    (hu : s.phiPlus C E hE ≤ u) :
+    s.gtProp C a E ∧ s.leProp C u E := by
+  have hHeart' := hHeart
+  rw [(s.phaseShift C a).toTStructure_heart_iff] at hHeart'
+  constructor
+  · exact (s.phaseShift_gtProp_zero C a E).mp hHeart'.1
+  · exact leProp_of_phiPlus_le_smallGap (C := C) (s := s) hE hu
+
+variable [IsTriangulated C] in
+private theorem geProp_leProp_of_phaseShiftHeart
+    (s : Slicing C) {E : C} {a l : ℝ}
+    (hHeart : ((s.phaseShift C a).toTStructure).heart E)
+    (hE : ¬IsZero E)
+    (hl : l ≤ s.phiMinus C E hE) :
+    s.geProp C l E ∧ s.leProp C (a + 1) E := by
+  have hHeart' := hHeart
+  rw [(s.phaseShift C a).toTStructure_heart_iff] at hHeart'
+  constructor
+  · exact geProp_of_phiMinus_ge_smallGap (C := C) (s := s) hE hl
+  · have hle : s.leProp C (1 + a) E := by
+      simpa [add_comm] using
+        (s.phaseShift_leProp C a 1 E).mp hHeart'.2
+    simpa [add_comm] using hle
+
 private theorem midpoint_left_target_thin
     {ψ₁ ψ₂ ε₀ : ℝ} (hsmall : ψ₁ ≤ ψ₂ + 2 * ε₀) (hε₀8 : ε₀ < 1 / 8) :
     (ψ₁ + ε₀) - ((ψ₁ + ψ₂) / 2 - 1 / 2) + 2 * ε₀ < 1 := by
@@ -5971,39 +6012,39 @@ private theorem midpoint_image_window_thin
 variable [IsTriangulated C] in
 private theorem mem_phaseShiftHeart_of_midpoint_left
     (s : Slicing C) {E : C} (hE : ¬IsZero E) {ψ₁ ψ₂ ε₀ : ℝ}
-    (hlo : ψ₁ - ε₀ < s.phiMinus C E hE)
-    (hhi : s.phiPlus C E hE < ψ₁ + ε₀)
+    (hlo : ψ₁ - ε₀ ≤ s.phiMinus C E hE)
+    (hhi : s.phiPlus C E hE ≤ ψ₁ + ε₀)
     (hgap : ψ₂ < ψ₁) (hsmall : ψ₁ ≤ ψ₂ + 2 * ε₀) (hε₀4 : ε₀ < 1 / 4) :
     (((s.phaseShift C ((ψ₁ + ψ₂) / 2 - 1 / 2)).toTStructure).heart E) := by
   refine mem_phaseShiftHeart_of_phaseBounds_smallGap (C := C) (s := s) hE ?_ ?_
   · have hmid : (ψ₁ + ψ₂) / 2 - 1 / 2 < s.phiMinus C E hE := by
       have h' : (ψ₁ + ψ₂) / 2 - 1 / 2 < ψ₁ - ε₀ := by
         linarith [hgap, hε₀4]
-      exact lt_trans h' hlo
+      exact lt_of_lt_of_le h' hlo
     exact hmid
   · have hmid : s.phiPlus C E hE ≤ (ψ₁ + ψ₂) / 2 - 1 / 2 + 1 := by
       have h' : ψ₁ + ε₀ ≤ (ψ₁ + ψ₂) / 2 - 1 / 2 + 1 := by
         linarith [hsmall, hε₀4]
-      exact le_trans (le_of_lt hhi) h'
+      exact le_trans hhi h'
     exact hmid
 
 variable [IsTriangulated C] in
 private theorem mem_phaseShiftHeart_of_midpoint_right
     (s : Slicing C) {E : C} (hE : ¬IsZero E) {ψ₁ ψ₂ ε₀ : ℝ}
-    (hlo : ψ₂ - ε₀ < s.phiMinus C E hE)
-    (hhi : s.phiPlus C E hE < ψ₂ + ε₀)
+    (hlo : ψ₂ - ε₀ ≤ s.phiMinus C E hE)
+    (hhi : s.phiPlus C E hE ≤ ψ₂ + ε₀)
     (hgap : ψ₂ < ψ₁) (hsmall : ψ₁ ≤ ψ₂ + 2 * ε₀) (hε₀4 : ε₀ < 1 / 4) :
     (((s.phaseShift C ((ψ₁ + ψ₂) / 2 - 1 / 2)).toTStructure).heart E) := by
   refine mem_phaseShiftHeart_of_phaseBounds_smallGap (C := C) (s := s) hE ?_ ?_
   · have hmid : (ψ₁ + ψ₂) / 2 - 1 / 2 < s.phiMinus C E hE := by
       have h' : (ψ₁ + ψ₂) / 2 - 1 / 2 < ψ₂ - ε₀ := by
         linarith [hsmall, hε₀4]
-      exact lt_trans h' hlo
+      exact lt_of_lt_of_le h' hlo
     exact hmid
   · have hmid : s.phiPlus C E hE ≤ (ψ₁ + ψ₂) / 2 - 1 / 2 + 1 := by
       have h' : ψ₂ + ε₀ ≤ (ψ₁ + ψ₂) / 2 - 1 / 2 + 1 := by
         linarith [hgap, hε₀4]
-      exact le_trans (le_of_lt hhi) h'
+      exact le_trans hhi h'
     exact hmid
 
 /-! ### Sharp hom-vanishing for Q (Node 7.6) -/
@@ -6030,6 +6071,7 @@ theorem StabilityCondition.hom_eq_zero_of_deformedPred
     (σ : StabilityCondition C)
     (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hε₀8 : ε₀ < 1 / 8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     {E F : C} {ψ₁ ψ₂ : ℝ}
     (hE : σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin ψ₁ E)
@@ -6073,34 +6115,39 @@ theorem StabilityCondition.hom_eq_zero_of_deformedPred
       simp only [hδ'_def]; linarith
     exact σ.slicing.intervalHom_eq_zero C hEI hFI hdisjoint f
   · -- Small gap: 0 < ψ₁ - ψ₂ ≤ 2ε₀.
-    -- Proof strategy (Bridgeland Lemma 7.6):
-    -- 1. Both E, F lie in a common abelian heart P((c, c+1]) (needs ε₀ < 1/4)
-    -- 2. Factor f as E ↠ im(f) ↪ F in the heart
-    -- 3. SES 0 → im(f) → F → coker(f) → 0 gives:
-    --    F's W-semistability implies wPhaseOf(W(im(f))) ≤ ψ₂
-    -- 4. SES 0 → ker(f) → E → im(f) → 0 and W(E) = W(ker) + W(im):
-    --    See-saw gives wPhaseOf(W(im(f))) ≥ ψ₁ (from E's W-semistability)
-    -- 5. ψ₁ ≤ wPhaseOf(W(im)) ≤ ψ₂ contradicts ψ₁ > ψ₂
-    -- Blockers: heart-SES-to-triangle correspondence, P(φ) closure under
-    -- subobjects/quotients in hearts, wPhaseOf see-saw lemma
+    -- Faithful Lemma 7.6 route:
+    -- choose the midpoint heart A = P((a,a+1]) with a = (ψ₁ + ψ₂)/2 - 1/2,
+    -- factor f in A, then compare the image in the paper's two thin target windows
+    -- P((a, ψ₁ + ε₀)) and P((ψ₂ - ε₀, a + 1)).
     push_neg at hlargeGap
     by_cases hf : f = 0
     · exact hf
-    · set c : ℝ := ψ₂ + 3 * ε₀ - 1
-      set ss := σ.slicing.phaseShift C c
+    · set a : ℝ := (ψ₁ + ψ₂) / 2 - 1 / 2
+      have hsmallGap : ψ₁ ≤ ψ₂ + 2 * ε₀ := hlargeGap
+      have hleftThin : (ψ₁ + ε₀) - a + 2 * ε₀ < 1 := by
+        simpa [a] using midpoint_left_target_thin (ψ₁ := ψ₁) (ψ₂ := ψ₂) hsmallGap hε₀8
+      have hrightThin : (a + 1) - (ψ₂ - ε₀) + 2 * ε₀ < 1 := by
+        simpa [a] using midpoint_right_target_thin (ψ₁ := ψ₁) (ψ₂ := ψ₂) hsmallGap hε₀8
+      have himageThin : (ψ₂ + ε₀) - (ψ₁ - ε₀) + 2 * ε₀ < 1 := by
+        exact midpoint_image_window_thin (ψ₁ := ψ₁) (ψ₂ := ψ₂) hgap hsmallGap hε₀8
+      set ss := σ.slicing.phaseShift C a
       let t := ss.toTStructure
       have hE_heart : t.heart E := by
-        apply mem_phaseShiftHeart_of_phaseBounds_smallGap (C := C) (s := σ.slicing) hSS₁.2.1
-        · dsimp [c]
-          linarith [hE_lo, hgap]
-        · dsimp [c]
-          linarith [hE_hi, hlargeGap, hε₀2]
+        simpa [t, ss, a] using
+          mem_phaseShiftHeart_of_midpoint_left (C := C) (s := σ.slicing) hSS₁.2.1
+            hE_lo hE_hi hgap hsmallGap hε₀2
       have hF_heart : t.heart F := by
-        apply mem_phaseShiftHeart_of_phaseBounds_smallGap (C := C) (s := σ.slicing) hSS₂.2.1
-        · dsimp [c]
-          linarith [hF_lo, hε₀2]
-        · dsimp [c]
-          linarith [hF_hi, hε₀2]
+        simpa [t, ss, a] using
+          mem_phaseShiftHeart_of_midpoint_right (C := C) (s := σ.slicing) hSS₂.2.1
+            hF_lo hF_hi hgap hsmallGap hε₀2
+      have hE_window :
+          σ.slicing.gtProp C a E ∧ σ.slicing.leProp C (ψ₁ + ε₀) E := by
+        exact gtProp_leProp_of_phaseShiftHeart (C := C) (s := σ.slicing)
+          (a := a) hE_heart hSS₁.2.1 hE_hi
+      have hF_window :
+          σ.slicing.geProp C (ψ₂ - ε₀) F ∧ σ.slicing.leProp C (a + 1) F := by
+        exact geProp_leProp_of_phaseShiftHeart (C := C) (s := σ.slicing)
+          (a := a) hF_heart hSS₂.2.1 hF_lo
       letI := t.hasHeartFullSubcategory
       letI : Abelian t.heart.FullSubcategory := t.heartFullSubcategoryAbelian
       let EH : t.heart.FullSubcategory := ⟨E, hE_heart⟩
@@ -6132,6 +6179,13 @@ theorem StabilityCondition.hom_eq_zero_of_deformedPred
         intro h
         apply hf
         simpa [fH] using congrArg (fun g => g.hom) h
+      -- Remaining work in the faithful route:
+      -- 1. show ker_A(f) ∈ P((a, ψ₁ + ε₀)),
+      --    im_A(f) ∈ P((ψ₁ - ε₀, ψ₂ + ε₀)),
+      --    coker_A(f) ∈ P((ψ₂ - ε₀, a + 1));
+      -- 2. transport E and F to the left/right target envelopes using Node 7.5;
+      -- 3. apply the transported semistability triangle tests to force
+      --    ψ₁ ≤ ψ(im_A(f)) ≤ ψ₂.
       sorry
 
 /-! ### Extension-closed subcategories Q(> t), Q(≤ t) (Node 7.8a) -/
@@ -6165,6 +6219,7 @@ theorem StabilityCondition.hom_eq_zero_of_deformedGt_deformedLe
     (σ : StabilityCondition C)
     (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hε₀8 : ε₀ < 1 / 8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     {E F : C} {t : ℝ}
     (hE : σ.deformedGtPred C W hW ε₀ hε₀ hε₀2 hsin t E)
@@ -6174,7 +6229,7 @@ theorem StabilityCondition.hom_eq_zero_of_deformedGt_deformedLe
   · exact hEZ.eq_of_src f 0
   rcases hF with hFZ | ⟨ψ₂, hψ₂, hF'⟩
   · exact hFZ.eq_of_tgt f 0
-  exact σ.hom_eq_zero_of_deformedPred C W hW hε₀ hε₀2 hsin hE' hF'
+  exact σ.hom_eq_zero_of_deformedPred C W hW hε₀ hε₀2 hε₀8 hsin hE' hF'
     (by linarith) f
 
 /-! ### Deformed slicing construction -/
@@ -6193,6 +6248,7 @@ handles the large-gap case via phase confinement and interval disjointness. -/
 def StabilityCondition.deformedSlicing (σ : StabilityCondition C)
     (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hε₀8 : ε₀ < 1 / 8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀))) :
     Slicing C where
   P := σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin
@@ -6357,7 +6413,7 @@ def StabilityCondition.deformedSlicing (σ : StabilityCondition C)
             rw [show (a + b) / 2 - 1 + 1 = (a + b) / 2 from by ring] at key
             linarith
   hom_vanishing ψ₁ ψ₂ A B hlt hA hB f :=
-    σ.hom_eq_zero_of_deformedPred C W hW hε₀ hε₀2 hsin hA hB hlt f
+    σ.hom_eq_zero_of_deformedPred C W hW hε₀ hε₀2 hε₀8 hsin hA hB hlt f
   hn_exists := by
     -- Bridgeland Nodes 7.7-7.9: HN filtrations for the deformed slicing Q.
     -- Proof strategy:
@@ -6382,9 +6438,10 @@ theorem StabilityCondition.deformedSlicing_compat
     (σ : StabilityCondition C)
     (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hε₀8 : ε₀ < 1 / 8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     (ψ : ℝ) (E : C)
-    (hQ : (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hsin).P ψ E)
+    (hQ : (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hsin).P ψ E)
     (hE : ¬IsZero E) :
     ∃ (m : ℝ), 0 < m ∧
       W (K₀.of C E) = ↑m * Complex.exp (↑(Real.pi * ψ) * Complex.I) := by
@@ -7450,12 +7507,13 @@ private theorem stabilityFunctionOnP_semistable_intervalProp
     (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hε₀8 : ε₀ < 1 / 8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     {φ : ℝ} {a b : ℝ} (ha : a < φ - ε₀) (hb : φ + ε₀ < b)
     {E : (σ.slicing.P φ).FullSubcategory}
     (hss : @StabilityFunction.IsSemistable (σ.slicing.P φ).FullSubcategory _
       (σ.P_phi_abelian C φ) (stabilityFunctionOnP C σ W hW hε₀ hε₀2 hsin φ) E) :
-    (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hsin).intervalProp C a b E.obj := by
+    (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hsin).intervalProp C a b E.obj := by
   rcases stabilityFunctionOnP_semistable_deformedPred (C := C) (σ := σ) (W := W) (hW := hW)
     hε₀ hε₀2 hsin ha hb hss with ⟨ψ, hψa, hψb, hQ⟩
   refine Or.inr ⟨HNFiltration.single C E.obj ψ hQ, ?_⟩
@@ -7473,15 +7531,16 @@ private theorem abelianHN_to_intervalProp
     (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hε₀8 : ε₀ < 1 / 8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     {φ : ℝ} {E : (σ.slicing.P φ).FullSubcategory}
     (hE : ¬IsZero E)
     {a b : ℝ} (ha : a < φ - ε₀) (hb : φ + ε₀ < b) :
-    (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hsin).intervalProp C a b
+    (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hsin).intervalProp C a b
       ((σ.slicing.P φ).ι.obj E) := by
   letI : Abelian (σ.slicing.P φ).FullSubcategory := σ.P_phi_abelian C φ
   let Zφ := stabilityFunctionOnP C σ W hW hε₀ hε₀2 hsin φ
-  let Q := σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hsin
+  let Q := σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hsin
   let ι := (σ.slicing.P φ).ι
   obtain ⟨F⟩ := stabilityFunctionOnP_hasHN C σ W hW hε₀ hε₀2 hsin φ E hE
   have stepTriangle
@@ -7550,7 +7609,7 @@ private theorem abelianHN_to_intervalProp
                 (Subobject.ofLE (F.chain j.castSucc) (F.chain j.succ)
                   (le_of_lt (F.chain_strictMono j.castSucc_lt_succ))))) := by
         exact stabilityFunctionOnP_semistable_intervalProp (C := C) (σ := σ) (W := W)
-          (hW := hW) hε₀ hε₀2 hsin ha hb (F.factor_semistable j)
+          (hW := hW) hε₀ hε₀2 hε₀8 hsin ha hb (F.factor_semistable j)
       obtain ⟨δ, hT⟩ := stepTriangle
         (X₁ := F.chain j.castSucc) (X₂ := F.chain j.succ)
         (F.chain_strictMono j.castSucc_lt_succ)
@@ -7586,10 +7645,11 @@ theorem sigma_semistable_intervalProp
     (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hε₀8 : ε₀ < 1 / 8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     {E : C} {φ : ℝ} (hP : σ.slicing.P φ E) (_hE : ¬IsZero E)
     {δ : ℝ} (hδ : 0 < δ) :
-    (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hsin).intervalProp C
+    (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hsin).intervalProp C
       (φ - ε₀ - δ) (φ + ε₀ + δ) E := by
   by_cases hEz : IsZero E
   · exact Or.inl hEz
@@ -7597,7 +7657,7 @@ theorem sigma_semistable_intervalProp
   set E' : (σ.slicing.P φ).FullSubcategory := ⟨E, hP⟩
   have hE'ne : ¬IsZero E' := fun h => hEz ((σ.slicing.P φ).ι.map_isZero h)
   -- Convert abelian HN in P(φ) to Q-intervalProp for E = ι.obj E'
-  exact abelianHN_to_intervalProp C σ W hW hε₀ hε₀2 hsin
+  exact abelianHN_to_intervalProp C σ W hW hε₀ hε₀2 hε₀8 hsin
     hE'ne (by linarith) (by linarith)
 
 /-! ### Deformation theorem (Theorem 7.1) -/
@@ -7624,14 +7684,15 @@ theorem bridgeland_7_1 (σ : StabilityCondition C)
     (W : K₀ C →+ ℂ)
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hε₀8 : ε₀ < 1 / 8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     (hε₀_lf : ∃ δ : ℝ, 0 < δ ∧ ∀ t (E : C),
       σ.slicing.intervalProp C (t - (ε₀ + δ)) (t + (ε₀ + δ)) E →
       Finite (Subobject E)) :
     ∃ (τ : StabilityCondition C), τ.Z = W ∧
       slicingDist C σ.slicing τ.slicing ≤ ENNReal.ofReal ε₀ := by
-  refine ⟨⟨σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hsin, W,
-    σ.deformedSlicing_compat C W hW ε₀ hε₀ hε₀2 hsin, ?_⟩, rfl, ?_⟩
+  refine ⟨⟨σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hsin, W,
+    σ.deformedSlicing_compat C W hW ε₀ hε₀ hε₀2 hε₀8 hsin, ?_⟩, rfl, ?_⟩
   · -- Local finiteness: inherited from σ via phase confinement
     obtain ⟨δ, hδ, hlf_σ⟩ := hε₀_lf
     constructor
@@ -7661,7 +7722,7 @@ theorem bridgeland_7_1 (σ : StabilityCondition C)
       intro ψ E
       sorry
   · -- Distance bound: d(P, Q) ≤ ε₀ by phase confinement
-    set Q := σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hsin
+    set Q := σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hsin
     -- Forward: Q-HN factors → phase confinement → σ-intervalProp
     have forward : ∀ (E : C) (hE : ¬IsZero E) (δ : ℝ), 0 < δ →
         σ.slicing.intervalProp C
@@ -7707,7 +7768,7 @@ theorem bridgeland_7_1 (σ : StabilityCondition C)
         -- Factor i is σ-semistable of phase F.φ i. By reverse phase confinement,
         -- it lies in Q-interval (F.φ i - ε₀ - δ, F.φ i + ε₀ + δ).
         have hQint := sigma_semistable_intervalProp C σ W hW
-          hε₀ hε₀2 hsin (F.semistable i) hFi hδ
+          hε₀ hε₀2 hε₀8 hsin (F.semistable i) hFi hδ
         -- Widen to (phiMinus - ε₀ - δ, phiPlus + ε₀ + δ) using monotonicity
         exact Q.intervalProp_mono C (by linarith) (by linarith) hQint
     -- Combine: |σ.phiPlus - Q.phiPlus| ≤ ε₀ and |σ.phiMinus - Q.phiMinus| ≤ ε₀

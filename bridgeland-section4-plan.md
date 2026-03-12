@@ -234,18 +234,23 @@ Optional cleanup left for later, not on the blocker path:
 4. **#1 small-gap hom-vanishing**
    - Done: the small-gap branch now has a compiled common-heart entry point:
      helper lemmas transport phase-confinement bounds into a shared heart
-     `P((c,c+1])`, and the branch now constructs the ambient heart image factorisation
+     `P((a,a+1])`, and the branch now constructs the ambient heart image factorisation
      `E_H ↠ I_H ↪ F_H`.
    - Done: the interval-independence layer now has a compiled general
      `semistable_of_target_envelope` transport theorem, obtained by intersecting the
      source and target envelopes and chaining the previously finished inclusion/subinterval
      lemmas.
+   - Done: the Node 7.6 / deformed-slicing theorem layer now explicitly carries the
+     faithful extra hypothesis `ε₀ < 1/8`, so the midpoint-heart rewrite can use the
+     paper's target-window geometry without a fake `1/4 ⇒ 1/8` derivation.
    - Remaining: rewrite the small-gap proof around the paper's actual midpoint-heart plus
-     two target envelopes argument.
-   - Critical API note: this faithful Lemma 7.6 route uses thin target windows whose
-     thinness needs `ε₀ < 1/8`; the current deformed-slicing wrapper still only carries
-     `ε₀ < 1/4`, so the wrapper/final theorem signatures need to be tightened once the
-     rewritten proof is in place.
+     two target envelopes argument, using the half-open left/right target windows rather
+     than assuming the open overlap `(ψ₁ - ε₀, ψ₂ + ε₀)` is nonempty.
+   - Important boundary note: at the endpoint `ψ₁ = ψ₂ + 2 ε₀`, one has
+     `ψ₁ - ε₀ = ψ₂ + ε₀`, so the overlap interval from the paper can degenerate.
+     The Lean proof therefore has to recover the image comparison from the kernel and
+     cokernel windows inside the common heart, not by prematurely inserting a
+     `Fact (ψ₁ - ε₀ < ψ₂ + ε₀)`.
 5. **#2 deformed slicing HN**
    - Finish the `hn_exists` field from sigma-HN plus the Phase 3 thin-interval HN recursion.
 6. **#5 local finiteness**
@@ -277,6 +282,10 @@ Optional cleanup left for later, not on the blocker path:
    This is not cosmetic: the two target windows have widths
    `ψ₁ + ε₀ - a` and `a + 1 - (ψ₂ - ε₀)`, and their thinness condition
    `width + 2 ε₀ < 1` is exactly where the `1 / 8` bound is used.
+   Status update: the theorem layer around `hom_eq_zero_of_deformedPred`,
+   `hom_eq_zero_of_deformedGt_deformedLe`, `deformedSlicing`,
+   `deformedSlicing_compat`, `sigma_semistable_intervalProp`, and
+   `bridgeland_7_1` now carries this extra hypothesis in the code.
 
 ### Sorry #2 (HN existence) — correct strategy (Bridgeland 7.7-7.9):
 1. Take sigma-HN filtration of E

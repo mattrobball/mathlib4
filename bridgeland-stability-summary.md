@@ -181,9 +181,16 @@ Current Phase 4 atomization:
    and the image comparison is made in the overlap
    `P((ψ₁ - ε₀, ψ₂ + ε₀))`.
    New constraint discovered during the audit:
-   those target windows are thin only when `ε₀ < 1 / 8`,
-   so the deformed-slicing wrapper API has to be tightened from `1 / 4` to `1 / 8`
-   instead of continuing with a non-paper workaround.
+   those target windows are thin only when `ε₀ < 1 / 8`.
+   The theorem layer has now been tightened accordingly:
+   `hom_eq_zero_of_deformedPred`, `hom_eq_zero_of_deformedGt_deformedLe`,
+   `deformedSlicing`, `deformedSlicing_compat`, `sigma_semistable_intervalProp`,
+   and `bridgeland_7_1` all now carry the faithful extra `1 / 8` hypothesis.
+   Additional boundary discovery: at the endpoint `ψ₁ = ψ₂ + 2 ε₀`, the nominal
+   overlap satisfies `ψ₁ - ε₀ = ψ₂ + ε₀`, so the open overlap interval can collapse.
+   That means the remaining small-gap proof must compare the image through the
+   kernel/cokernel half-open target windows inside the midpoint heart, not by assuming
+   a pre-existing `Fact (ψ₁ - ε₀ < ψ₂ + ε₀)`.
 
 Current remaining sorry sites in `Deformation.lean`:
 
