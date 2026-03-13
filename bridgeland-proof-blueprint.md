@@ -319,7 +319,8 @@ class Slicing.IsLocallyFinite (s : Slicing C) : Prop :=
 
 This is the definition that should drive the code. The `Slicing.IsLocallyFinite`
 definition in the branch has now been corrected accordingly. The remaining stale
-surrogate is downstream in the old section-7 thin-interval HN theorem, which still
+surrogate is downstream in the legacy helper
+`SkewedStabilityFunction.hn_exists_in_thin_interval_of_finiteSubobjects`, which still
 assumes `Finite (Subobject _)`. Replacing it merely by ordinary `IsArtinianObject` /
 `IsNoetherianObject` on all subobjects would still be too strong. The formal target
 has to talk about ACC/DCC on **strict** subobjects / strict quotients in the thin
@@ -1088,6 +1089,16 @@ Use Lemmas 3.4 and 7.3.
 
 Repeat the Proposition 2.4 argument, but with strict subobjects / strict quotients and using Lemma 7.6 in place of the abelian hom-vanishing argument.
 
+Implementation note:
+the current `Deformation.lean` checkpoint now has the first faithful quotient-side packaging
+for this node:
+`phase_cokernel_lt_of_phase_gt_strictSubobject`,
+`exists_semistable_strictQuotient_le_phase_of_finiteLength`,
+`IsStrictMDQKernel`, and the strict-Artinian theorem
+`semistable_cokernel_of_minPhase_strictKernel_of_minimal_of_strictArtinian`.
+The remaining work is to replace the old finite-subobject kernel selection by an actual
+mdq existence recursion on strict kernels.
+
 #### Node 7.7e — HN filtrations in `G`
 
 Induct on mdq kernels exactly as in Proposition 2.4.
@@ -1376,7 +1387,8 @@ The branch has already completed the earlier structural work:
 The live proof order is therefore narrower:
 
 1. finish Node 7.5 / 7.6 faithfully, i.e. the remaining `P_phi_wSemistable_is_deformedPred` bridge,
-2. rebuild the Node 7.7 thin-interval HN theorem so it uses strict finite-length data instead of `Finite (Subobject _)`,
+2. replace the legacy `Finite (Subobject _)` helper proof by an actual proof of the
+   corrected Node 7.7 strict finite-length theorem,
 3. close `deformedSlicing.hn_exists`,
 4. package Theorem 1.2 from Theorem 7.1 plus the Section 6 uniqueness results.
 

@@ -167,9 +167,19 @@ Audit correction:
 
 - Proposition 2.4 is now genuinely repaired in `StabilityFunction.lean` via
   Artinian/Noetherian recursion on kernels and mdq quotients.
-- The remaining stale part is the thin-interval theorem
-  `SkewedStabilityFunction.hn_exists_in_thin_interval` in `Deformation.lean`,
-  which still assumes `Finite (Subobject _)`.
+- The canonical thin-interval theorem
+  `SkewedStabilityFunction.hn_exists_in_thin_interval` in `Deformation.lean`
+  now has the paper-facing strict finite-length statement.
+- The first strict-finite-length bridge under that theorem is now compiled:
+  `phase_cokernel_lt_of_phase_gt_strictSubobject`,
+  `exists_semistable_strictQuotient_le_phase_of_finiteLength`,
+  `IsStrictMDQKernel`,
+  `semistable_cokernel_of_minPhase_strictKernel_of_minimal_of_strictArtinian`,
+  and `isStrictMDQKernel_of_minPhase_strictKernel_of_finiteLength`.
+- The remaining stale part is its legacy proof helper
+  `SkewedStabilityFunction.hn_exists_in_thin_interval_of_finiteSubobjects`,
+  together with the old minimal-kernel selection theorems it still depends on,
+  all of which still assume `Finite (Subobject _)`.
 - So the real remaining Phase 3 work is **not** in the abelian section-2 layer anymore;
   it is the section-7 thin-category HN recursion, which must be rebuilt from strict
   finite-length chain conditions before `deformedSlicing.hn_exists` can be closed
@@ -240,6 +250,12 @@ existence refactor.
      bookkeeping for future reuse in the blocker proofs.
    - Next atom: use the compiled inclusion theorem to replace the remaining ad hoc tails
      in blockers `#3` and `#1`.
+   - New checkpoint: the upper-source branch of blocker `#3` is now rewritten in the
+     file around Bridgeland's actual first strict short exact sequence in the upper
+     source envelope, followed by the `P(φ)`-image factorisation and its epi-kernel
+     triangle in the midpoint heart. The remaining local proof obligation there is no
+     longer a vague image-comparison tail: it is specifically to recover the kernel term
+     of that `P(φ)`-image triangle inside the same upper source interval.
    - Replaced plan: use the compiled common-heart / pullback / quotient infrastructure as
      support lemmas for the interval-independence proof. The previous "last contradiction"
      route is not strong enough on its own.
@@ -311,12 +327,27 @@ existence refactor.
      `φ`-heart into `F ∈ P(φ)` now yields a nonzero image object still lying in `P(φ)`,
      together with the semistability inequality `phase(image) ≤ ψ` coming from
      `stabilityFunctionOnP`.
+   - New compiled target-window specialization:
+     `exists_target_P_phi_image_factorisation_phase_le`.
+     The remaining contradiction can now be attached directly to the actual first strict
+     short exact sequence in `P((ψ - ε₀, ψ + ε₀))`, instead of being phrased through the
+     discarded upper-source kernel placeholder.
    - Current live faithful gap:
      the remaining missing theorem is the opposite inequality
      `ψ < phase(image)`
-     for the `P(φ)` image of a one-sided source-envelope destabilizing object.
-     Equivalently: prove the quotient-side lower bound from the Node 7.3 source
-     semistable object to its `P(φ)` image.
+     for the `P(φ)` image of the target-window destabilizing strict subobject.
+     Equivalently: prove the faithful comparison between the thin target-category image
+     and the `P(φ)` image.
+   - New compiled reduction:
+     `SkewedStabilityFunction.phase_le_of_triangle_quotient` and
+     `wPhaseOf_gt_of_upper_source_P_phi_image_triangle` now package the quotient-side
+     lower-bound argument itself. Once the admissibility triangle for the `P(φ)` image
+     is known to stay inside the upper source interval, the contradiction against
+     abelian `stabilityFunctionOnP` semistability is immediate.
+   - So the live structural gap is now narrower:
+     prove that the kernel term in the `P(φ)`-image admissibility triangle of a
+     one-sided source-envelope destabilizing object remains in the same upper source
+     interval `P((ψ - ε₀, φ + ε₀))`.
    - Fresh audit warning:
      do not try to prove that the larger thin-category destabilizing object `M`
      is isomorphic to its `P(φ)`-image. That is the wrong proof shape: the paper's
@@ -375,9 +406,11 @@ existence refactor.
      cokernel half-open windows inside the common heart, not by prematurely inserting a
      `Fact (ψ₁ - ε₀ < ψ₂ + ε₀)`.
 5. **#2 deformed slicing HN**
-   - Replace the stale `Finite (Subobject _)` theorem
-     `SkewedStabilityFunction.hn_exists_in_thin_interval` by a strict finite-length
-     version driven by `Slicing.IsLocallyFinite`.
+   - Replace the legacy `Finite (Subobject _)` helper
+     `SkewedStabilityFunction.hn_exists_in_thin_interval_of_finiteSubobjects`
+     by an actual proof of the corrected strict finite-length theorem
+     `SkewedStabilityFunction.hn_exists_in_thin_interval`, driven by
+     `Slicing.IsLocallyFinite`.
    - Then finish the `hn_exists` field from sigma-HN plus the repaired thin-interval HN recursion.
 6. **Theorem 1.2**
    - After Theorem 7.1 is honestly proved, package it with the Section 6 uniqueness

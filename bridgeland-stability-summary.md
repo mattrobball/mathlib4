@@ -40,14 +40,22 @@ The project is compiling again after the `IsLocallyFinite` refactor. The section
 finite-length infrastructure is now back on the paper-faithful track:
 Proposition 2.4 is finished in `StabilityFunction.lean`. The remaining explicit
 placeholders are all in `Deformation.lean`, and the main structural debt is that the
-thin-interval HN recursion in `Deformation.lean` still uses the pre-refactor
-`Finite (Subobject _)` surrogate and must be rebuilt from strict finite-length data.
+paper-facing Node 7.7 theorem statement has now been corrected to the strict
+finite-length interface, but its proof still has to be rebuilt from that data rather
+than from the old `Finite (Subobject _)` surrogate. The quotient-semistability side of
+that rebuild now has three faithful entry points:
+`phase_le_of_strictQuotient_of_window`,
+`phase_cokernel_lt_of_phase_gt_strictSubobject`, and
+`exists_semistable_strictQuotient_le_phase_of_finiteLength` for the Proposition 2.4
+quotient-selection step, together with `IsStrictMDQKernel` and the strict-Artinian
+theorem `semistable_cokernel_of_minPhase_strictKernel_of_minimal_of_strictArtinian`
+for the later mdq-kernel packaging.
 
 | File | Name | Line | Status |
 |---|---|---|---|
 | `Deformation.lean` | `StabilityCondition.exists_epsilon0` | 58 | Statement correct; dependent transport proof postponed |
 | `Deformation.lean` | `StabilityCondition.exists_epsilon0_sector` | 83 | Statement correct; same transport issue |
-| `Deformation.lean` | `deformedSlicing.hn_exists` | 7049 | Node 7.7 still open; currently still depends on stale `Finite (Subobject _)` thin-interval HN recursion |
+| `Deformation.lean` | `deformedSlicing.hn_exists` | 7049 | Node 7.7 still open; the canonical theorem statement is corrected, but its proof still needs the strict finite-length rebuild |
 | `Deformation.lean` | `P_phi_wSemistable_is_deformedPred` | 7863 | Live Phase 4 blocker: faithful Lemma 7.5 / 7.6 larger-to-smaller argument still open |
 | `Deformation.lean` | `bridgeland_theorem_1_2` | 8734 | Top-level shell; should be proved from Theorem 7.1 + Section 6 uniqueness |
 
@@ -106,10 +114,13 @@ Phase 4 / Node 7.7 refactor rather than surviving as a standalone `sorry`.
 - [x] Paper-faithful abelian finite-length route (Proposition 2.4) in `StabilityFunction.lean`
 - [x] `P(φ)`-side finite-length bridge in `Deformation.lean`
 - [x] Thin-interval selection / quotient-recursion infrastructure in `Deformation.lean`
+- [x] The canonical Node 7.7 theorem statement
+  `SkewedStabilityFunction.hn_exists_in_thin_interval` now uses strict finite length
 - [ ] Thin-interval HN recursion itself still needs refactoring:
-  `SkewedStabilityFunction.hn_exists_in_thin_interval` currently assumes
-  `Finite (Subobject _)` and is therefore no longer faithful to the corrected
-  `IsLocallyFinite`
+  the legacy helper
+  `SkewedStabilityFunction.hn_exists_in_thin_interval_of_finiteSubobjects`
+  is still the only closed recursion and must be replaced by a proof from strict
+  finite-length data
 
 ### Phase 4: Fill sorrys — in progress
 
@@ -173,6 +184,12 @@ Current Phase 4 atomization:
      rewrite. The intended source intervals are `(ψ - ε₀, φ + ε₀)` and
      `(φ - ε₀, ψ + ε₀)`, followed by transport back to `(ψ - ε₀, ψ + ε₀)` via
      `semistable_of_target_subinterval`.
+   - new checkpoint: the upper-source half of that rewrite is now explicit in Lean. The
+     theorem no longer stops at a generic target-vs-`P(φ)` comparison placeholder; it
+     now goes through the first strict SES in the upper source envelope, the
+     `P(φ)`-image factorisation of the destabilising subobject, and the resulting
+     epi-kernel triangle in the midpoint heart. The remaining live subgoal there is
+     exactly to place that kernel object back in the same upper source interval.
    - newly compiled source-envelope scaffolding in `Deformation.lean`:
      `intervalProp_P_phi_upper_source`, `intervalProp_P_phi_lower_source`,
      `wPhaseOf_eq_upper_source_midpoint_of_mem_P_phi`, and
@@ -215,12 +232,28 @@ Current Phase 4 atomization:
      This now packages the abelian image comparison step cleanly: a nonzero morphism in
      the `φ`-heart into `F ∈ P(φ)` yields a nonzero image object still in `P(φ)`, and
      `stabilityFunctionOnP` semistability of `F` gives `phase(image) ≤ ψ`.
+   - newly compiled target-window wrapper:
+     `exists_target_P_phi_image_factorisation_phase_le`.
+     This is the same `P(φ)`-image comparison, but specialized to the actual first strict
+     short exact sequence in the thin target category `P((ψ - ε₀, ψ + ε₀))`, so the
+     remaining Phase 4 contradiction can now be phrased without detouring through the old
+     upper-source kernel tail.
    - current live gap after that extraction:
      the missing theorem is now the opposite inequality
      `ψ < phase(image)`
-     for the `P(φ)` image of a one-sided source-envelope destabilizing object.
-     Equivalently, the remaining blocker is the faithful quotient-side lower bound from
-     the Node 7.3 source semistable object to its `P(φ)` image.
+     for the `P(φ)` image of the actual target-window destabilizing strict subobject.
+     Equivalently, the remaining blocker is the faithful comparison between the thin
+     target-category image and the `P(φ)` image, not the abandoned fixed-heart kernel
+     subgoal.
+   - newly compiled reduction:
+     `SkewedStabilityFunction.phase_le_of_triangle_quotient` removes the unnecessary
+     strict-quotient wrapper from the quotient-side phase comparison, and
+     `wPhaseOf_gt_of_upper_source_P_phi_image_triangle` now packages the actual
+     upper-source contradiction once the `P(φ)`-image admissibility triangle is known to
+     stay inside `P((ψ - ε₀, φ + ε₀))`.
+   - current blocker after that refinement:
+     the only remaining hard sublemma for the upper branch is the interval-control step
+     for the kernel of the `P(φ)`-image admissibility triangle.
    - fresh audit warning:
      the right comparison is not `M ≅ image_{P(φ)}(M)`. The paper keeps an explicit
      boundary-strip quotient between the larger thin-category image and the `P(φ)`
