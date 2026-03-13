@@ -274,6 +274,11 @@ existence refactor.
      the **first strict short exact sequence** in the thin target category, exactly as
      Node 7.3 says, and then compare its image in `P(φ)` to the abelian
      `stabilityFunctionOnP` semistability of `F`.
+   - Done: the literal Lemma 7.5 subobject step for the upper source envelope is now
+     compiled as `upper_source_strictSubobject_mem_target` in `Deformation.lean`.
+     This is the sentence "by Lemma 3.4, one has `φ⁺(A) ≤ φ`, so since `E ∈ B`, one
+     has `A ∈ B`" formalized for
+     `B = P((ψ - ε₀, ψ + ε₀)) ⊂ C = P((ψ - ε₀, φ + ε₀))`.
    - Done: the `#3` bridge API itself now carries the paper's `ε₀ < 1/8` slack, so the
      documented one-sided source envelopes are genuinely thin in the formalization.
    - Done: `Deformation.lean` now has an explicit thin-category first-SES wrapper,
@@ -293,23 +298,46 @@ existence refactor.
      Even ordinary `IsArtinianObject` / `IsNoetherianObject` on all thin-category
      subobjects is still stronger than the paper. The right finiteness interface is
      chain conditions on **strict** subobjects in the thin category.
-   - New top-priority structural correction:
-     before more Phase 4 proof work, redefine `Slicing.IsLocallyFinite` itself in that
-     paper-faithful finite-length form and let the compiler expose the fallout. Do not
-     spend time on naming cleanup before that definition change lands.
-   - Current live finiteness gap:
-     the remaining missing theorem is now specifically a way to prove finiteness of the
-     relevant left-heart subobject lattice in the source-envelope situations used in `#3`.
-   - Remaining faithful gap after the paper re-read:
-     the open issue is no longer "source envelope versus target envelope" in the abstract.
-     It is to formalize the exact larger-to-smaller destabilization step from Lemma 7.5
-     and then plug that precise output into the `P(φ)` comparison.
-   - Concretely, the next missing atom is:
+   - Done since that note:
+     `Slicing.IsLocallyFinite` is already corrected to the paper-faithful finite-length
+     definition, and Proposition 2.4 is now rebuilt on Artinian/Noetherian chain
+     conditions rather than a fake finite-subobject surrogate.
+   - New compiled `P(φ)`-image API in `Deformation.lean`:
+     `mem_phiHeart_of_mem_P_phi`,
+     `P_phi_of_heart_triangle'`,
+     `exists_P_phi_image_factorisation_in_phiHeart`, and
+     `exists_P_phi_image_factorisation_phase_le`.
+     This packages the abelian image comparison step cleanly: a nonzero morphism in the
+     `φ`-heart into `F ∈ P(φ)` now yields a nonzero image object still lying in `P(φ)`,
+     together with the semistability inequality `phase(image) ≤ ψ` coming from
+     `stabilityFunctionOnP`.
+   - Current live faithful gap:
+     the remaining missing theorem is the opposite inequality
+     `ψ < phase(image)`
+     for the `P(φ)` image of a one-sided source-envelope destabilizing object.
+     Equivalently: prove the quotient-side lower bound from the Node 7.3 source
+     semistable object to its `P(φ)` image.
+   - Fresh audit warning:
+     do not try to prove that the larger thin-category destabilizing object `M`
+     is isomorphic to its `P(φ)`-image. That is the wrong proof shape: the paper's
+     Lemma 7.5 route keeps an explicit boundary-strip quotient between the larger
+     thin-category image and the `P(φ)` image, and that quotient data is exactly
+     what still has to be formalized.
+   - New proof-audit correction:
+     the faithful Node 7.3 / 7.5 proof also needs the actual Section 7.0
+     finite-length witness at radius `2ε₀` / `4ε₀`, not just the standalone
+     smallness hypothesis `ε₀ < 1/8`.
+     In code terms, the remaining refactor has to thread the chosen
+     local-finiteness witness far enough down the private theorem chain so that
+     the first strict short exact sequence in the one-sided source envelope is
+     justified for the same `ε₀` used in `deformedPred`.
+   - The authoritative route is still the paper's Lemma 7.5 larger-to-smaller
+     destabilization step:
      package the quotient decomposition
      `0 → B₁ → B → B₂ → 0`
-     and pullback square in the precise direction used on p. 338, so that
-     the current Node 7.5 machinery is being invoked in the same way as the paper,
-     not replaced by another standalone common-heart argument.
+     and pullback square in the precise direction used on p. 338, then feed that
+     output into the new `P(φ)`-image API. Do not go back to the discarded terminal
+     sign-chase strategy.
 3. **#4 abelian HN bridge**
    - Done: `abelianHN_to_intervalProp` is now closed.
    - The proof uses `stabilityFunctionOnP_hasHN`, the single-factor bridges

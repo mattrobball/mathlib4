@@ -181,6 +181,10 @@ Current Phase 4 atomization:
      the faithful `#3` proof should now pivot to the actual Lemma 7.5 larger-to-smaller
      destabilization argument, not back to more endpoint-sign bookkeeping and not to a
      bespoke common-heart surrogate.
+   - newly compiled literal Lemma 7.5 step:
+     `upper_source_strictSubobject_mem_target` now proves, in the upper source envelope,
+     that the first destabilizing strict subobject already lies in the smaller target
+     interval. This is the paper sentence "φ⁺(A) ≤ φ, hence A ∈ B" made explicit.
    - newly compiled API alignment: `P_phi_wSemistable_is_deformedPred` and its immediate
      bridge now explicitly carry `ε₀ < 1 / 8`, which is the bound under which the paper's
      one-sided source envelopes are actually thin.
@@ -200,15 +204,35 @@ Current Phase 4 atomization:
      `Finite (Subobject X.obj)` in `C`. Bridgeland's local finiteness is finite-length
      information inside the thin quasi-abelian category, so the formal interface has to
      talk about strict subobjects in the thin category itself.
-   - current finiteness bottleneck:
-     what is still missing is a faithful source-envelope theorem proving finiteness of
-     the left-heart subobject lattice in the specific Node 7.5 / `#3` situations.
-   - remaining gap after the paper re-read:
-     `#3` still needs the exact p. 338 quotient decomposition
-     `0 → B₁ → B → B₂ → 0`
-     and the resulting pullback-produced destabilizing sequence in the smaller target
-     thin category. The finite-subobject issue is now secondary to getting that
-     control flow aligned with the paper.
+   - done since that note:
+     `IsLocallyFinite` is already refactored to Bridgeland's finite-length notion, and
+     Proposition 2.4 no longer depends on a bogus finite-subobject surrogate.
+   - newly compiled `P(φ)`-image API in `Deformation.lean`:
+     `mem_phiHeart_of_mem_P_phi`,
+     `P_phi_of_heart_triangle'`,
+     `exists_P_phi_image_factorisation_in_phiHeart`, and
+     `exists_P_phi_image_factorisation_phase_le`.
+     This now packages the abelian image comparison step cleanly: a nonzero morphism in
+     the `φ`-heart into `F ∈ P(φ)` yields a nonzero image object still in `P(φ)`, and
+     `stabilityFunctionOnP` semistability of `F` gives `phase(image) ≤ ψ`.
+   - current live gap after that extraction:
+     the missing theorem is now the opposite inequality
+     `ψ < phase(image)`
+     for the `P(φ)` image of a one-sided source-envelope destabilizing object.
+     Equivalently, the remaining blocker is the faithful quotient-side lower bound from
+     the Node 7.3 source semistable object to its `P(φ)` image.
+   - fresh audit warning:
+     the right comparison is not `M ≅ image_{P(φ)}(M)`. The paper keeps an explicit
+     boundary-strip quotient between the larger thin-category image and the `P(φ)`
+     image, so the next proof step has to formalize that quotient rather than force
+     a false image-identification.
+   - new proof-audit correction:
+     the faithful first-SES route also needs the actual Section 7.0
+     local-finiteness witness at scale `2ε₀` / `4ε₀`; `ε₀ < 1/8` by itself is
+     not enough to justify the source-envelope finite-length input.
+     So part of the remaining Phase 4 refactor is to thread that chosen witness
+     through the private `Deformation.lean` bridge layer instead of relying only
+     on the small-gap hypotheses.
    - authoritative proof shape for the remaining `#3` work:
      let the smaller thin category be
      `P((ψ - ε₀, ψ + ε₀))`,

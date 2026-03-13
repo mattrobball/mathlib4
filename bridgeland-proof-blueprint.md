@@ -963,6 +963,12 @@ theorem exists_small_epsilon0
 
 This is the input used everywhere in section 7.
 
+In particular, Nodes 7.3, 7.5, and 7.7 should depend on this chosen witness
+itself, not merely on an isolated inequality like `ε₀ < 1/8`. The formal
+development should thread enough local-finiteness data to justify the first
+strict short exact sequence in the actual thin categories built from that same
+`ε₀`.
+
 ### 3F.2 Thin subcategories and the restricted skewed stability function
 
 #### Node 7.2 — thin subcategory
@@ -1015,6 +1021,10 @@ Paper reference:
   and `B₂` belongs to the smaller thin category `B`,
   then use the pullback square and Lemma 3.4 to descend a destabilizing strict short
   exact sequence to `B`.
+- Negative guidance:
+  do not replace this by an attempted identification of the larger-category destabilizing
+  object with its image in the smaller / heart-level category. The boundary-strip quotient
+  is part of Bridgeland's argument, not an artifact to be optimized away.
 - For the current branch this is the authoritative proof shape for blocker `#3`.
   Do not replace it by an ad hoc terminal `K₀` sign chase or by a generic
   common-heart bookkeeping argument that skips the paper's quotient decomposition.
