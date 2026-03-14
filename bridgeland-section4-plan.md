@@ -181,9 +181,30 @@ Audit correction:
   `SkewedStabilityFunction.hn_exists_in_thin_interval_of_finiteSubobjects`,
   together with the old minimal-kernel selection theorems it still depends on,
   all of which still assume `Finite (Subobject _)`.
-- So the real remaining Phase 4 work is **not** Node 7.7 anymore; it is the
-  downstream transport into `deformedSlicing.hn_exists`, which still depends on the
-  faithful completion of blocker #3.
+- So the real remaining Phase 4 work is **not** Node 7.7 anymore.
+- Node 7.8a/7.8b are now also on the faithful shape:
+  `deformedGtPred` / `deformedLePred` are defined by existence of `Q`-HN
+  filtrations with all phases on one side of the cutoff, and the orthogonality
+  theorem is proved by HN phase-gap induction on `deformedPred`.
+- The live downstream gap is now Node 7.8c / 7.9: build the truncation triangle
+  and then `deformedSlicing.hn_exists`, instead of routing through the old
+  abelian `P(φ)` bridge.
+- New compiled support for that step:
+  `split_hn_filtration_at_cutoff` and
+  `exists_deformedGt_deformedLe_triangle_of_hn` now formalize the paper's
+  "split a Q-HN filtration at phase `t`" move directly.
+- Additional compiled bridge:
+  `hom_eq_zero_of_enveloped_interval_semistable` and
+  `exists_deformedHN_of_enveloped_interval` now isolate the remaining Node 7.8c
+  work cleanly: once a thin interval has the paper's enveloping phase window,
+  Lemma 7.7 upgrades directly to a `deformedPred`-HN filtration with no further
+  HN assembly.
+- New audit correction:
+  the faithful p.24 route also needs an explicit **wide** local-finiteness input
+  for intervals of width `8 ε₀`. The current `deformedSlicing` statement layer
+  is still shaped for the older abelian-heart detour and does not yet expose that
+  witness, so part of the remaining Node 7.8/7.9 refactor is a signature-level
+  cleanup, not just proof filling.
 
 **Dependencies**: Phase 2.
 
@@ -193,8 +214,8 @@ Audit correction:
 
 | Order | Sorry | Line | Lines | Depends on |
 |-------|-------|------|-------|------------|
-| 1 | #3 Triangle test | 7863 | ~470 | Faithful Lemma 7.5 / 7.6 larger-to-smaller argument |
-| 2 | #2 HN existence | 7049 | ~300 | Use the completed thin-interval Node 7.7 theorem plus blocker #3 to build deformed-slicing HN |
+| 1 | #2 HN existence | 7049 | ~300 | Faithful Node 7.8c / 7.9 truncation + global HN assembly |
+| 2 | #3 Triangle test | 7863 | ~470 | Old abelian detour; should be removed from the critical path once #2 is rewritten |
 | 3 | Theorem 1.2 shell | 8734 | ~15 | Theorem 7.1 + Section 6 local-homeomorphism packaging |
 
 The old standalone “Q(ψ)-subobject finiteness” bullet is no longer a separate explicit

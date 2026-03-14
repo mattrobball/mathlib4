@@ -1118,9 +1118,19 @@ Conclude for every nonzero object of `P((a+2ε, b-4ε))`.
 
 #### Node 7.8a — define extension-closed categories `Q(> t)`, `Q(≤ t)`, `Q(< t)`
 
+Implementation note:
+`Deformation.lean` now does this in the faithful HN-closure form.
+The old one-factor surrogate definitions have been replaced by predicates defined by
+existence of a `Q`-HN filtration whose phases all lie on the specified side of the cutoff.
+
 #### Node 7.8b — orthogonality
 
 Use Lemma 7.6.
+
+Implementation note:
+the orthogonality theorem is now proved at that extension-closed level by the same
+HN phase-gap induction pattern as `Slicing.hom_eq_zero_of_phase_gap`, but specialized
+to `deformedPred`.
 
 #### Node 7.8c — truncation triangle for arbitrary `E`
 
@@ -1132,6 +1142,23 @@ Proof atoms:
 2. apply Lemma 7.7,
 3. split the resulting HN factors at phase `t`,
 4. package the two extension-closed pieces into a triangle.
+
+Implementation note:
+step (3) is now compiled in `Deformation.lean` as
+`split_hn_filtration_at_cutoff` and
+`exists_deformedGt_deformedLe_triangle_of_hn`.
+The additional bridge
+`exists_deformedHN_of_enveloped_interval`
+is also now compiled: once step (1) supplies the paper's enveloped local window,
+Lemma 7.7 upgrades directly to a `Q`-HN filtration without any further
+factor-by-factor rebuilding.
+
+Audit correction:
+the remaining missing part is step (1), and it exposes a genuine statement-level
+issue: the faithful p.24 route needs the chosen wide finite-length witness for
+intervals of width `8 ε`, whereas the current `deformedSlicing` statement layer
+was designed around the older abelian-heart detour and does not yet thread that
+wide witness explicitly.
 
 #### Node 7.8d — conclude that `Q(>t)` is a t-structure
 
