@@ -1448,14 +1448,13 @@ The branch has already completed the earlier structural work:
 
 The live proof order is therefore narrower:
 
-1. finish Node 7.5 / 7.6 faithfully, i.e. the remaining `P_phi_wSemistable_is_deformedPred` bridge,
-2. replace the legacy `Finite (Subobject _)` helper proof by an actual proof of the
-   corrected Node 7.7 strict finite-length theorem,
-3. close `deformedSlicing.hn_exists`,
-4. package Theorem 1.2 from Theorem 7.1 plus the Section 6 uniqueness results.
+1. finish the exact p.24 strip recursion for `deformedSlicing.hn_exists`,
+2. prove Theorem 7.1 from that completed deformed slicing,
+3. package Theorem 1.2 from Theorem 7.1 plus the Section 6 uniqueness results.
 
-Trying to prove `deformedSlicing.hn_exists` before that thin-interval HN refactor would
-reintroduce the exact post-`IsLocallyFinite` mismatch that the current audit has exposed.
+The old `P(φ)` semistability transport block is now off the theorem-critical path:
+`sigma_semistable_intervalProp` has been rewritten onto the direct local thin-interval
+`Q`-HN route, and the remaining global work is the strip assembly, not abelian-heart transport.
 
 ---
 

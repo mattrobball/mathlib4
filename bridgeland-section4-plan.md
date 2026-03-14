@@ -198,6 +198,9 @@ Audit correction:
 - The live downstream gap is now Node 7.8c / 7.9: build the truncation triangle
   and then `deformedSlicing.hn_exists`, instead of routing through the old
   abelian `P(φ)` bridge.
+- `sigma_semistable_intervalProp` has now also been rewritten onto the direct
+  local thin-interval `Q`-HN route, so the old `P(φ)` semistability transport
+  block is no longer on the theorem-critical path.
 - New compiled support for that step:
   `split_hn_filtration_at_cutoff` and
   `exists_deformedGt_deformedLe_triangle_of_hn` now formalize the paper's
@@ -462,7 +465,9 @@ existence refactor.
      by an actual proof of the corrected strict finite-length theorem
      `SkewedStabilityFunction.hn_exists_in_thin_interval`, driven by
      `Slicing.IsLocallyFinite`. This replacement is now complete.
-   - Then finish the `hn_exists` field from sigma-HN plus the completed thin-interval HN theorem.
+   - Then finish the `hn_exists` field via the paper's exact p.24 strip recursion,
+     using the completed thin-interval HN theorem together with the compiled
+     `Q(> t)` / `Q(≤ t)` cutoff API.
 6. **Theorem 1.2**
    - After Theorem 7.1 is honestly proved, package it with the Section 6 uniqueness
      results into `bridgeland_theorem_1_2`.
@@ -497,6 +502,8 @@ Current explicit refactor placeholders:
 - `StabilityCondition.exists_epsilon0`
 - `StabilityCondition.exists_epsilon0_sector`
 - `deformedSlicing.hn_exists`
+- `deformedSlicing.hn_exists`
+  Live target: exact p.24 strip recursion, not the old `P(φ)` detour.
 - `P_phi_wSemistable_is_deformedPred`
 - `bridgeland_theorem_1_2`
 

@@ -55,11 +55,11 @@ helper and is not the canonical Section 7.7 result anymore.
 |---|---|---|---|
 | `Deformation.lean` | `StabilityCondition.exists_epsilon0` | 58 | Statement correct; dependent transport proof postponed |
 | `Deformation.lean` | `StabilityCondition.exists_epsilon0_sector` | 83 | Statement correct; same transport issue |
-| `Deformation.lean` | `deformedSlicing.hn_exists` | 7049 | Node 7.7 is complete, Node 7.8a/7.8b are on the faithful HN-closure definitions, `split_hn_filtration_at_cutoff` / `exists_deformedGt_deformedLe_triangle_of_hn` are compiled, and the new bridge `exists_deformedHN_of_enveloped_interval` now packages “thin finite-length HN + interior phase window ⇒ Q-HN”. The 7.7 recursion has also been refactored to expose the paper-facing `G/H` input directly as `hn_exists_in_thin_interval_of_quotientLowerBound` / `hn_exists_in_thin_interval_of_strictQuotientLowerBound`, and Lemma 3.4’s lower-bound feed now exists as `wPhaseOf_gt_of_strictQuotient_of_inner_strip` together with the direct wrapper `hn_exists_in_thin_interval_of_innerStrip`. The live Node 7.8c / 7.9 gap is now narrower: produce the remaining paper envelope/hom-vanishing hypotheses for the exact p.24 windows and use these wrappers to close `hn_exists`. The statement-level finite-length refactor is also underway: `deformedSlicing`, `deformedSlicing_compat`, `sigma_semistable_intervalProp`, and `bridgeland_7_1` now thread the wide finite-length witness explicitly, and `interval_thinFiniteLength_of_inclusion(_strict)` / `ThinFiniteLengthInInterval.of_wide` / `thinFiniteLength_of_node78_window` are compiled as the inclusion-transport API for the p.24 windows. |
-| `Deformation.lean` | `P_phi_wSemistable_is_deformedPred` | 7863 | Live Phase 4 blocker: faithful Lemma 7.5 / 7.6 larger-to-smaller argument still open |
+| `Deformation.lean` | `deformedSlicing.hn_exists` | 7049 | Node 7.7 is complete, Node 7.8a/7.8b are on the faithful HN-closure definitions, `split_hn_filtration_at_cutoff` / `exists_deformedGt_deformedLe_triangle_of_hn` are compiled, and `exists_deformedHN_of_enveloped_interval` packages the local “thin finite-length HN + interior phase window ⇒ Q-HN” step. `sigma_semistable_intervalProp` has now also been rewritten onto the direct local thin-interval route, so the old `P(φ)` bridge is no longer on the theorem-critical path. The live blocker is now the exact p.24 strip recursion: produce the remaining `Q((t,t+δ))` envelope windows and assemble global `hn_exists` from those strip-local HN filtrations. |
+| `Deformation.lean` | `P_phi_wSemistable_is_deformedPred` | 7863 | Quarantined legacy block: still incomplete, but no longer on the critical path to Theorem 7.1 / Theorem 1.2 |
 | `Deformation.lean` | `bridgeland_theorem_1_2` | 8734 | Top-level shell; should be proved from Theorem 7.1 + Section 6 uniqueness |
 
-**Current proof order:** `finish threading the faithful wide/local finite-length witnesses into the Node 7.8/7.9 API -> use the new interval finite-length transport helpers to build the p.24 windows -> finish Node 7.8c/7.9 for #2 -> remove the old #3 detour from the critical path -> Theorem 1.2`.
+**Current proof order:** `finish the exact p.24 strip recursion for deformedSlicing.hn_exists -> prove Theorem 7.1 from that completed deformed slicing -> package Theorem 1.2 from Theorem 7.1 + the Section 6 uniqueness/local-homeomorphism results`.
 The old separate “Q(ψ)-subobject finiteness” placeholder has been absorbed into the
 Phase 4 / Node 7.7 refactor rather than surviving as a standalone `sorry`.
 
@@ -134,7 +134,7 @@ Current blocker order:
 - [ ] #3 `P_phi_wSemistable_is_deformedPred`
 - [x] #4 `abelianHN_to_intervalProp`
 - [x] #1 `hom_eq_zero_of_deformedPred`
-- [ ] #2 `deformedSlicing.hn_exists` after replacing the stale thin-interval HN theorem
+- [ ] #2 `deformedSlicing.hn_exists` via the p.24 strip recursion (`Q((t,t+δ))`, not the old `P(φ)` detour)
 - [ ] Theorem 1.2 packaging after Theorem 7.1 is complete
 
 Current Phase 4 atomization:
