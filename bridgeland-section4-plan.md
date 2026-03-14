@@ -173,6 +173,10 @@ Audit correction:
   the exact paper-facing Lemma 7.7 wrapper still has to be surfaced in the form
   `A = P((a,b))` finite length, objects in `P((a + 2 ε, b - 4 ε))`
   admit HN filtrations with factors semistable in `A`.
+- The next faithful substep is now explicit from p.23:
+  add the Bridgeland `G` / `H` wrapper layer around the already-compiled strict
+  recursion theorem, rather than pretending the current generic theorem is itself
+  the quoted Lemma 7.7 statement.
 - Its strict-finite-length bridge is compiled through:
   `phase_cokernel_lt_of_phase_gt_strictSubobject`,
   `exists_semistable_strictQuotient_le_phase_of_finiteLength`,

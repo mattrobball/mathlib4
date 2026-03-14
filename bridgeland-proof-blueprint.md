@@ -1103,6 +1103,8 @@ Audit correction:
 the exact paper-facing Lemma 7.7 wrapper still has to be re-exposed in the form
 `A = P((a,b))` finite length, objects in the inner strip
 `P((a + 2 ε, b - 4 ε))` admit HN filtrations with factors semistable in `A`.
+The next code step is therefore the explicit `G` / `H` wrapper layer from the
+p.23 proof text, not more hidden reuse of the generic recursion theorem.
 
 #### Node 7.7e — HN filtrations in `G`
 

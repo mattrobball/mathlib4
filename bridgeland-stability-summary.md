@@ -118,6 +118,8 @@ Phase 4 / Node 7.7 refactor rather than surviving as a standalone `sorry`.
 - [ ] Re-expose that recursion in the paper-facing Lemma 7.7 shape:
   `A = P((a,b))` finite length, objects in the inner strip `P((a + 2 ε, b - 4 ε))`
   admit HN filtrations with factors semistable in `A`
+  The immediate next step is to add Bridgeland's `G` / `H` wrapper layer from p.23
+  around the compiled strict-recursion engine.
   with the Lemma 7.6 Hom-vanishing input
 - [ ] The legacy helper
   `SkewedStabilityFunction.hn_exists_in_thin_interval_of_finiteSubobjects`
