@@ -39,8 +39,8 @@ covering Sections 2–7 and the main deformation theorem (Theorem 7.1 / Theorem 
 The project is compiling again after the `IsLocallyFinite` refactor. The section-2
 finite-length infrastructure is now back on the paper-faithful track:
 Proposition 2.4 is finished in `StabilityFunction.lean`, and the canonical paper-facing
-Node 7.7 theorem `SkewedStabilityFunction.hn_exists_in_thin_interval` is now proved in
-`Deformation.lean` from the strict finite-length hypothesis itself. The quotient-
+The strict finite-length HN recursion theorem underlying Node 7.7 is now proved in
+`Deformation.lean`. The quotient-
 semistability / mdq side of that rebuild has these faithful entry points:
 `phase_le_of_strictQuotient_of_window`,
 `phase_cokernel_lt_of_phase_gt_strictSubobject`, and
@@ -114,9 +114,10 @@ Phase 4 / Node 7.7 refactor rather than surviving as a standalone `sorry`.
 - [x] Paper-faithful abelian finite-length route (Proposition 2.4) in `StabilityFunction.lean`
 - [x] `P(φ)`-side finite-length bridge in `Deformation.lean`
 - [x] Thin-interval selection / quotient-recursion infrastructure in `Deformation.lean`
-- [x] The canonical Node 7.7 theorem statement
-  `SkewedStabilityFunction.hn_exists_in_thin_interval` now uses strict finite length
 - [x] Thin-interval HN recursion itself is now proved from strict finite-length data
+- [ ] Re-expose that recursion in the paper-facing Lemma 7.7 shape:
+  `A = P((a,b))` finite length, objects in the inner strip `P((a + 2 ε, b - 4 ε))`
+  admit HN filtrations with factors semistable in `A`
   with the Lemma 7.6 Hom-vanishing input
 - [ ] The legacy helper
   `SkewedStabilityFunction.hn_exists_in_thin_interval_of_finiteSubobjects`

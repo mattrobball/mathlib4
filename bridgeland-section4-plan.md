@@ -167,9 +167,12 @@ Audit correction:
 
 - Proposition 2.4 is now genuinely repaired in `StabilityFunction.lean` via
   Artinian/Noetherian recursion on kernels and mdq quotients.
-- The canonical thin-interval theorem
-  `SkewedStabilityFunction.hn_exists_in_thin_interval` in `Deformation.lean`
-  is now proved with the paper-facing strict finite-length statement.
+- The strict finite-length thin-interval HN recursion theorem in
+  `Deformation.lean` is now proved.
+- Audit correction:
+  the exact paper-facing Lemma 7.7 wrapper still has to be surfaced in the form
+  `A = P((a,b))` finite length, objects in `P((a + 2 ε, b - 4 ε))`
+  admit HN filtrations with factors semistable in `A`.
 - Its strict-finite-length bridge is compiled through:
   `phase_cokernel_lt_of_phase_gt_strictSubobject`,
   `exists_semistable_strictQuotient_le_phase_of_finiteLength`,
@@ -181,7 +184,9 @@ Audit correction:
   `SkewedStabilityFunction.hn_exists_in_thin_interval_of_finiteSubobjects`,
   together with the old minimal-kernel selection theorems it still depends on,
   all of which still assume `Finite (Subobject _)`.
-- So the real remaining Phase 4 work is **not** Node 7.7 anymore.
+- So the real remaining Phase 4 work is no longer the strict-recursion proof of
+  Node 7.7 itself, but it still includes re-expressing that theorem in the exact
+  inner-strip form used on p.24 before the Node 7.8/7.9 assembly.
 - Node 7.8a/7.8b are now also on the faithful shape:
   `deformedGtPred` / `deformedLePred` are defined by existence of `Q`-HN
   filtrations with all phases on one side of the cutoff, and the orthogonality

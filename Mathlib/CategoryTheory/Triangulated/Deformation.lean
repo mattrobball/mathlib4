@@ -171,44 +171,6 @@ private def WideSectorFiniteLength (σ : StabilityCondition C) (ε₀ : ℝ)
     ∀ E : σ.slicing.IntervalCat C a b,
       IsStrictArtinianObject E ∧ IsStrictNoetherianObject E
 
-private theorem SectorFiniteLength.of_wide
-    (σ : StabilityCondition C) {ε₀ : ℝ}
-    (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4) (hε₀8 : ε₀ < 1 / 8)
-    (hWide : WideSectorFiniteLength (C := C) σ ε₀ hε₀ hε₀8) :
-    SectorFiniteLength (C := C) σ ε₀ hε₀ hε₀2 := by
-  intro t
-  let a₁ : ℝ := t - 2 * ε₀
-  let b₁ : ℝ := t + 2 * ε₀
-  let a₂ : ℝ := t - 4 * ε₀
-  let b₂ : ℝ := t + 4 * ε₀
-  letI : Fact (a₁ < b₁) := ⟨by
-    dsimp [a₁, b₁]
-    linarith [hε₀]⟩
-  letI : Fact (b₁ - a₁ ≤ 1) := ⟨by
-    dsimp [a₁, b₁]
-    linarith [hε₀2]⟩
-  intro E
-  letI : Fact (a₂ < b₂) := ⟨by
-    dsimp [a₂, b₂]
-    linarith [hε₀]⟩
-  letI : Fact (b₂ - a₂ ≤ 1) := ⟨by
-    dsimp [a₂, b₂]
-    linarith [hε₀8]⟩
-  let hIncl :
-      σ.slicing.intervalProp C a₁ b₁ ≤
-        σ.slicing.intervalProp C a₂ b₂ := by
-    intro F hF
-    exact σ.slicing.intervalProp_mono C (by dsimp [a₁, a₂]; linarith)
-      (by dsimp [b₁, b₂]; linarith) hF
-  have hBig := hWide t ((ObjectProperty.ιOfLE hIncl).obj E)
-  letI : IsStrictArtinianObject ((ObjectProperty.ιOfLE hIncl).obj E) := hBig.1
-  letI : IsStrictNoetherianObject ((ObjectProperty.ιOfLE hIncl).obj E) := hBig.2
-  simpa using
-    (interval_strictFiniteLength_of_inclusion_strict
-      (C := C) (s₁ := σ.slicing) (s₂ := σ.slicing)
-      (a₁ := a₁) (b₁ := b₁) (a₂ := a₂) (b₂ := b₂) hIncl
-      (X := E))
-
 /-! ### Phase confinement for nearby stability conditions -/
 
 /-- **Phase confinement**. If `d(σ.P, τ.P) < ε` and `E` is `τ`-semistable of phase `φ`,
@@ -3563,6 +3525,28 @@ private theorem interval_thinFiniteLength_of_inclusion_strict
       (C := C) (s₁ := s₁) (s₂ := s₂)
       (a₁ := a₁) (b₁ := b₁) (a₂ := a₂) (b₂ := b₂) h (X := X))
 
+private theorem SectorFiniteLength.of_wide
+    (σ : StabilityCondition C) {ε₀ : ℝ}
+    (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4) (hε₀8 : ε₀ < 1 / 8)
+    (hWide : WideSectorFiniteLength (C := C) σ ε₀ hε₀ hε₀8) :
+    SectorFiniteLength (C := C) σ ε₀ hε₀ hε₀2 := by
+  intro t
+  dsimp [SectorFiniteLength, WideSectorFiniteLength] at hWide ⊢
+  intro E
+  letI : Fact (t - 2 * ε₀ < t + 2 * ε₀) := ⟨by linarith [hε₀]⟩
+  letI : Fact ((t + 2 * ε₀) - (t - 2 * ε₀) ≤ 1) := ⟨by linarith [hε₀2]⟩
+  letI : Fact (t - 4 * ε₀ < t + 4 * ε₀) := ⟨by linarith [hε₀]⟩
+  letI : Fact ((t + 4 * ε₀) - (t - 4 * ε₀) ≤ 1) := ⟨by linarith [hε₀8]⟩
+  let hIncl :
+      σ.slicing.intervalProp C (t - 2 * ε₀) (t + 2 * ε₀) ≤
+        σ.slicing.intervalProp C (t - 4 * ε₀) (t + 4 * ε₀) := by
+    intro F hF
+    exact σ.slicing.intervalProp_mono C (by linarith) (by linarith) hF
+  exact interval_thinFiniteLength_of_inclusion_strict
+    (C := C) (s₁ := σ.slicing) (s₂ := σ.slicing)
+    (a₁ := t - 2 * ε₀) (b₁ := t + 2 * ε₀)
+    (a₂ := t - 4 * ε₀) (b₂ := t + 4 * ε₀) hIncl (hWide t) E
+
 private theorem interval_K0_of_strictMono
     {s : Slicing C} [IsTriangulated C] {a b : ℝ}
     [Fact (a < b)] [Fact (b - a ≤ 1)]
@@ -6115,13 +6099,26 @@ private theorem ThinFiniteLengthInInterval.of_wide
     (C := C) (s₁ := σ.slicing) (s₂ := σ.slicing)
     (a₁ := a) (b₁ := b) (a₂ := a') (b₂ := b') hIncl (hWide t) X
 
+private theorem ThinFiniteLengthInInterval.of_ambient
+    (σ : StabilityCondition C) {a₁ b₁ a₂ b₂ : ℝ}
+    [Fact (a₁ < b₁)] [Fact (b₁ - a₁ ≤ 1)]
+    [Fact (a₂ < b₂)] [Fact (b₂ - a₂ ≤ 1)]
+    (h : σ.slicing.intervalProp C a₁ b₁ ≤ σ.slicing.intervalProp C a₂ b₂)
+    (hFinite : ∀ Y : σ.slicing.IntervalCat C a₂ b₂,
+      IsArtinianObject Y ∧ IsNoetherianObject Y) :
+    ThinFiniteLengthInInterval (C := C) σ a₁ b₁ := by
+  intro X
+  exact interval_thinFiniteLength_of_inclusion
+    (C := C) (s₁ := σ.slicing) (s₂ := σ.slicing)
+    (a₁ := a₁) (b₁ := b₁) (a₂ := a₂) (b₂ := b₂) h hFinite X
+
 private theorem thinFiniteLength_of_node78_window
     (σ : StabilityCondition C) {ε₀ t : ℝ}
+    [Fact (t - 3 * ε₀ < t + 5 * ε₀)]
+    [Fact ((t + 5 * ε₀) - (t - 3 * ε₀) ≤ 1)]
     (hε₀ : 0 < ε₀) (hε₀8 : ε₀ < 1 / 8)
     (hWide : WideSectorFiniteLength (C := C) σ ε₀ hε₀ hε₀8) :
     ThinFiniteLengthInInterval (C := C) σ (t - 3 * ε₀) (t + 5 * ε₀) := by
-  letI : Fact (t - 3 * ε₀ < t + 5 * ε₀) := ⟨by linarith [hε₀]⟩
-  letI : Fact ((t + 5 * ε₀) - (t - 3 * ε₀) ≤ 1) := ⟨by linarith [hε₀8]⟩
   refine ThinFiniteLengthInInterval.of_wide
     (C := C) σ (t := t + ε₀) hε₀ hε₀8 ?_ ?_ hWide
   · dsimp

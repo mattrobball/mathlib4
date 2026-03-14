@@ -1098,8 +1098,11 @@ interface. The key supporting declarations are
 `semistable_cokernel_of_minPhase_strictKernel_of_minimal_of_strictArtinian`,
 `isStrictMDQKernel_of_minPhase_strictKernel_of_finiteLength`,
 `exists_strictMDQ_of_finiteLength`,
-and the final theorem
-`SkewedStabilityFunction.hn_exists_in_thin_interval`.
+and the final strict-recursion theorem used downstream.
+Audit correction:
+the exact paper-facing Lemma 7.7 wrapper still has to be re-exposed in the form
+`A = P((a,b))` finite length, objects in the inner strip
+`P((a + 2 ε, b - 4 ε))` admit HN filtrations with factors semistable in `A`.
 
 #### Node 7.7e — HN filtrations in `G`
 
@@ -1109,6 +1112,8 @@ Implementation note:
 the current theorem `SkewedStabilityFunction.hn_exists_in_thin_interval`
 now carries out this induction explicitly on `StrictSubobject X`, with the
 Lemma 7.6 Hom-vanishing packaged as an explicit hypothesis `hHom`.
+That is the right recursion engine, but not yet the final statement the paper
+quotes on p.23.
 
 #### Node 7.7f — endpoint of Lemma 7.7
 
