@@ -1090,18 +1090,25 @@ Use Lemmas 3.4 and 7.3.
 Repeat the Proposition 2.4 argument, but with strict subobjects / strict quotients and using Lemma 7.6 in place of the abelian hom-vanishing argument.
 
 Implementation note:
-the current `Deformation.lean` checkpoint now has the first faithful quotient-side packaging
-for this node:
+this node is now compiled in `Deformation.lean` on the faithful strict finite-length
+interface. The key supporting declarations are
 `phase_cokernel_lt_of_phase_gt_strictSubobject`,
 `exists_semistable_strictQuotient_le_phase_of_finiteLength`,
-`IsStrictMDQKernel`, and the strict-Artinian theorem
-`semistable_cokernel_of_minPhase_strictKernel_of_minimal_of_strictArtinian`.
-The remaining work is to replace the old finite-subobject kernel selection by an actual
-mdq existence recursion on strict kernels.
+`IsStrictMDQKernel`,
+`semistable_cokernel_of_minPhase_strictKernel_of_minimal_of_strictArtinian`,
+`isStrictMDQKernel_of_minPhase_strictKernel_of_finiteLength`,
+`exists_strictMDQ_of_finiteLength`,
+and the final theorem
+`SkewedStabilityFunction.hn_exists_in_thin_interval`.
 
 #### Node 7.7e — HN filtrations in `G`
 
 Induct on mdq kernels exactly as in Proposition 2.4.
+
+Implementation note:
+the current theorem `SkewedStabilityFunction.hn_exists_in_thin_interval`
+now carries out this induction explicitly on `StrictSubobject X`, with the
+Lemma 7.6 Hom-vanishing packaged as an explicit hypothesis `hHom`.
 
 #### Node 7.7f — endpoint of Lemma 7.7
 

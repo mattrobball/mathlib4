@@ -2,7 +2,7 @@
 
 **Branch:** `feat/bridgeland-section4-quasiabelian`
 **Repository:** `mattrobball/mathlib4_fork`
-**Last updated:** 2026-03-12
+**Last updated:** 2026-03-13
 
 ---
 
@@ -11,7 +11,7 @@
 Formalization of Bridgeland's "Stability conditions on triangulated categories" (Annals 2007),
 covering Sections 2–7 and the main deformation theorem (Theorem 7.1 / Theorem 1.2).
 
-**10 files, 20,604 lines total.**
+**10 files, 25,116 lines total.**
 
 ---
 
@@ -19,14 +19,14 @@ covering Sections 2–7 and the main deformation theorem (Theorem 7.1 / Theorem 
 
 | File | Lines | Sorrys | Description |
 |------|-------|--------|-------------|
-| `Deformation.lean` | 8744 | 5 | §7: deformation theorem, thin-interval semistability transport, deformed slicing |
-| `Slicing.lean` | 2873 | 0 | §3: HNFiltration, Slicing, Lemma 3.4, ltProp/geProp |
+| `Deformation.lean` | 13227 | 4 | §7: deformation theorem, thin-interval semistability transport, deformed slicing |
+| `Slicing.lean` | 2893 | 0 | §3: HNFiltration, Slicing, Lemma 3.4, ltProp/geProp |
 | `StabilityFunction.lean` | 3086 | 0 | §2: StabilityFunction, mdq recursion, `hasHN_of_artinian_noetherian` |
-| `StabilityCondition.lean` | 1617 | 0 | §5-6: StabilityCondition, Lemma 6.4, Thm 1.2 skeleton |
+| `StabilityCondition.lean` | 1618 | 0 | §5-6: StabilityCondition, Lemma 6.4, Thm 1.2 skeleton |
 | `IntervalCategory.lean` | 2762 | 0 | §4: IntervalCat, two-heart theory, quasi-abelian structure, strict SES bridge |
 | `HeartEquivalence.lean` | 336 | 10 | §5.3: Prop 5.3, Lemma 5.2, HeartStabilityData scaffolding |
 | `GrothendieckGroup.lean` | 208 | 0 | K₀, K₀.of, K₀.lift |
-| `Strict.lean` | 701 | 0 | §4: IsStrict, QuasiAbelian, StrictShortExact, strict Artinian/Noetherian transfer |
+| `Strict.lean` | 710 | 0 | §4: IsStrict, QuasiAbelian, StrictShortExact, strict Artinian/Noetherian transfer |
 | `PostnikovTower.lean` | 88 | 0 | Postnikov towers, factor extraction |
 | `NumericalStability.lean` | 188 | 0 | Cor. 1.3 statement |
 
@@ -38,28 +38,28 @@ covering Sections 2–7 and the main deformation theorem (Theorem 7.1 / Theorem 
 
 The project is compiling again after the `IsLocallyFinite` refactor. The section-2
 finite-length infrastructure is now back on the paper-faithful track:
-Proposition 2.4 is finished in `StabilityFunction.lean`. The remaining explicit
-placeholders are all in `Deformation.lean`, and the main structural debt is that the
-paper-facing Node 7.7 theorem statement has now been corrected to the strict
-finite-length interface, but its proof still has to be rebuilt from that data rather
-than from the old `Finite (Subobject _)` surrogate. The quotient-semistability side of
-that rebuild now has three faithful entry points:
+Proposition 2.4 is finished in `StabilityFunction.lean`, and the canonical paper-facing
+Node 7.7 theorem `SkewedStabilityFunction.hn_exists_in_thin_interval` is now proved in
+`Deformation.lean` from the strict finite-length hypothesis itself. The quotient-
+semistability / mdq side of that rebuild has these faithful entry points:
 `phase_le_of_strictQuotient_of_window`,
 `phase_cokernel_lt_of_phase_gt_strictSubobject`, and
 `exists_semistable_strictQuotient_le_phase_of_finiteLength` for the Proposition 2.4
 quotient-selection step, together with `IsStrictMDQKernel` and the strict-Artinian
 theorem `semistable_cokernel_of_minPhase_strictKernel_of_minimal_of_strictArtinian`
-for the later mdq-kernel packaging.
+for the later mdq-kernel packaging. The old theorem
+`hn_exists_in_thin_interval_of_finiteSubobjects` remains only as a quarantined legacy
+helper and is not the canonical Section 7.7 result anymore.
 
 | File | Name | Line | Status |
 |---|---|---|---|
 | `Deformation.lean` | `StabilityCondition.exists_epsilon0` | 58 | Statement correct; dependent transport proof postponed |
 | `Deformation.lean` | `StabilityCondition.exists_epsilon0_sector` | 83 | Statement correct; same transport issue |
-| `Deformation.lean` | `deformedSlicing.hn_exists` | 7049 | Node 7.7 still open; the canonical theorem statement is corrected, but its proof still needs the strict finite-length rebuild |
+| `Deformation.lean` | `deformedSlicing.hn_exists` | 7049 | Node 7.7 is complete; this remaining sorry is the downstream transport from thin-interval HN to the deformed slicing and still depends on blocker #3 |
 | `Deformation.lean` | `P_phi_wSemistable_is_deformedPred` | 7863 | Live Phase 4 blocker: faithful Lemma 7.5 / 7.6 larger-to-smaller argument still open |
 | `Deformation.lean` | `bridgeland_theorem_1_2` | 8734 | Top-level shell; should be proved from Theorem 7.1 + Section 6 uniqueness |
 
-**Current proof order:** `#3 -> rebuild #2 on strict finite length -> Theorem 1.2`.
+**Current proof order:** `#3 -> close #2 using the completed Node 7.7 theorem -> Theorem 1.2`.
 The old separate “Q(ψ)-subobject finiteness” placeholder has been absorbed into the
 Phase 4 / Node 7.7 refactor rather than surviving as a standalone `sorry`.
 
@@ -109,18 +109,18 @@ Phase 4 / Node 7.7 refactor rather than surviving as a standalone `sorry`.
 - [x] `intervalCat_quasiAbelian`
 - [x] Strict SES ↔ triangles correspondence
 
-### Phase 3: Quasi-Abelian / Thin-Interval HN — partially repaired
+### Phase 3: Quasi-Abelian / Thin-Interval HN — complete
 
 - [x] Paper-faithful abelian finite-length route (Proposition 2.4) in `StabilityFunction.lean`
 - [x] `P(φ)`-side finite-length bridge in `Deformation.lean`
 - [x] Thin-interval selection / quotient-recursion infrastructure in `Deformation.lean`
 - [x] The canonical Node 7.7 theorem statement
   `SkewedStabilityFunction.hn_exists_in_thin_interval` now uses strict finite length
-- [ ] Thin-interval HN recursion itself still needs refactoring:
-  the legacy helper
+- [x] Thin-interval HN recursion itself is now proved from strict finite-length data
+  with the Lemma 7.6 Hom-vanishing input
+- [ ] The legacy helper
   `SkewedStabilityFunction.hn_exists_in_thin_interval_of_finiteSubobjects`
-  is still the only closed recursion and must be replaced by a proof from strict
-  finite-length data
+  still remains in the file as a temporary non-canonical theorem
 
 ### Phase 4: Fill sorrys — in progress
 

@@ -169,21 +169,21 @@ Audit correction:
   Artinian/Noetherian recursion on kernels and mdq quotients.
 - The canonical thin-interval theorem
   `SkewedStabilityFunction.hn_exists_in_thin_interval` in `Deformation.lean`
-  now has the paper-facing strict finite-length statement.
-- The first strict-finite-length bridge under that theorem is now compiled:
+  is now proved with the paper-facing strict finite-length statement.
+- Its strict-finite-length bridge is compiled through:
   `phase_cokernel_lt_of_phase_gt_strictSubobject`,
   `exists_semistable_strictQuotient_le_phase_of_finiteLength`,
   `IsStrictMDQKernel`,
   `semistable_cokernel_of_minPhase_strictKernel_of_minimal_of_strictArtinian`,
-  and `isStrictMDQKernel_of_minPhase_strictKernel_of_finiteLength`.
-- The remaining stale part is its legacy proof helper
+  `isStrictMDQKernel_of_minPhase_strictKernel_of_finiteLength`,
+  `exists_strictMDQ_of_finiteLength`, and the final HN recursion itself.
+- The remaining stale part is only its legacy proof helper
   `SkewedStabilityFunction.hn_exists_in_thin_interval_of_finiteSubobjects`,
   together with the old minimal-kernel selection theorems it still depends on,
   all of which still assume `Finite (Subobject _)`.
-- So the real remaining Phase 3 work is **not** in the abelian section-2 layer anymore;
-  it is the section-7 thin-category HN recursion, which must be rebuilt from strict
-  finite-length chain conditions before `deformedSlicing.hn_exists` can be closed
-  faithfully.
+- So the real remaining Phase 4 work is **not** Node 7.7 anymore; it is the
+  downstream transport into `deformedSlicing.hn_exists`, which still depends on the
+  faithful completion of blocker #3.
 
 **Dependencies**: Phase 2.
 
@@ -194,7 +194,7 @@ Audit correction:
 | Order | Sorry | Line | Lines | Depends on |
 |-------|-------|------|-------|------------|
 | 1 | #3 Triangle test | 7863 | ~470 | Faithful Lemma 7.5 / 7.6 larger-to-smaller argument |
-| 2 | #2 HN existence | 7049 | ~300 | Rebuild thin-interval HN from strict finite length + blocker #3 |
+| 2 | #2 HN existence | 7049 | ~300 | Use the completed thin-interval Node 7.7 theorem plus blocker #3 to build deformed-slicing HN |
 | 3 | Theorem 1.2 shell | 8734 | ~15 | Theorem 7.1 + Section 6 local-homeomorphism packaging |
 
 The old standalone “Q(ψ)-subobject finiteness” bullet is no longer a separate explicit
@@ -410,8 +410,8 @@ existence refactor.
      `SkewedStabilityFunction.hn_exists_in_thin_interval_of_finiteSubobjects`
      by an actual proof of the corrected strict finite-length theorem
      `SkewedStabilityFunction.hn_exists_in_thin_interval`, driven by
-     `Slicing.IsLocallyFinite`.
-   - Then finish the `hn_exists` field from sigma-HN plus the repaired thin-interval HN recursion.
+     `Slicing.IsLocallyFinite`. This replacement is now complete.
+   - Then finish the `hn_exists` field from sigma-HN plus the completed thin-interval HN theorem.
 6. **Theorem 1.2**
    - After Theorem 7.1 is honestly proved, package it with the Section 6 uniqueness
      results into `bridgeland_theorem_1_2`.
