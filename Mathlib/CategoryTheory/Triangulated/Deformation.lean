@@ -9026,6 +9026,32 @@ lemma StabilityCondition.deformedPred_zero (σ : StabilityCondition C)
     σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin ψ E :=
   Or.inl hE
 
+lemma StabilityCondition.deformedPred_closedUnderIso (σ : StabilityCondition C)
+    (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    (ψ : ℝ) :
+    (σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin ψ).IsClosedUnderIsomorphisms := by
+  constructor
+  intro E E' e h
+  rcases h with hZ | ⟨a, b, hab, hthin, henv_lo, henv_hi, hSS⟩
+  · exact Or.inl ((Iso.isZero_iff e).mp hZ)
+  · refine Or.inr ⟨a, b, hab, hthin, henv_lo, henv_hi, ?_, ?_, ?_, ?_,
+      fun K Q f₁ f₂ f₃ hT hK hQ hKne ↦ ?_⟩
+    · rcases hSS.1 with hZ' | ⟨F, hF⟩
+      · exact absurd hZ' hSS.2.1
+      · exact Or.inr ⟨F.ofIso C e, hF⟩
+    · exact fun hE' ↦ hSS.2.1 ((Iso.isZero_iff e.symm).mp hE')
+    · rw [show K₀.of C E' = K₀.of C E from (K₀.of_iso C e).symm]
+      exact hSS.2.2.1
+    · rw [show K₀.of C E' = K₀.of C E from (K₀.of_iso C e).symm]
+      exact hSS.2.2.2.1
+    · have hT' : Triangle.mk (f₁ ≫ e.inv) (e.hom ≫ f₂) f₃ ∈ distTriang C :=
+        isomorphic_distinguished _ hT _
+          (Triangle.isoMk _ _ (Iso.refl _) e (Iso.refl _)
+            (by simp) (by simp) (by simp))
+      exact hSS.2.2.2.2 hT' hK hQ hKne
+
 variable [IsTriangulated C] in
 private theorem gtProp_of_lt_phiMinus_smallGap
     (s : Slicing C) {E : C} (hE : ¬IsZero E) {t : ℝ}
@@ -9844,6 +9870,52 @@ private theorem StabilityCondition.deformedLePred_of_deformedLtPred
   rcases hE with hZ | ⟨G, hG⟩
   · exact Or.inl hZ
   · exact Or.inr ⟨G, fun j ↦ le_of_lt (hG j)⟩
+
+variable [IsTriangulated C] in
+/-- Once a distinguished triangle is split at cutoff `t` into an object of `Q(> t)` and an
+object of `Q(≤ t)`, the middle term automatically has a full `Q`-HN filtration. This is the
+last generic step needed after constructing Bridgeland's p.24 truncation triangles. -/
+private theorem exists_hn_of_deformedGt_deformedLe_triangle
+    (σ : StabilityCondition C)
+    (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    {t : ℝ} {X E Y : C} {f : X ⟶ E} {g : E ⟶ Y} {h : Y ⟶ X⟦(1 : ℤ)⟧}
+    (hT : Triangle.mk f g h ∈ distTriang C)
+    (hX : σ.deformedGtPred C W hW ε₀ hε₀ hε₀2 hsin t X)
+    (hY : σ.deformedLePred C W hW ε₀ hε₀ hε₀2 hsin t Y) :
+    Nonempty (HNFiltration C (σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin) E) := by
+  rcases hX with hXZ | ⟨GX, hGX⟩
+  · haveI : IsIso g := (Triangle.isZero₁_iff_isIso₂ _ hT).mp hXZ
+    rcases hY with hYZ | ⟨GY, _⟩
+    · have hEZ : IsZero E := (Triangle.isZero₃_iff_isZero₂ _ hT).mp hYZ
+      exact ⟨HNFiltration.zero C (P := σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin)
+        E hEZ⟩
+    · exact ⟨GY.ofIso C (asIso g).symm⟩
+  · rcases hY with hYZ | ⟨GY, hGY⟩
+    · haveI : IsIso f := (Triangle.isZero₃_iff_isIso₁ _ hT).mp hYZ
+      exact ⟨GX.ofIso C (asIso f)⟩
+    · have hPiso :
+          ∀ φ : ℝ,
+            (σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin φ).IsClosedUnderIsomorphisms :=
+        σ.deformedPred_closedUnderIso C W hW ε₀ hε₀ hε₀2 hsin
+      let jLast : Fin GY.n := ⟨GY.n - 1, by have := GY.hn; omega⟩
+      let t0 : ℝ := GY.φ jLast - 1
+      have hGX_gt : ∀ j : Fin GX.n, t0 < GX.φ j := by
+        intro j
+        exact lt_trans (by dsimp [t0]; linarith [hGY jLast]) (lt_of_lt_of_le (hGY jLast) (hGX j))
+      have hGY_gt : ∀ i : Fin GY.n, t0 < GY.φ i := by
+        intro i
+        dsimp [t0]
+        calc
+          GY.φ jLast - 1 < GY.φ jLast := by linarith
+          _ ≤ GY.φ i := GY.hφ.antitone (Fin.mk_le_mk.mpr (by omega))
+      have hsep : ∀ i : Fin GY.n, ∀ j : Fin GX.n, GY.φ i < GX.φ j := by
+        intro i j
+        exact lt_of_le_of_lt (hGY i) (hGX j)
+      obtain ⟨G, _⟩ :=
+        append_hn_filtration_of_triangle (C := C) hPiso GX GY f g h hT t0 hGX_gt hGY_gt hsep
+      exact ⟨G⟩
 
 variable [IsTriangulated C] in
 /-- **Orthogonality of Q(> t) and Q(≤ t)** (**Node 7.8b**). Every morphism from a
@@ -12451,6 +12523,51 @@ private theorem compare_strongEpi_monoFactorisations
       _ = eJ := image.fac_lift FJ
   haveI : Mono c := mono_of_mono_fac hc_fac
   exact ⟨c, inferInstance, hc_fac, hc_left⟩
+
+variable [IsTriangulated C] in
+private theorem kernel_mem_upper_source_of_target_image_factorisation
+    (σ : StabilityCondition C) {ε₀ φ ψ : ℝ}
+    {F : C} (hPφ : σ.slicing.P φ F)
+    [Fact (ψ - ε₀ < φ + ε₀)] [Fact ((φ + ε₀) - (ψ - ε₀) ≤ 1)]
+    (hψ_lo : φ - ε₀ < ψ) (hψ_hi : ψ < φ + ε₀)
+    {M :
+      Subobject
+        (⟨F, intervalProp_P_phi_upper_source (C := C) σ hPφ hψ_lo hψ_hi⟩ :
+          σ.slicing.IntervalCat C (ψ - ε₀) (φ + ε₀))}
+    {I_H :
+      ((σ.slicing.phaseShift C (ψ - ε₀)).toTStructure).heart.FullSubcategory}
+    {pH :
+      ⟨((M : σ.slicing.IntervalCat C (ψ - ε₀) (φ + ε₀)).obj),
+        σ.slicing.intervalProp_implies_leftHeart C (by
+          have hwidth : (φ + ε₀) - (ψ - ε₀) ≤ 1 := Fact.out
+          exact hwidth)
+          (M : σ.slicing.IntervalCat C (ψ - ε₀) (φ + ε₀)).property⟩ ⟶ I_H}
+    (hI_target : σ.slicing.intervalProp C (ψ - ε₀) (ψ + ε₀) I_H.obj)
+    [Epi pH] :
+    σ.slicing.intervalProp C (ψ - ε₀) (φ + ε₀) (kernel pH).obj := by
+  let a : ℝ := ψ - ε₀
+  let b : ℝ := φ + ε₀
+  let MI : σ.slicing.IntervalCat C a b :=
+    ⟨((M : σ.slicing.IntervalCat C a b).obj),
+      (M : σ.slicing.IntervalCat C a b).property⟩
+  have hI_source : σ.slicing.intervalProp C a b I_H.obj :=
+    σ.slicing.intervalProp_mono C (show a ≤ a by rfl) (by linarith) hI_target
+  let II : σ.slicing.IntervalCat C a b := ⟨I_H.obj, hI_source⟩
+  let pL : MI ⟶ II := ObjectProperty.homMk pH.hom
+  let FL := Slicing.IntervalCat.toLeftHeart (C := C) (s := σ.slicing) a b (Fact.out : b - a ≤ 1)
+  have hpL_epi : Epi (FL.map pL) := by
+    simpa [FL, pL, MI, II] using (inferInstance : Epi pH)
+  have hpL_strict : IsStrictEpi pL := by
+    letI : Epi (FL.map pL) := hpL_epi
+    exact Slicing.IntervalCat.strictEpi_of_epi_toLeftHeart
+      (C := C) (s := σ.slicing) (a := a) (b := b) pL
+  let eK := Slicing.IntervalCat.toLeftHeartKernelIso
+    (C := C) (s := σ.slicing) (a := a) (b := b) pL
+  let eK0 : (kernel pL).obj ≅ (kernel pH).obj :=
+    ⟨eK.hom.hom, eK.inv.hom,
+      by simpa using congrArg InducedCategory.Hom.hom eK.hom_inv_id,
+      by simpa using congrArg InducedCategory.Hom.hom eK.inv_hom_id⟩
+  exact (σ.slicing.intervalProp C a b).prop_of_iso eK0 (kernel pL).property
 
 variable [IsTriangulated C] in
 private theorem exists_target_P_phi_image_factorisation_phase_le
