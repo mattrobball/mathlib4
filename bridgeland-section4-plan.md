@@ -205,6 +205,14 @@ Audit correction:
   is still shaped for the older abelian-heart detour and does not yet expose that
   witness, so part of the remaining Node 7.8/7.9 refactor is a signature-level
   cleanup, not just proof filling.
+- New compiled API checkpoint:
+  `deformedSlicing`, `deformedSlicing_compat`, `sigma_semistable_intervalProp`,
+  and `bridgeland_7_1` now thread the wide witness explicitly, and the generic
+  inclusion transport lemmas `interval_thinFiniteLength_of_inclusion`,
+  `interval_thinFiniteLength_of_inclusion_strict`,
+  `ThinFiniteLengthInInterval.of_wide`, and
+  `thinFiniteLength_of_node78_window` are available for the exact p.24
+  thin-window bookkeeping.
 
 **Dependencies**: Phase 2.
 

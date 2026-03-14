@@ -171,6 +171,44 @@ private def WideSectorFiniteLength (σ : StabilityCondition C) (ε₀ : ℝ)
     ∀ E : σ.slicing.IntervalCat C a b,
       IsStrictArtinianObject E ∧ IsStrictNoetherianObject E
 
+private theorem SectorFiniteLength.of_wide
+    (σ : StabilityCondition C) {ε₀ : ℝ}
+    (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4) (hε₀8 : ε₀ < 1 / 8)
+    (hWide : WideSectorFiniteLength (C := C) σ ε₀ hε₀ hε₀8) :
+    SectorFiniteLength (C := C) σ ε₀ hε₀ hε₀2 := by
+  intro t
+  let a₁ : ℝ := t - 2 * ε₀
+  let b₁ : ℝ := t + 2 * ε₀
+  let a₂ : ℝ := t - 4 * ε₀
+  let b₂ : ℝ := t + 4 * ε₀
+  letI : Fact (a₁ < b₁) := ⟨by
+    dsimp [a₁, b₁]
+    linarith [hε₀]⟩
+  letI : Fact (b₁ - a₁ ≤ 1) := ⟨by
+    dsimp [a₁, b₁]
+    linarith [hε₀2]⟩
+  intro E
+  letI : Fact (a₂ < b₂) := ⟨by
+    dsimp [a₂, b₂]
+    linarith [hε₀]⟩
+  letI : Fact (b₂ - a₂ ≤ 1) := ⟨by
+    dsimp [a₂, b₂]
+    linarith [hε₀8]⟩
+  let hIncl :
+      σ.slicing.intervalProp C a₁ b₁ ≤
+        σ.slicing.intervalProp C a₂ b₂ := by
+    intro F hF
+    exact σ.slicing.intervalProp_mono C (by dsimp [a₁, a₂]; linarith)
+      (by dsimp [b₁, b₂]; linarith) hF
+  have hBig := hWide t ((ObjectProperty.ιOfLE hIncl).obj E)
+  letI : IsStrictArtinianObject ((ObjectProperty.ιOfLE hIncl).obj E) := hBig.1
+  letI : IsStrictNoetherianObject ((ObjectProperty.ιOfLE hIncl).obj E) := hBig.2
+  simpa using
+    (interval_strictFiniteLength_of_inclusion_strict
+      (C := C) (s₁ := σ.slicing) (s₂ := σ.slicing)
+      (a₁ := a₁) (b₁ := b₁) (a₂ := a₂) (b₂ := b₂) hIncl
+      (X := E))
+
 /-! ### Phase confinement for nearby stability conditions -/
 
 /-- **Phase confinement**. If `d(σ.P, τ.P) < ε` and `E` is `τ`-semistable of phase `φ`,
@@ -3335,6 +3373,25 @@ private theorem interval_strictFiniteLength_of_inclusion
     interval_strictNoetherianObject_of_inclusion (C := C) (s₁ := s₁) (s₂ := s₂)
       (a₁ := a₁) (b₁ := b₁) (a₂ := a₂) (b₂ := b₂) h⟩
 
+private theorem interval_thinFiniteLength_of_inclusion
+    {s₁ s₂ : Slicing C} [IsTriangulated C]
+    {a₁ b₁ a₂ b₂ : ℝ}
+    [Fact (a₁ < b₁)] [Fact (b₁ - a₁ ≤ 1)]
+    [Fact (a₂ < b₂)] [Fact (b₂ - a₂ ≤ 1)]
+    (h : s₁.intervalProp C a₁ b₁ ≤ s₂.intervalProp C a₂ b₂)
+    (hFinite : ∀ Y : s₂.IntervalCat C a₂ b₂,
+      IsArtinianObject Y ∧ IsNoetherianObject Y) :
+    ∀ X : s₁.IntervalCat C a₁ b₁,
+      IsStrictArtinianObject X ∧ IsStrictNoetherianObject X := by
+  intro X
+  have hBig := hFinite ((ObjectProperty.ιOfLE h).obj X)
+  letI : IsArtinianObject ((ObjectProperty.ιOfLE h).obj X) := hBig.1
+  letI : IsNoetherianObject ((ObjectProperty.ιOfLE h).obj X) := hBig.2
+  simpa using
+    (interval_strictFiniteLength_of_inclusion
+      (C := C) (s₁ := s₁) (s₂ := s₂)
+      (a₁ := a₁) (b₁ := b₁) (a₂ := a₂) (b₂ := b₂) h (X := X))
+
 private theorem interval_strictArtinianObject_of_inclusion_strict
     {s₁ s₂ : Slicing C} [IsTriangulated C]
     {a₁ b₁ a₂ b₂ : ℝ}
@@ -3486,6 +3543,25 @@ private theorem interval_strictFiniteLength_of_inclusion_strict
       (a₁ := a₁) (b₁ := b₁) (a₂ := a₂) (b₂ := b₂) h,
     interval_strictNoetherianObject_of_inclusion_strict (C := C) (s₁ := s₁) (s₂ := s₂)
       (a₁ := a₁) (b₁ := b₁) (a₂ := a₂) (b₂ := b₂) h⟩
+
+private theorem interval_thinFiniteLength_of_inclusion_strict
+    {s₁ s₂ : Slicing C} [IsTriangulated C]
+    {a₁ b₁ a₂ b₂ : ℝ}
+    [Fact (a₁ < b₁)] [Fact (b₁ - a₁ ≤ 1)]
+    [Fact (a₂ < b₂)] [Fact (b₂ - a₂ ≤ 1)]
+    (h : s₁.intervalProp C a₁ b₁ ≤ s₂.intervalProp C a₂ b₂)
+    (hFinite : ∀ Y : s₂.IntervalCat C a₂ b₂,
+      IsStrictArtinianObject Y ∧ IsStrictNoetherianObject Y) :
+    ∀ X : s₁.IntervalCat C a₁ b₁,
+      IsStrictArtinianObject X ∧ IsStrictNoetherianObject X := by
+  intro X
+  have hBig := hFinite ((ObjectProperty.ιOfLE h).obj X)
+  letI : IsStrictArtinianObject ((ObjectProperty.ιOfLE h).obj X) := hBig.1
+  letI : IsStrictNoetherianObject ((ObjectProperty.ιOfLE h).obj X) := hBig.2
+  simpa using
+    (interval_strictFiniteLength_of_inclusion_strict
+      (C := C) (s₁ := s₁) (s₂ := s₂)
+      (a₁ := a₁) (b₁ := b₁) (a₂ := a₂) (b₂ := b₂) h (X := X))
 
 private theorem interval_K0_of_strictMono
     {s : Slicing C} [IsTriangulated C] {a b : ℝ}
@@ -6015,6 +6091,43 @@ private def ThinFiniteLengthInInterval (σ : StabilityCondition C) (a b : ℝ)
     [Fact (a < b)] [Fact (b - a ≤ 1)] : Prop :=
   ∀ Y : σ.slicing.IntervalCat C a b,
     IsStrictArtinianObject Y ∧ IsStrictNoetherianObject Y
+
+private theorem ThinFiniteLengthInInterval.of_wide
+    (σ : StabilityCondition C) {ε₀ t a b : ℝ}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    (hε₀ : 0 < ε₀) (hε₀8 : ε₀ < 1 / 8)
+    (ha : t - 4 * ε₀ ≤ a) (hb : b ≤ t + 4 * ε₀)
+    (hWide : WideSectorFiniteLength (C := C) σ ε₀ hε₀ hε₀8) :
+    ThinFiniteLengthInInterval (C := C) σ a b := by
+  let a' : ℝ := t - 4 * ε₀
+  let b' : ℝ := t + 4 * ε₀
+  letI : Fact (a' < b') := ⟨by
+    dsimp [a', b']
+    linarith [hε₀]⟩
+  letI : Fact (b' - a' ≤ 1) := ⟨by
+    dsimp [a', b']
+    linarith [hε₀8]⟩
+  let hIncl : σ.slicing.intervalProp C a b ≤ σ.slicing.intervalProp C a' b' := by
+    intro F hF
+    exact σ.slicing.intervalProp_mono C ha hb hF
+  intro X
+  exact interval_thinFiniteLength_of_inclusion_strict
+    (C := C) (s₁ := σ.slicing) (s₂ := σ.slicing)
+    (a₁ := a) (b₁ := b) (a₂ := a') (b₂ := b') hIncl (hWide t) X
+
+private theorem thinFiniteLength_of_node78_window
+    (σ : StabilityCondition C) {ε₀ t : ℝ}
+    (hε₀ : 0 < ε₀) (hε₀8 : ε₀ < 1 / 8)
+    (hWide : WideSectorFiniteLength (C := C) σ ε₀ hε₀ hε₀8) :
+    ThinFiniteLengthInInterval (C := C) σ (t - 3 * ε₀) (t + 5 * ε₀) := by
+  letI : Fact (t - 3 * ε₀ < t + 5 * ε₀) := ⟨by linarith [hε₀]⟩
+  letI : Fact ((t + 5 * ε₀) - (t - 3 * ε₀) ≤ 1) := ⟨by linarith [hε₀8]⟩
+  refine ThinFiniteLengthInInterval.of_wide
+    (C := C) σ (t := t + ε₀) hε₀ hε₀8 ?_ ?_ hWide
+  · dsimp
+    linarith
+  · dsimp
+    linarith
 
 variable [IsTriangulated C] in
 /-- Faithful strict finite-length quotient selection for thin interval categories:
@@ -9849,7 +9962,7 @@ def StabilityCondition.deformedSlicing (σ : StabilityCondition C)
     (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hε₀8 : ε₀ < 1 / 8)
-    (hSector : SectorFiniteLength (C := C) σ ε₀ hε₀ hε₀2)
+    (hWide : WideSectorFiniteLength (C := C) σ ε₀ hε₀ hε₀8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀))) :
     Slicing C where
   P := σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin
@@ -10040,10 +10153,10 @@ theorem StabilityCondition.deformedSlicing_compat
     (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hε₀8 : ε₀ < 1 / 8)
-    (hSector : SectorFiniteLength (C := C) σ ε₀ hε₀ hε₀2)
+    (hWide : WideSectorFiniteLength (C := C) σ ε₀ hε₀ hε₀8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     (ψ : ℝ) (E : C)
-    (hQ : (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hSector hsin).P ψ E)
+    (hQ : (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hWide hsin).P ψ E)
     (hE : ¬IsZero E) :
     ∃ (m : ℝ), 0 < m ∧
       W (K₀.of C E) = ↑m * Complex.exp (↑(Real.pi * ψ) * Complex.I) := by
@@ -13435,13 +13548,15 @@ private theorem stabilityFunctionOnP_semistable_intervalProp
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hε₀8 : ε₀ < 1 / 8)
-    (hSector : SectorFiniteLength (C := C) σ ε₀ hε₀ hε₀2)
+    (hWide : WideSectorFiniteLength (C := C) σ ε₀ hε₀ hε₀8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     {φ : ℝ} {a b : ℝ} (ha : a < φ - ε₀) (hb : φ + ε₀ < b)
     {E : (σ.slicing.P φ).FullSubcategory}
     (hss : @StabilityFunction.IsSemistable (σ.slicing.P φ).FullSubcategory _
       (σ.P_phi_abelian C φ) (stabilityFunctionOnP C σ W hW hε₀ hε₀2 hsin φ) E) :
-    (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hSector hsin).intervalProp C a b E.obj := by
+    (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hWide hsin).intervalProp C a b E.obj := by
+  let hSector : SectorFiniteLength (C := C) σ ε₀ hε₀ hε₀2 :=
+    SectorFiniteLength.of_wide (C := C) σ hε₀ hε₀2 hε₀8 hWide
   rcases stabilityFunctionOnP_semistable_deformedPred (C := C) (σ := σ) (W := W) (hW := hW)
     hε₀ hε₀2 hε₀8 hSector hsin ha hb hss with ⟨ψ, hψa, hψb, hQ⟩
   refine Or.inr ⟨HNFiltration.single C E.obj ψ hQ, ?_⟩
@@ -13460,15 +13575,17 @@ private theorem abelianHN_to_intervalProp
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hε₀8 : ε₀ < 1 / 8)
-    (hSector : SectorFiniteLength (C := C) σ ε₀ hε₀ hε₀2)
+    (hWide : WideSectorFiniteLength (C := C) σ ε₀ hε₀ hε₀8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     {φ : ℝ} {E : (σ.slicing.P φ).FullSubcategory}
     (hE : ¬IsZero E)
     {a b : ℝ} (ha : a < φ - ε₀) (hb : φ + ε₀ < b) :
-    (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hSector hsin).intervalProp C a b
+    (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hWide hsin).intervalProp C a b
       ((σ.slicing.P φ).ι.obj E) := by
   letI : Abelian (σ.slicing.P φ).FullSubcategory := σ.P_phi_abelian C φ
-  let Q := σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hSector hsin
+  let hSector : SectorFiniteLength (C := C) σ ε₀ hε₀ hε₀2 :=
+    SectorFiniteLength.of_wide (C := C) σ hε₀ hε₀2 hε₀8 hWide
+  let Q := σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hWide hsin
   obtain ⟨F⟩ := stabilityFunctionOnP_hasHN C σ W hW hε₀ hε₀2 hsin φ E hE
   let G := pphiHNBridge (C := C) (σ := σ) (W := W) (hW := hW) (hε₀ := hε₀)
     (hε₀2 := hε₀2) (hε₀8 := hε₀8) (hSector := hSector) (hsin := hsin) F
@@ -13502,12 +13619,14 @@ private theorem sigmaSemistable_hasDeformedHN
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hε₀8 : ε₀ < 1 / 8)
-    (hSector : SectorFiniteLength (C := C) σ ε₀ hε₀ hε₀2)
+    (hWide : WideSectorFiniteLength (C := C) σ ε₀ hε₀ hε₀8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     {E : C} {φ : ℝ} (hP : σ.slicing.P φ E) (hE : ¬IsZero E) :
     Nonempty (HNFiltration C (σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin) E) := by
   let E' : (σ.slicing.P φ).FullSubcategory := ⟨E, hP⟩
   have hE' : ¬IsZero E' := fun hZ ↦ hE ((σ.slicing.P φ).ι.map_isZero hZ)
+  let hSector : SectorFiniteLength (C := C) σ ε₀ hε₀ hε₀2 :=
+    SectorFiniteLength.of_wide (C := C) σ hε₀ hε₀2 hε₀8 hWide
   simpa [E'] using
     stabilityFunctionOnP_hasDeformedHN (C := C) (σ := σ) (W := W) (hW := hW)
       (hε₀ := hε₀) (hε₀2 := hε₀2) (hε₀8 := hε₀8) (hSector := hSector) (hsin := hsin) hE'
@@ -13535,11 +13654,11 @@ theorem sigma_semistable_intervalProp
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hε₀8 : ε₀ < 1 / 8)
-    (hSector : SectorFiniteLength (C := C) σ ε₀ hε₀ hε₀2)
+    (hWide : WideSectorFiniteLength (C := C) σ ε₀ hε₀ hε₀8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     {E : C} {φ : ℝ} (hP : σ.slicing.P φ E) (_hE : ¬IsZero E)
     {δ : ℝ} (hδ : 0 < δ) :
-    (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hSector hsin).intervalProp C
+    (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hWide hsin).intervalProp C
       (φ - ε₀ - δ) (φ + ε₀ + δ) E := by
   by_cases hEz : IsZero E
   · exact Or.inl hEz
@@ -13547,7 +13666,7 @@ theorem sigma_semistable_intervalProp
   set E' : (σ.slicing.P φ).FullSubcategory := ⟨E, hP⟩
   have hE'ne : ¬IsZero E' := fun h => hEz ((σ.slicing.P φ).ι.map_isZero h)
   -- Convert abelian HN in P(φ) to Q-intervalProp for E = ι.obj E'
-  exact abelianHN_to_intervalProp C σ W hW hε₀ hε₀2 hε₀8 hSector hsin
+  exact abelianHN_to_intervalProp C σ W hW hε₀ hε₀2 hε₀8 hWide hsin
     hE'ne (by linarith) (by linarith)
 
 /-! ### Deformation theorem (Theorem 7.1) -/
@@ -13575,7 +13694,7 @@ theorem bridgeland_7_1 (σ : StabilityCondition C)
     (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
     (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
     (hε₀8 : ε₀ < 1 / 8)
-    (hSector : SectorFiniteLength (C := C) σ ε₀ hε₀ hε₀2)
+    (hWide : WideSectorFiniteLength (C := C) σ ε₀ hε₀ hε₀8)
     (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
     (hε₀_lf : ∃ δ : ℝ, 0 < δ ∧ ε₀ + δ < 1 / 2 ∧ ∀ t : ℝ,
       ∀ (E :
@@ -13583,8 +13702,10 @@ theorem bridgeland_7_1 (σ : StabilityCondition C)
         IsArtinianObject E ∧ IsNoetherianObject E) :
     ∃ (τ : StabilityCondition C), τ.Z = W ∧
       slicingDist C σ.slicing τ.slicing ≤ ENNReal.ofReal ε₀ := by
-  refine ⟨⟨σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hSector hsin, W,
-    σ.deformedSlicing_compat C W hW ε₀ hε₀ hε₀2 hε₀8 hSector hsin, ?_⟩, rfl, ?_⟩
+  let hSector : SectorFiniteLength (C := C) σ ε₀ hε₀ hε₀2 :=
+    SectorFiniteLength.of_wide (C := C) σ hε₀ hε₀2 hε₀8 hWide
+  refine ⟨⟨σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hWide hsin, W,
+    σ.deformedSlicing_compat C W hW ε₀ hε₀ hε₀2 hε₀8 hWide hsin, ?_⟩, rfl, ?_⟩
   · -- Local finiteness: inherited from σ via phase confinement
     obtain ⟨δ, hδ, hδ_half, hlf_σ⟩ := hε₀_lf
     let δ' : ℝ := min (δ / 2) (1 / 4)
@@ -13607,7 +13728,7 @@ theorem bridgeland_7_1 (σ : StabilityCondition C)
         exact min_le_right _ _
       linarith⟩
     have hIncl :
-        (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hSector hsin).intervalProp C
+        (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hWide hsin).intervalProp C
             (t - δ') (t + δ') ≤
           σ.slicing.intervalProp C (t - (ε₀ + δ)) (t + (ε₀ + δ)) := by
       intro X hX
@@ -13631,7 +13752,7 @@ theorem bridgeland_7_1 (σ : StabilityCondition C)
               dsimp [δ'] at hright
               linarith [hhi, min_le_left (δ / 2) (1 / 4 : ℝ)])
     let I :
-        (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hSector hsin).IntervalCat C
+        (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hWide hsin).IntervalCat C
             (t - δ') (t + δ') ⥤
           σ.slicing.IntervalCat C (t - (ε₀ + δ)) (t + (ε₀ + δ)) :=
       ObjectProperty.ιOfLE hIncl
@@ -13644,14 +13765,14 @@ theorem bridgeland_7_1 (σ : StabilityCondition C)
     have hstrictE :
         IsStrictArtinianObject E ∧ IsStrictNoetherianObject E :=
       interval_strictFiniteLength_of_inclusion (C := C)
-        (s₁ := σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hSector hsin) (s₂ := σ.slicing)
+        (s₁ := σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hWide hsin) (s₂ := σ.slicing)
         (a₁ := t - δ') (b₁ := t + δ') (a₂ := t - (ε₀ + δ)) (b₂ := t + (ε₀ + δ))
         hIncl (X := E)
     haveI : IsStrictArtinianObject E := hstrictE.1
     haveI : IsStrictNoetherianObject E := hstrictE.2
     exact ⟨inferInstance, inferInstance⟩
   · -- Distance bound: d(P, Q) ≤ ε₀ by phase confinement
-    set Q := σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hSector hsin
+    set Q := σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hWide hsin
     -- Forward: Q-HN factors → phase confinement → σ-intervalProp
     have forward : ∀ (E : C) (hE : ¬IsZero E) (δ : ℝ), 0 < δ →
         σ.slicing.intervalProp C
@@ -13697,7 +13818,7 @@ theorem bridgeland_7_1 (σ : StabilityCondition C)
         -- Factor i is σ-semistable of phase F.φ i. By reverse phase confinement,
         -- it lies in Q-interval (F.φ i - ε₀ - δ, F.φ i + ε₀ + δ).
         have hQint := sigma_semistable_intervalProp C σ W hW
-          hε₀ hε₀2 hε₀8 hSector hsin (F.semistable i) hFi hδ
+          hε₀ hε₀2 hε₀8 hWide hsin (F.semistable i) hFi hδ
         -- Widen to (phiMinus - ε₀ - δ, phiPlus + ε₀ + δ) using monotonicity
         exact Q.intervalProp_mono C (by linarith) (by linarith) hQint
     -- Combine: |σ.phiPlus - Q.phiPlus| ≤ ε₀ and |σ.phiMinus - Q.phiMinus| ≤ ε₀

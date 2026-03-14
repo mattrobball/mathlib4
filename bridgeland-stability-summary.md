@@ -55,11 +55,11 @@ helper and is not the canonical Section 7.7 result anymore.
 |---|---|---|---|
 | `Deformation.lean` | `StabilityCondition.exists_epsilon0` | 58 | Statement correct; dependent transport proof postponed |
 | `Deformation.lean` | `StabilityCondition.exists_epsilon0_sector` | 83 | Statement correct; same transport issue |
-| `Deformation.lean` | `deformedSlicing.hn_exists` | 7049 | Node 7.7 is complete, Node 7.8a/7.8b are on the faithful HN-closure definitions, `split_hn_filtration_at_cutoff` / `exists_deformedGt_deformedLe_triangle_of_hn` are compiled, and the new bridge `exists_deformedHN_of_enveloped_interval` now packages “thin finite-length HN + interior phase window ⇒ Q-HN”; the live gaps are still Node 7.8c / 7.9 and producing the paper’s actual enveloped local windows |
+| `Deformation.lean` | `deformedSlicing.hn_exists` | 7049 | Node 7.7 is complete, Node 7.8a/7.8b are on the faithful HN-closure definitions, `split_hn_filtration_at_cutoff` / `exists_deformedGt_deformedLe_triangle_of_hn` are compiled, and the new bridge `exists_deformedHN_of_enveloped_interval` now packages “thin finite-length HN + interior phase window ⇒ Q-HN”; the live gaps are still Node 7.8c / 7.9 and producing the paper’s actual enveloped local windows. The statement-level finite-length refactor is also underway: `deformedSlicing`, `deformedSlicing_compat`, `sigma_semistable_intervalProp`, and `bridgeland_7_1` now thread the wide finite-length witness explicitly, and `interval_thinFiniteLength_of_inclusion(_strict)` / `ThinFiniteLengthInInterval.of_wide` / `thinFiniteLength_of_node78_window` are compiled as the inclusion-transport API for the p.24 windows. |
 | `Deformation.lean` | `P_phi_wSemistable_is_deformedPred` | 7863 | Live Phase 4 blocker: faithful Lemma 7.5 / 7.6 larger-to-smaller argument still open |
 | `Deformation.lean` | `bridgeland_theorem_1_2` | 8734 | Top-level shell; should be proved from Theorem 7.1 + Section 6 uniqueness |
 
-**Current proof order:** `thread the faithful wide finite-length witness into the Node 7.8/7.9 API -> finish Node 7.8c/7.9 for #2 -> remove the old #3 detour from the critical path -> Theorem 1.2`.
+**Current proof order:** `finish threading the faithful wide/local finite-length witnesses into the Node 7.8/7.9 API -> use the new interval finite-length transport helpers to build the p.24 windows -> finish Node 7.8c/7.9 for #2 -> remove the old #3 detour from the critical path -> Theorem 1.2`.
 The old separate “Q(ψ)-subobject finiteness” placeholder has been absorbed into the
 Phase 4 / Node 7.7 refactor rather than surviving as a standalone `sorry`.
 

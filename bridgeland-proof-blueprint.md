@@ -1160,6 +1160,18 @@ intervals of width `8 ε`, whereas the current `deformedSlicing` statement layer
 was designed around the older abelian-heart detour and does not yet thread that
 wide witness explicitly.
 
+New API checkpoint:
+`deformedSlicing`, `deformedSlicing_compat`, `sigma_semistable_intervalProp`,
+and `bridgeland_7_1` now thread that wide witness explicitly, and the reusable
+interval finite-length transport lemmas
+`interval_thinFiniteLength_of_inclusion`,
+`interval_thinFiniteLength_of_inclusion_strict`,
+`ThinFiniteLengthInInterval.of_wide`, and
+`thinFiniteLength_of_node78_window`
+are compiled. The live gap is therefore no longer the thin finite-length
+transport itself, but the actual production of the paper's local windows in
+step (1).
+
 #### Node 7.8d — conclude that `Q(>t)` is a t-structure
 
 ### 3F.9 HN filtrations for all objects in the new slicing
