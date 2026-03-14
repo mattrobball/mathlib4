@@ -8090,6 +8090,46 @@ private theorem SkewedStabilityFunction.hn_exists_in_thin_interval_of_strictQuot
       (C := C) (σ := σ) (a := a) (b := b) (ssf := ssf)
       hFiniteLength hW_interval hWindow hWidth hHom t X hX hquot'
 
+set_option maxHeartbeats 800000 in
+private theorem SkewedStabilityFunction.hn_exists_in_thin_interval_of_innerStrip
+    (σ : StabilityCondition C) {a b ε₀ : ℝ}
+    {ssf : SkewedStabilityFunction C σ.slicing a b}
+    [Fact (a < b)] [Fact (b - a ≤ 1)]
+    (hFiniteLength : ThinFiniteLengthInInterval (C := C) σ a b)
+    (hW_interval : ∀ {F : C}, σ.slicing.intervalProp C a b F → ¬IsZero F →
+      ssf.W (K₀.of C F) ≠ 0)
+    {L U : ℝ}
+    (hWindow : ∀ {F : C}, σ.slicing.intervalProp C a b F → ¬IsZero F →
+      L < wPhaseOf (ssf.W (K₀.of C F)) ssf.α ∧
+        wPhaseOf (ssf.W (K₀.of C F)) ssf.α < U)
+    (hWidth : U - L < 1)
+    (hHom :
+      ∀ {E F : σ.slicing.IntervalCat C a b}
+        (hE : ssf.Semistable C E.obj
+          (wPhaseOf (ssf.W (K₀.of C E.obj)) ssf.α))
+        (hF : ssf.Semistable C F.obj
+          (wPhaseOf (ssf.W (K₀.of C F.obj)) ssf.α)),
+        wPhaseOf (ssf.W (K₀.of C F.obj)) ssf.α <
+          wPhaseOf (ssf.W (K₀.of C E.obj)) ssf.α →
+        ∀ f : E ⟶ F, f = 0)
+    (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hthin : b - a + 2 * ε₀ < 1)
+    (hsin : stabSeminorm C σ (ssf.W - σ.Z) <
+      ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    (X : σ.slicing.IntervalCat C a b) (hX : ¬IsZero X)
+    (hX_inner : σ.slicing.intervalProp C (a + 2 * ε₀) (b - 4 * ε₀) X.obj) :
+    let Psem : ℝ → ObjectProperty C := fun ψ E => ssf.Semistable C E ψ
+    ∃ G : HNFiltration C Psem X.obj,
+      ∀ j, a + ε₀ < G.φ j ∧ G.φ j < U := by
+  exact
+    SkewedStabilityFunction.hn_exists_in_thin_interval_of_strictQuotientLowerBound
+      (C := C) (σ := σ) (a := a) (b := b) (ssf := ssf)
+      hFiniteLength hW_interval hWindow hWidth hHom (a + ε₀) X hX
+      (fun q hq hB ↦
+        wPhaseOf_gt_of_strictQuotient_of_inner_strip
+          (C := C) (σ := σ) (W := ssf.W) (hW := ssf.hW) hε₀ hε₀2 hthin hsin
+          hX_inner q hq hB)
+
 /-! ### Extension-closure of `intervalProp` over Postnikov towers -/
 
 /-- Extension-closure of `intervalProp` over Postnikov towers: if all factors of a

@@ -214,6 +214,13 @@ Audit correction:
   paper's `G/H` recursion boundary directly. The remaining Node 7.8/7.9 work is
   therefore to prove Bridgeland's Lemma 3.4 quotient lower bound in the p.24
   windows and feed it to that wrapper, not to refactor the recursion again.
+- New Lemma 3.4 checkpoint:
+  `wPhaseOf_gt_of_strictQuotient_of_inner_strip` now proves the lower-bound half
+  of Bridgeland's class `G` for inner-strip objects, and
+  `hn_exists_in_thin_interval_of_innerStrip` packages that input into the
+  faithful 7.7 recursion. The remaining gap is now the corresponding envelope /
+  hom-vanishing package needed to turn that inner-strip HN theorem into the
+  exact Node 7.8c / 7.9 local windows.
 - New audit correction:
   the faithful p.24 route also needs an explicit **wide** local-finiteness input
   for intervals of width `8 ε₀`. The current `deformedSlicing` statement layer

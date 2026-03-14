@@ -1182,7 +1182,11 @@ quotient-lower-bound boundary directly as
 `hn_exists_in_thin_interval_of_quotientLowerBound` /
 `hn_exists_in_thin_interval_of_strictQuotientLowerBound`, so the next proof
 step should be the Lemma 3.4 input to those wrappers rather than another API
-refactor.
+refactor. That lower-bound input is now partially formalized too:
+`wPhaseOf_gt_of_strictQuotient_of_inner_strip` and
+`hn_exists_in_thin_interval_of_innerStrip` capture the class-`G` half of the
+p.23 argument, leaving the remaining p.24 work concentrated on the envelope /
+hom-vanishing side needed for Nodes 7.8c and 7.9.
 
 #### Node 7.8d — conclude that `Q(>t)` is a t-structure
 
