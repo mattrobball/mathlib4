@@ -1177,7 +1177,12 @@ interval finite-length transport lemmas
 `thinFiniteLength_of_node78_window`
 are compiled. The live gap is therefore no longer the thin finite-length
 transport itself, but the actual production of the paper's local windows in
-step (1).
+step (1). The strict-recursion engine now also exposes the paper-facing
+quotient-lower-bound boundary directly as
+`hn_exists_in_thin_interval_of_quotientLowerBound` /
+`hn_exists_in_thin_interval_of_strictQuotientLowerBound`, so the next proof
+step should be the Lemma 3.4 input to those wrappers rather than another API
+refactor.
 
 #### Node 7.8d — conclude that `Q(>t)` is a t-structure
 

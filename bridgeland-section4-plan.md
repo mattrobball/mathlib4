@@ -208,6 +208,12 @@ Audit correction:
   work cleanly: once a thin interval has the paper's enveloping phase window,
   Lemma 7.7 upgrades directly to a `deformedPred`-HN filtration with no further
   HN assembly.
+- New 7.7 API checkpoint:
+  `hn_exists_in_thin_interval_of_quotientLowerBound` and
+  `hn_exists_in_thin_interval_of_strictQuotientLowerBound` now expose the
+  paper's `G/H` recursion boundary directly. The remaining Node 7.8/7.9 work is
+  therefore to prove Bridgeland's Lemma 3.4 quotient lower bound in the p.24
+  windows and feed it to that wrapper, not to refactor the recursion again.
 - New audit correction:
   the faithful p.24 route also needs an explicit **wide** local-finiteness input
   for intervals of width `8 ε₀`. The current `deformedSlicing` statement layer
