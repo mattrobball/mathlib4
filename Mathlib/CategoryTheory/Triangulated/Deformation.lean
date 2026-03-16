@@ -14544,4 +14544,34 @@ theorem bridgeland_theorem_1_2 :
   -/
   sorry
 
+variable [IsTriangulated C] in
+/-- **Bridgeland's Theorem 7.1 with connected-component tracking**.
+
+Combines `bridgeland_7_1` (deformation of stability conditions) with the connected
+component claim: the deformed `τ` lies in the same component as `σ`.
+
+The connected component claim follows from Bridgeland's observation that the deformed
+slicing depends continuously on `W`. Formally, the linear interpolation
+`W_t = Z(σ) + t·(W − Z(σ))` gives a continuous path from `σ` to `τ` in `Stab(D)`:
+path-continuity at `t₀` follows from applying Theorem 7.1 centred at `γ(t₀)` with a
+small `ε′`, then identifying the result with `γ(t)` via **Lemma 6.4** (uniqueness of
+stability conditions with the same `Z` and `d < 1`). The image of `[0, 1]` under `γ`
+is therefore preconnected, giving `ConnectedComponents.mk τ = ConnectedComponents.mk σ`.
+
+The interface takes `exists_epsilon0` output directly (strict finite length in wide
+intervals), avoiding the quasi-abelian ↔ abelian artinian conversion. -/
+theorem bridgeland_7_1_with_component (σ : StabilityCondition C)
+    (W : K₀ C →+ ℂ)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀8 : ε₀ < 1 / 8)
+    (hwide : ∀ t : ℝ,
+      letI : Fact (t - 4 * ε₀ < t + 4 * ε₀) := ⟨by linarith⟩
+      letI : Fact (t + 4 * ε₀ - (t - 4 * ε₀) ≤ 1) := ⟨by linarith⟩
+      ∀ (E : σ.slicing.IntervalCat C (t - 4 * ε₀) (t + 4 * ε₀)),
+        IsStrictArtinianObject E ∧ IsStrictNoetherianObject E) :
+    ∃ (τ : StabilityCondition C), τ.Z = W ∧
+      slicingDist C σ.slicing τ.slicing ≤ ENNReal.ofReal ε₀ ∧
+      ConnectedComponents.mk τ = ConnectedComponents.mk σ := by
+  sorry
+
 end CategoryTheory.Triangulated
