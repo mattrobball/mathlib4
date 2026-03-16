@@ -14545,33 +14545,18 @@ theorem bridgeland_theorem_1_2 :
   sorry
 
 variable [IsTriangulated C] in
-/-- **Bridgeland's Theorem 7.1 with connected-component tracking**.
+/-- **Local connectedness of `Stab(D)`**: every basis neighbourhood is contained in
+the topological connected component of its centre.
 
-Combines `bridgeland_7_1` (deformation of stability conditions) with the connected
-component claim: the deformed `τ` lies in the same component as `σ`.
-
-The connected component claim follows from Bridgeland's observation that the deformed
-slicing depends continuously on `W`. Formally, the linear interpolation
-`W_t = Z(σ) + t·(W − Z(σ))` gives a continuous path from `σ` to `τ` in `Stab(D)`:
-path-continuity at `t₀` follows from applying Theorem 7.1 centred at `γ(t₀)` with a
-small `ε′`, then identifying the result with `γ(t)` via **Lemma 6.4** (uniqueness of
-stability conditions with the same `Z` and `d < 1`). The image of `[0, 1]` under `γ`
-is therefore preconnected, giving `ConnectedComponents.mk τ = ConnectedComponents.mk σ`.
-
-The interface takes `exists_epsilon0` output directly (strict finite length in wide
-intervals), avoiding the quasi-abelian ↔ abelian artinian conversion. -/
-theorem bridgeland_7_1_with_component (σ : StabilityCondition C)
-    (W : K₀ C →+ ℂ)
-    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
-    (ε₀ : ℝ) (hε₀ : 0 < ε₀) (hε₀8 : ε₀ < 1 / 8)
-    (hwide : ∀ t : ℝ,
-      letI : Fact (t - 4 * ε₀ < t + 4 * ε₀) := ⟨by linarith⟩
-      letI : Fact (t + 4 * ε₀ - (t - 4 * ε₀) ≤ 1) := ⟨by linarith⟩
-      ∀ (E : σ.slicing.IntervalCat C (t - 4 * ε₀) (t + 4 * ε₀)),
-        IsStrictArtinianObject E ∧ IsStrictNoetherianObject E) :
-    ∃ (τ : StabilityCondition C), τ.Z = W ∧
-      slicingDist C σ.slicing τ.slicing ≤ ENNReal.ofReal ε₀ ∧
-      ConnectedComponents.mk τ = ConnectedComponents.mk σ := by
+This is the path-connectedness content of Bridgeland's Theorem 1.2 proof (§7).
+For `τ ∈ basisNhd(σ, ε)`, the linear interpolation `W_t = Z(σ) + t·(Z(τ) − Z(σ))`
+and `γ(t) = bridgeland_7_1(σ, W_t, ε₀)` define a path from `σ` to `τ`.
+Path-continuity at `t₀` follows from applying Theorem 7.1 centred at `γ(t₀)` with
+a small `ε′`, then **Lemma 6.4** (uniqueness for same `Z` and `d < 1`) identifies
+the result with `γ(t)`. The image of `[0, 1]` is therefore preconnected. -/
+theorem basisNhd_subset_connectedComponent (σ : StabilityCondition C)
+    {ε : ℝ} (hε : 0 < ε) (hε8 : ε < 1 / 8) :
+    basisNhd C σ ε ⊆ {τ | ConnectedComponents.mk τ = ConnectedComponents.mk σ} := by
   sorry
 
 end CategoryTheory.Triangulated
