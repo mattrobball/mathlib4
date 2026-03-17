@@ -10039,94 +10039,6 @@ private theorem StabilityCondition.deformedLePred_of_deformedLtPred
   · exact Or.inr ⟨G, fun j ↦ le_of_lt (hG j)⟩
 
 variable [IsTriangulated C] in
-/-- Once a distinguished triangle is split at cutoff `t` into an object of `Q(> t)` and an
-object of `Q(≤ t)`, the middle term automatically has a full `Q`-HN filtration. This is the
-last generic step needed after constructing Bridgeland's p.24 truncation triangles. -/
-private theorem exists_hn_of_deformedGt_deformedLe_triangle
-    (σ : StabilityCondition C)
-    (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
-    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
-    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
-    {t : ℝ} {X E Y : C} {f : X ⟶ E} {g : E ⟶ Y} {h : Y ⟶ X⟦(1 : ℤ)⟧}
-    (hT : Triangle.mk f g h ∈ distTriang C)
-    (hX : σ.deformedGtPred C W hW ε₀ hε₀ hε₀2 hsin t X)
-    (hY : σ.deformedLePred C W hW ε₀ hε₀ hε₀2 hsin t Y) :
-    Nonempty (HNFiltration C (σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin) E) := by
-  rcases hX with hXZ | ⟨GX, hGX⟩
-  · haveI : IsIso g := (Triangle.isZero₁_iff_isIso₂ _ hT).mp hXZ
-    rcases hY with hYZ | ⟨GY, _⟩
-    · have hEZ : IsZero E := (Triangle.isZero₃_iff_isZero₂ _ hT).mp hYZ
-      exact ⟨HNFiltration.zero C (P := σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin)
-        E hEZ⟩
-    · exact ⟨GY.ofIso C (asIso g).symm⟩
-  · rcases hY with hYZ | ⟨GY, hGY⟩
-    · haveI : IsIso f := (Triangle.isZero₃_iff_isIso₁ _ hT).mp hYZ
-      exact ⟨GX.ofIso C (asIso f)⟩
-    · have hPiso :
-          ∀ φ : ℝ,
-            (σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin φ).IsClosedUnderIsomorphisms :=
-        σ.deformedPred_closedUnderIso C W hW ε₀ hε₀ hε₀2 hsin
-      let jLast : Fin GY.n := ⟨GY.n - 1, by have := GY.hn; omega⟩
-      let t0 : ℝ := GY.φ jLast - 1
-      have hGX_gt : ∀ j : Fin GX.n, t0 < GX.φ j := by
-        intro j
-        exact lt_trans (by dsimp [t0]; linarith [hGY jLast]) (lt_of_lt_of_le (hGY jLast) (hGX j))
-      have hGY_gt : ∀ i : Fin GY.n, t0 < GY.φ i := by
-        intro i
-        dsimp [t0]
-        calc
-          GY.φ jLast - 1 < GY.φ jLast := by linarith
-          _ ≤ GY.φ i := GY.hφ.antitone (Fin.mk_le_mk.mpr (by omega))
-      have hsep : ∀ i : Fin GY.n, ∀ j : Fin GX.n, GY.φ i < GX.φ j := by
-        intro i j
-        exact lt_of_le_of_lt (hGY i) (hGX j)
-      obtain ⟨G, _⟩ :=
-        append_hn_filtration_of_triangle (C := C) hPiso GX GY f g h hT t0 hGX_gt hGY_gt hsep
-      exact ⟨G⟩
-
-variable [IsTriangulated C] in
-/-- **Orthogonality of Q(> t) and Q(≤ t)** (**Node 7.8b**). Every morphism from a
-`Q(> t)`-object to a `Q(≤ t)`-object is zero, by the sharp hom-vanishing (Node 7.6). -/
-theorem StabilityCondition.hom_eq_zero_of_deformedGt_deformedLe
-    (σ : StabilityCondition C)
-    (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
-    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
-    (hε₀8 : ε₀ < 1 / 8)
-    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
-    {E F : C} {t : ℝ}
-    (hE : σ.deformedGtPred C W hW ε₀ hε₀ hε₀2 hsin t E)
-    (hF : σ.deformedLePred C W hW ε₀ hε₀ hε₀2 hsin t F)
-    (f : E ⟶ F) : f = 0 := by
-  rcases hE with hEZ | ⟨GE, hGE⟩
-  · exact hEZ.eq_of_src f 0
-  rcases hF with hFZ | ⟨GF, hGF⟩
-  · exact hFZ.eq_of_tgt f 0
-  exact hom_eq_zero_of_phase_gap_deformed (C := C) (σ := σ) (W := W) (hW := hW)
-    hε₀ hε₀2 hε₀8 hsin GE GF
-    (fun i j ↦ lt_of_le_of_lt (hGF j) (hGE i)) f
-
-variable [IsTriangulated C] in
-/-- Orthogonality of `Q(> t)` and `Q(< t)`. This is the strict version of Node 7.8b used
-later for the strip categories `Q((t, t + δ))`. -/
-theorem StabilityCondition.hom_eq_zero_of_deformedGt_deformedLt
-    (σ : StabilityCondition C)
-    (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
-    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
-    (hε₀8 : ε₀ < 1 / 8)
-    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
-    {E F : C} {t : ℝ}
-    (hE : σ.deformedGtPred C W hW ε₀ hε₀ hε₀2 hsin t E)
-    (hF : σ.deformedLtPred C W hW ε₀ hε₀ hε₀2 hsin t F)
-    (f : E ⟶ F) : f = 0 := by
-  rcases hE with hEZ | ⟨GE, hGE⟩
-  · exact hEZ.eq_of_src f 0
-  rcases hF with hFZ | ⟨GF, hGF⟩
-  · exact hFZ.eq_of_tgt f 0
-  exact hom_eq_zero_of_phase_gap_deformed (C := C) (σ := σ) (W := W) (hW := hW)
-    hε₀ hε₀2 hε₀8 hsin GE GF
-    (fun i j ↦ lt_trans (hGF j) (hGE i)) f
-
-variable [IsTriangulated C] in
 /-- A length-one HN filtration presents the ambient object as isomorphic to its unique factor.
 Hence, if the phase predicate is closed under isomorphisms, the ambient object is semistable
 of that same phase. -/
@@ -10427,6 +10339,94 @@ private theorem split_hn_filtration_at_cutoff
               · exact le_of_lt (hφlast_lt ⟨j.val, hj⟩)
               · exact le_rfl
 
+
+variable [IsTriangulated C] in
+/-- Once a distinguished triangle is split at cutoff `t` into an object of `Q(> t)` and an
+object of `Q(≤ t)`, the middle term automatically has a full `Q`-HN filtration. This is the
+last generic step needed after constructing Bridgeland's p.24 truncation triangles. -/
+private theorem exists_hn_of_deformedGt_deformedLe_triangle
+    (σ : StabilityCondition C)
+    (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    {t : ℝ} {X E Y : C} {f : X ⟶ E} {g : E ⟶ Y} {h : Y ⟶ X⟦(1 : ℤ)⟧}
+    (hT : Triangle.mk f g h ∈ distTriang C)
+    (hX : σ.deformedGtPred C W hW ε₀ hε₀ hε₀2 hsin t X)
+    (hY : σ.deformedLePred C W hW ε₀ hε₀ hε₀2 hsin t Y) :
+    Nonempty (HNFiltration C (σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin) E) := by
+  rcases hX with hXZ | ⟨GX, hGX⟩
+  · haveI : IsIso g := (Triangle.isZero₁_iff_isIso₂ _ hT).mp hXZ
+    rcases hY with hYZ | ⟨GY, _⟩
+    · have hEZ : IsZero E := (Triangle.isZero₃_iff_isZero₂ _ hT).mp hYZ
+      exact ⟨HNFiltration.zero C (P := σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin)
+        E hEZ⟩
+    · exact ⟨GY.ofIso C (asIso g).symm⟩
+  · rcases hY with hYZ | ⟨GY, hGY⟩
+    · haveI : IsIso f := (Triangle.isZero₃_iff_isIso₁ _ hT).mp hYZ
+      exact ⟨GX.ofIso C (asIso f)⟩
+    · have hPiso :
+          ∀ φ : ℝ,
+            (σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin φ).IsClosedUnderIsomorphisms :=
+        σ.deformedPred_closedUnderIso C W hW ε₀ hε₀ hε₀2 hsin
+      let jLast : Fin GY.n := ⟨GY.n - 1, by have := GY.hn; omega⟩
+      let t0 : ℝ := GY.φ jLast - 1
+      have hGX_gt : ∀ j : Fin GX.n, t0 < GX.φ j := by
+        intro j
+        exact lt_trans (by dsimp [t0]; linarith [hGY jLast]) (lt_of_lt_of_le (hGY jLast) (hGX j))
+      have hGY_gt : ∀ i : Fin GY.n, t0 < GY.φ i := by
+        intro i
+        dsimp [t0]
+        calc
+          GY.φ jLast - 1 < GY.φ jLast := by linarith
+          _ ≤ GY.φ i := GY.hφ.antitone (Fin.mk_le_mk.mpr (by omega))
+      have hsep : ∀ i : Fin GY.n, ∀ j : Fin GX.n, GY.φ i < GX.φ j := by
+        intro i j
+        exact lt_of_le_of_lt (hGY i) (hGX j)
+      obtain ⟨G, _⟩ :=
+        append_hn_filtration_of_triangle (C := C) hPiso GX GY f g h hT t0 hGX_gt hGY_gt hsep
+      exact ⟨G⟩
+
+variable [IsTriangulated C] in
+/-- **Orthogonality of Q(> t) and Q(≤ t)** (**Node 7.8b**). Every morphism from a
+`Q(> t)`-object to a `Q(≤ t)`-object is zero, by the sharp hom-vanishing (Node 7.6). -/
+theorem StabilityCondition.hom_eq_zero_of_deformedGt_deformedLe
+    (σ : StabilityCondition C)
+    (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hε₀8 : ε₀ < 1 / 8)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    {E F : C} {t : ℝ}
+    (hE : σ.deformedGtPred C W hW ε₀ hε₀ hε₀2 hsin t E)
+    (hF : σ.deformedLePred C W hW ε₀ hε₀ hε₀2 hsin t F)
+    (f : E ⟶ F) : f = 0 := by
+  rcases hE with hEZ | ⟨GE, hGE⟩
+  · exact hEZ.eq_of_src f 0
+  rcases hF with hFZ | ⟨GF, hGF⟩
+  · exact hFZ.eq_of_tgt f 0
+  exact hom_eq_zero_of_phase_gap_deformed (C := C) (σ := σ) (W := W) (hW := hW)
+    hε₀ hε₀2 hε₀8 hsin GE GF
+    (fun i j ↦ lt_of_le_of_lt (hGF j) (hGE i)) f
+
+variable [IsTriangulated C] in
+/-- Orthogonality of `Q(> t)` and `Q(< t)`. This is the strict version of Node 7.8b used
+later for the strip categories `Q((t, t + δ))`. -/
+theorem StabilityCondition.hom_eq_zero_of_deformedGt_deformedLt
+    (σ : StabilityCondition C)
+    (W : K₀ C →+ ℂ) (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hε₀8 : ε₀ < 1 / 8)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    {E F : C} {t : ℝ}
+    (hE : σ.deformedGtPred C W hW ε₀ hε₀ hε₀2 hsin t E)
+    (hF : σ.deformedLtPred C W hW ε₀ hε₀ hε₀2 hsin t F)
+    (f : E ⟶ F) : f = 0 := by
+  rcases hE with hEZ | ⟨GE, hGE⟩
+  · exact hEZ.eq_of_src f 0
+  rcases hF with hFZ | ⟨GF, hGF⟩
+  · exact hFZ.eq_of_tgt f 0
+  exact hom_eq_zero_of_phase_gap_deformed (C := C) (σ := σ) (W := W) (hW := hW)
+    hε₀ hε₀2 hε₀8 hsin GE GF
+    (fun i j ↦ lt_trans (hGF j) (hGE i)) f
 variable [IsTriangulated C] in
 /-- A `Q`-HN filtration split at cutoff `t` gives the paper's truncation triangle whose two
 pieces lie in `Q(> t)` and `Q(≤ t)`. -/
