@@ -23,6 +23,12 @@ Example: for `hn_exists`, the paper has two steps — (1) every σ-semistable ob
 
 If a sorry for an earlier result (e.g., local finiteness, Proposition 5.3) doesn't cause type errors in later theorems that should depend on it, something is wrong. It likely means a definition upstream has baked in the conclusion, making the sorry vacuously bypassable. Trace the dependency: if the paper says Step N uses Step M, the formalization must too. A "clean" build with missing steps means the dependency graph doesn't match the paper.
 
+## Factor generic reasoning out of domain-specific proofs
+
+When the same inductive structure appears in multiple proofs, extract the reasoning into a generic lemma on that structure. The domain-specific theorems become one-liners that supply the generator-level fact. This reduces sorry count faster, handles the induction once correctly, and keeps domain-specific code focused on domain-specific content (e.g., phase arithmetic, not induction bookkeeping).
+
+Example: `ExtensionClosure.hom_eq_zero` (if generators are orthogonal, extension closures are orthogonal) proved both `hom_eq_zero_of_deformedGt_deformedLe` and `hom_eq_zero_of_deformedGt_deformedLt` as one-liners.
+
 ## Keep files short and thematically focused
 
 Long files make build-edit-check cycles painfully slow — Lean re-elaborates the entire file on each change. Split early and split by theme. Each file should cover one coherent piece of the argument (e.g., one section of the paper, one major lemma and its helpers). If a file is getting unwieldy, split it before it becomes a problem.
