@@ -10357,9 +10357,9 @@ private theorem exists_hn_of_deformedGt_deformedLe_triangle
   rcases hX with hXZ | ⟨GX, hGX⟩
   · haveI : IsIso g := (Triangle.isZero₁_iff_isIso₂ _ hT).mp hXZ
     rcases hY with hYZ | ⟨GY, _⟩
-    · have hEZ : IsZero E := (Triangle.isZero₃_iff_isZero₂ _ hT).mp hYZ
+    · -- X zero ⟹ g iso; Y zero ⟹ E ≅ Y zero
       exact ⟨HNFiltration.zero C (P := σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin)
-        E hEZ⟩
+        E (IsZero.of_iso hYZ (asIso g))⟩
     · exact ⟨GY.ofIso C (asIso g).symm⟩
   · rcases hY with hYZ | ⟨GY, hGY⟩
     · haveI : IsIso f := (Triangle.isZero₃_iff_isIso₁ _ hT).mp hYZ
@@ -10368,23 +10368,25 @@ private theorem exists_hn_of_deformedGt_deformedLe_triangle
           ∀ φ : ℝ,
             (σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin φ).IsClosedUnderIsomorphisms :=
         σ.deformedPred_closedUnderIso C W hW ε₀ hε₀ hε₀2 hsin
-      let jLast : Fin GY.n := ⟨GY.n - 1, by have := GY.hn; omega⟩
-      let t0 : ℝ := GY.φ jLast - 1
-      have hGX_gt : ∀ j : Fin GX.n, t0 < GX.φ j := by
-        intro j
-        exact lt_trans (by dsimp [t0]; linarith [hGY jLast]) (lt_of_lt_of_le (hGY jLast) (hGX j))
-      have hGY_gt : ∀ i : Fin GY.n, t0 < GY.φ i := by
-        intro i
-        dsimp [t0]
-        calc
-          GY.φ jLast - 1 < GY.φ jLast := by linarith
-          _ ≤ GY.φ i := GY.hφ.antitone (Fin.mk_le_mk.mpr (by omega))
-      have hsep : ∀ i : Fin GY.n, ∀ j : Fin GX.n, GY.φ i < GX.φ j := by
-        intro i j
-        exact lt_of_le_of_lt (hGY i) (hGX j)
-      obtain ⟨G, _⟩ :=
-        append_hn_filtration_of_triangle (C := C) hPiso GX GY f g h hT t0 hGX_gt hGY_gt hsep
-      exact ⟨G⟩
+      rcases Nat.eq_zero_or_pos GY.n with hGYn0 | hGYn
+      · -- GY.n = 0: Y is zero, so f is iso and E ≅ X has HN via GX
+        haveI : IsIso f := (Triangle.isZero₃_iff_isIso₁ _ hT).mp (GY.zero_isZero hGYn0)
+        exact ⟨GX.ofIso C (asIso f)⟩
+      · -- GY.n > 0: concatenate GX and GY HN filtrations across the triangle
+        let jLast : Fin GY.n := ⟨GY.n - 1, by omega⟩
+        let t0 : ℝ := GY.φ jLast - 1
+        have hGX_gt : ∀ j : Fin GX.n, t0 < GX.φ j := by
+          intro j; dsimp [t0]; linarith [hGY jLast, hGX j]
+        have hGY_gt : ∀ i : Fin GY.n, t0 < GY.φ i := by
+          intro i; dsimp [t0]
+          calc GY.φ jLast - 1 < GY.φ jLast := by linarith
+            _ ≤ GY.φ i := GY.hφ.antitone (Fin.mk_le_mk.mpr (by omega))
+        have hsep : ∀ i : Fin GY.n, ∀ j : Fin GX.n, GY.φ i < GX.φ j := by
+          intro i j; exact lt_of_le_of_lt (hGY i) (hGX j)
+        obtain ⟨G, _⟩ :=
+          append_hn_filtration_of_triangle (C := C) hPiso GX GY f g h hT t0
+            hGX_gt hGY_gt hsep
+        exact ⟨G⟩
 
 variable [IsTriangulated C] in
 /-- **Orthogonality of Q(> t) and Q(≤ t)** (**Node 7.8b**). Every morphism from a
