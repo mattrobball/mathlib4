@@ -14282,67 +14282,11 @@ theorem sigma_semistable_intervalProp
     {δ : ℝ} (hδ : 0 < δ) :
     (σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hWide hsin).intervalProp C
       (φ - ε₀ - δ) (φ + ε₀ + δ) E := by
-  by_cases hEz : IsZero E
-  · exact Or.inl hEz
-  let η : ℝ := min δ ε₀
-  have hη_pos : 0 < η := by
-    dsimp [η]
-    exact lt_min hδ hε₀
-  have hη_le_δ : η ≤ δ := by
-    dsimp [η]
-    exact min_le_left _ _
-  have hη_le_ε₀ : η ≤ ε₀ := by
-    dsimp [η]
-    exact min_le_right _ _
-  let a : ℝ := φ - η / 2
-  let b : ℝ := φ + η / 2
-  have hab : a < b := by
-    dsimp [a, b]
-    linarith
-  letI : Fact (a < b) := ⟨hab⟩
-  letI : Fact (b - a ≤ 1) := ⟨by
-    dsimp [a, b]
-    linarith [hη_le_ε₀, hε₀2]⟩
-  have hFiniteLength : ThinFiniteLengthInInterval (C := C) σ a b := by
-    refine ThinFiniteLengthInInterval.of_wide (C := C) σ (t := φ) hε₀ hε₀8 ?_ ?_ hWide
-    · dsimp [a]
-      linarith [hη_le_ε₀]
-    · dsimp [b]
-      linarith [hη_le_ε₀]
-  have hthin : b - a + 2 * ε₀ < 1 := by
-    dsimp [a, b]
-    linarith [hη_le_ε₀, hε₀2]
-  have hI : σ.slicing.intervalProp C a b E := by
-    exact σ.slicing.intervalProp_of_semistable C hP
-      (by
-        dsimp [a]
-        linarith [hη_pos])
-      (by
-        dsimp [b]
-        linarith [hη_pos])
-  let EI : σ.slicing.IntervalCat C a b := ⟨E, hI⟩
-  have hEI : ¬IsZero EI := by
-    intro hZ
-    exact hEz (((σ.slicing.intervalProp C a b).ι).map_isZero hZ)
-  obtain ⟨G, hGφ⟩ :=
-    exists_deformedHN_of_thin_interval
-      (C := C) (σ := σ) (W := W) (hW := hW) hab
-      hFiniteLength hε₀ hε₀2 hε₀8 hthin hsin
-      (X := EI) hEI
-  let Q := σ.deformedSlicing C W hW ε₀ hε₀ hε₀2 hε₀8 hWide hsin
-  apply intervalProp_of_postnikovTower C Q G.toPostnikovTower
-  intro i
-  by_cases hGi : IsZero (G.toPostnikovTower.factor i)
-  · exact Or.inl hGi
-  · exact Q.intervalProp_of_semistable C (G.semistable i)
-      (by
-        have hφi := hGφ i
-        dsimp [a] at hφi
-        linarith [hη_le_δ])
-      (by
-        have hφi := hGφ i
-        dsimp [b] at hφi
-        linarith [hη_le_δ])
+  -- Bridgeland p.24: embed E ∈ P(φ) in wide interval P((φ-3ε₀, φ+5ε₀)),
+  -- apply Lemma 7.7 (exists_deformedHN_of_enveloped_interval), then read off
+  -- the Q-interval bounds from the HN factor phases.
+  -- Previous proof routed through unfaithful exists_deformedHN_of_thin_interval.
+  sorry
 
 /-! ### Deformation theorem (Theorem 7.1) -/
 
