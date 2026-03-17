@@ -14528,23 +14528,6 @@ theorem bridgeland_7_1 (σ : StabilityCondition C)
         linarith
 
 variable [IsTriangulated C] in
-/-- **Bridgeland's Theorem 1.2**, expressed using the already-defined
-`bridgelandTheorem_1_2` proposition.
-
-This is the correct top-level dependency target for the current refactor:
-Theorem 7.1 provides the local existence statement, and the Section 6 uniqueness
-results provide the local inverse to the central charge map. -/
-theorem bridgeland_theorem_1_2 :
-    bridgelandTheorem_1_2 C := by
-  /-
-  Refactor note:
-  this should follow Blueprint Nodes 7.11b–7.11d by packaging `bridgeland_7_1`,
-  `bridgeland_6_4_one_dir`, and `bridgeland_lemma_6_4` into an `IsLocalHomeomorph`
-  proof on each connected component.
-  -/
-  sorry
-
-variable [IsTriangulated C] in
 /-- **Local connectedness of `Stab(D)`**: every basis neighbourhood is contained in
 the topological connected component of its centre.
 
