@@ -19,6 +19,10 @@ The Lean declarations should mirror the logical skeleton of Bridgeland's proofs.
 
 Example: for `hn_exists`, the paper has two steps — (1) every σ-semistable object admits a Q(>t)/Q(≤t) truncation triangle, (2) every object does (by σ-HN + octahedral). The API should have separate declarations for Step 1, Step 2, and the composition, so that Step 1 can be proven mechanically while Step 2 carries the sorry for the real content.
 
+## Sorries that don't break downstream are a red flag
+
+If a sorry for an earlier result (e.g., local finiteness, Proposition 5.3) doesn't cause type errors in later theorems that should depend on it, something is wrong. It likely means a definition upstream has baked in the conclusion, making the sorry vacuously bypassable. Trace the dependency: if the paper says Step N uses Step M, the formalization must too. A "clean" build with missing steps means the dependency graph doesn't match the paper.
+
 ## Keep files short and thematically focused
 
 Long files make build-edit-check cycles painfully slow — Lean re-elaborates the entire file on each change. Split early and split by theme. Each file should cover one coherent piece of the argument (e.g., one section of the paper, one major lemma and its helpers). If a file is getting unwieldy, split it before it becomes a problem.
