@@ -13168,6 +13168,23 @@ private theorem exists_P_phi_quotient_factorisation_phase_ge
   exact ⟨I_H, q_I, i_I, inferInstance, inferInstance, hqIi, hI_Pφ, hIne, hI_phase_ge⟩
 
 
+variable [IsTriangulated C] in
+/-- **σ-semistable objects have Q-HN filtrations** (Bridgeland p.24).
+For E ∈ P(φ), embed E in the wide interval P((φ-3ε₀, φ+5ε₀)) and apply Lemma 7.7
+(`exists_deformedHN_of_enveloped_interval`). The enveloping condition is automatic
+since phase confinement (Lemma 7.3) gives W-phases in (φ-ε₀, φ+ε₀) ⊂ (a+ε₀, b-ε₀). -/
+private theorem sigmaSemistable_hasDeformedHN
+    (σ : StabilityCondition C) (W : K₀ C →+ ℂ)
+    (hW : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal 1)
+    {ε₀ : ℝ} (hε₀ : 0 < ε₀) (hε₀2 : ε₀ < 1 / 4)
+    (hε₀8 : ε₀ < 1 / 8)
+    (hWide : WideSectorFiniteLength (C := C) σ ε₀ hε₀ hε₀8)
+    (hsin : stabSeminorm C σ (W - σ.Z) < ENNReal.ofReal (Real.sin (Real.pi * ε₀)))
+    {E : C} {φ : ℝ} (hP : σ.slicing.P φ E) (hE : ¬IsZero E) :
+    Nonempty (HNFiltration C (σ.deformedPred C W hW ε₀ hε₀ hε₀2 hsin) E) := by
+  -- Bridgeland p.24: embed E in P((φ-3ε₀, φ+5ε₀)), apply Lemma 7.7.
+  sorry
+
 /-! #### Step A4: Main theorem -/
 
 variable [IsTriangulated C] in
